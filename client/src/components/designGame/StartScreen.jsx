@@ -117,12 +117,12 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
           </span>
         ) : (
           <span className="flex items-center gap-2">
-            Start Playing <ArrowRight className="h-5 w-5" />
+            Start Single Player Game <ArrowRight className="h-5 w-5" />
           </span>
         )}
       </Button>
 
-      <div className="mt-4 flex flex-col items-center space-y-3">
+      <div className="mt-4 flex flex-col items-center space-y-4">
         <button
           type="button"
           onClick={onPortfolio}
@@ -130,12 +130,20 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
         >
           View my portfolio →
         </button>
+
+        {/* Multiplayer Divider & Button */}
+        <div className="w-full flex items-center justify-center space-x-2 py-2">
+          <div className="h-px bg-white/20 flex-1"></div>
+          <span className="text-[10px] uppercase font-bold text-white/50 tracking-widest">or play with friends</span>
+          <div className="h-px bg-white/20 flex-1"></div>
+        </div>
+
         <button
           type="button"
           onClick={() => window.location.href = '/multiplayer'}
-          className="text-amber-300 hover:text-amber-200 text-xs font-extrabold bg-black/25 hover:bg-black/40 rounded-full px-5 py-2 transition shadow-lg border border-amber-500/30"
+          className="w-full text-amber-300 hover:text-amber-200 text-sm font-extrabold bg-black/35 hover:bg-black/50 rounded-2xl py-4 transition shadow-xl border border-amber-500/35"
         >
-          🎮 Play Multiplayer Battle Mode
+          🎮 Enter Multiplayer Battle Arena
         </button>
       </div>
     </motion.div>

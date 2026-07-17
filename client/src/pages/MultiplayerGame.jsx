@@ -418,6 +418,9 @@ export default function MultiplayerGame() {
                       Waiting for Host to start...
                     </div>
                   )}
+                  <Button variant="ghost" onClick={() => { setMode("setup"); setRoom(null); }} className="w-full text-white/70 hover:text-white mt-3 text-xs">
+                    Leave Room & Exit
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
@@ -511,6 +514,9 @@ export default function MultiplayerGame() {
                       </div>
                     ))}
                   </div>
+                  <Button variant="ghost" onClick={() => { setMode("setup"); setRoom(null); }} className="w-full text-white/50 hover:text-white/80 mt-3 text-xs">
+                    Quit Game & Exit
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
@@ -611,12 +617,20 @@ export default function MultiplayerGame() {
                 </CardContent>
               </Card>
 
-              <Button 
-                onClick={() => setMode("setup")}
-                className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 shadow-lg"
-              >
-                🎮 Play Again
-              </Button>
+              <div className="flex gap-4">
+                <Button 
+                  onClick={() => { setMode("setup"); setRoom(null); }}
+                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 shadow-lg text-sm rounded-xl"
+                >
+                  🎮 Play Again
+                </Button>
+                <Button 
+                  onClick={() => navigate("/")}
+                  className="flex-1 bg-black/35 hover:bg-black/55 text-white font-bold py-4 shadow-lg text-sm rounded-xl border border-white/10"
+                >
+                  🏠 Single Player
+                </Button>
+              </div>
             </motion.div>
           )}
 
