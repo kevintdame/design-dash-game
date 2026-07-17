@@ -233,7 +233,7 @@ Requirements:
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -308,7 +308,7 @@ RULES OF CONVERSATION:
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
       contents: contents,
       config: {
         systemInstruction: systemInstruction,
@@ -359,7 +359,7 @@ Rules:
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -434,7 +434,7 @@ For EACH idea (in order), give honest, specific feedback from your perspective a
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -508,7 +508,7 @@ Then write a short, in-character review (2-4 sentences) as this customer reactin
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
