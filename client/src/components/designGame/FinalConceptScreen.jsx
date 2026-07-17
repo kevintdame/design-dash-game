@@ -13,9 +13,9 @@ export default function FinalConceptScreen({ challenge, onSubmit, loading }) {
   ]);
 
   const ready =
-    problem.trim().length > 15 &&
-    solutionOverview.trim().length > 15 &&
-    features.every((f) => f.title.trim().length > 2 && f.description.trim().length > 10);
+    problem.trim().length > 0 &&
+    solutionOverview.trim().length > 0 &&
+    features.every((f) => f.title.trim().length > 0 && f.description.trim().length > 0);
 
   function updateFeature(i, field, val) {
     const next = [...features];
