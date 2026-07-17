@@ -22,7 +22,7 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-display">
             Design Dash
           </h1>
-          <p className="text-white/80 text-xs sm:text-sm mt-1">
+          <p className="text-pink-100/80 text-xs sm:text-sm mt-1">
             Solve real-world design challenges and pitch your ideas to virtual customers.
           </p>
         </div>
@@ -33,18 +33,18 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
         {/* Single Player Card */}
         <Card 
           onClick={onSelectSingle}
-          className="bg-white/10 border-white/20 hover:border-white/40 text-white backdrop-blur-md cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-2xl text-left"
+          className="bg-white/10 border-white/20 hover:border-white/35 text-white backdrop-blur-md cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-2xl text-left rounded-3xl"
         >
           <CardContent className="p-5 flex items-start space-x-4">
-            <div className="h-12 w-12 rounded-2xl bg-white text-purple-700 flex items-center justify-center shrink-0 shadow-md">
-              <User className="h-6 w-6" />
+            <div className="h-12 w-12 rounded-2xl bg-white/15 text-white flex items-center justify-center shrink-0 shadow-inner ring-1 ring-white/15">
+              <User className="h-5 w-5" />
             </div>
             <div className="flex-1 space-y-1">
               <div className="font-extrabold text-base flex items-center justify-between">
                 <span>Single Player Sprint</span>
-                <ArrowRight className="h-4 w-4 opacity-70" />
+                <ArrowRight className="h-4 w-4 opacity-75" />
               </div>
-              <p className="text-white/70 text-xs leading-relaxed">
+              <p className="text-pink-100/70 text-xs leading-relaxed">
                 Take on a design sprint solo and pitch your final solution to a virtual customer.
               </p>
             </div>
@@ -54,18 +54,18 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
         {/* Multiplayer Card */}
         <Card 
           onClick={onSelectMulti}
-          className="bg-black/25 border-amber-500/20 hover:border-amber-500/40 text-white backdrop-blur-md cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-2xl text-left"
+          className="bg-white/10 border-white/20 hover:border-white/35 text-white backdrop-blur-md cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-2xl text-left rounded-3xl"
         >
           <CardContent className="p-5 flex items-start space-x-4">
-            <div className="h-12 w-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md">
-              <Users className="h-6 w-6" />
+            <div className="h-12 w-12 rounded-2xl bg-white/15 text-white flex items-center justify-center shrink-0 shadow-inner ring-1 ring-white/15">
+              <Users className="h-5 w-5" />
             </div>
             <div className="flex-1 space-y-1">
-              <div className="font-extrabold text-base text-amber-300 flex items-center justify-between">
+              <div className="font-extrabold text-base flex items-center justify-between">
                 <span>Multiplayer Battle Arena</span>
-                <ArrowRight className="h-4 w-4 opacity-70" />
+                <ArrowRight className="h-4 w-4 opacity-75" />
               </div>
-              <p className="text-white/70 text-xs leading-relaxed">
+              <p className="text-pink-100/70 text-xs leading-relaxed">
                 Create a room or join friends to compete on the same challenge side-by-side.
               </p>
             </div>
@@ -77,9 +77,9 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
       <button
         type="button"
         onClick={onPortfolio}
-        className="text-white/60 hover:text-white text-xs font-semibold underline-offset-4 hover:underline transition mt-2"
+        className="text-pink-100/70 hover:text-white text-xs font-semibold underline-offset-4 hover:underline transition mt-2"
       >
-        📂 View My Design Portfolio →
+        View My Design Portfolio →
       </button>
     </motion.div>
   );
