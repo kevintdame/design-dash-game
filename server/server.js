@@ -237,7 +237,10 @@ app.post('/api/challenge', async (req, res) => {
     event: "an event or live experience"
   }[constraint] || constraint;
 
+  const randomSeed = Math.random().toString(36).substring(7);
   const prompt = `You are a design thinking game master. Generate ONE compelling, realistic design challenge for a player to solve.
+
+[RANDOM SEED: ${randomSeed}]
 
 PLAYER-CHOSEN PARAMETERS:
 - Domain: ${domain}
@@ -256,6 +259,7 @@ Requirements:
       model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
+        temperature: 1.0,
         responseMimeType: 'application/json',
         responseSchema: {
           type: "OBJECT",
