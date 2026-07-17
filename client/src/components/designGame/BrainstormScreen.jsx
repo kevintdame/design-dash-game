@@ -14,21 +14,24 @@ const ENTHU = {
 export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedbacks, setFeedbacks, insights, onContinue }) {
   const [loading, setLoading] = useState(false);
 
-  const allFilled = ideas.every((i) => i.trim().length > 0);
+  const hasAtLeastOne = ideas.some((i) => i.trim().length > 0);
 
   async function handleGetFeedback() {
-    if (!allFilled) return;
+    if (!hasAtLeastOne) return;
     setLoading(true);
     try {
       const { getIdeaFeedback } = await import("@/lib/designGame");
-      const res = await getIdeaFeedback(challenge, ideas);
-      setFeedbacks(res);
+      const activeIdeas = ideas.filter(i => i.trim().length > 0);
+      const res = await getIdeaFeedback(challenge, activeIdeas);
+      
+      const mappedFeedbacks = ideas.map((idea) => {
+        if (!idea.trim()) return null;
+        const activeIdx = activeIdeas.findIndex(ai => ai === idea);
+        return res[activeIdx] || { feedback: "No feedback available.", enthusiasm: "neutral" };
+      });
+      setFeedbacks(mappedFeedbacks);
     } catch (e) {
-      setFeedbacks([
-        { feedback: "I couldn't process that — try refining your ideas and submit again.", enthusiasm: "neutral" },
-        { feedback: "I couldn't process that — try refining your ideas and submit again.", enthusiasm: "neutral" },
-        { feedback: "I couldn't process that — try refining your ideas and submit again.", enthusiasm: "neutral" }
-      ]);
+      setFeedbacks(ideas.map(idea => idea.trim() ? { feedback: "I couldn't process this idea.", enthusiasm: "neutral" } : null));
     } finally {
       setLoading(false);
     }
@@ -104,7 +107,7 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
       {!hasFeedback ? (
         <Button
           onClick={handleGetFeedback}
-          disabled={!allFilled || loading}
+          disabled={!hasAtLeastOne || loading}
           className="w-full bg-white text-purple-700 hover:bg-white/90 font-bold rounded-2xl h-12 shadow-md disabled:opacity-50"
         >
           {loading ? (
