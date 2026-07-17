@@ -48,15 +48,15 @@ export default function StartScreen({ onStart, loading, onBack }) {
     >
       {/* Header */}
       <div className="flex flex-col items-center space-y-2 text-center">
-        <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Step 2 of 3</div>
-        <h2 className="text-3xl font-black uppercase tracking-tighter bg-gradient-to-r from-[#c93c76] to-[#de573a] bg-clip-text text-transparent font-sans">
-          Choose a Domain
+        <div className="text-[10px] uppercase font-extrabold text-white/80 tracking-widest">Step 2 of 3</div>
+        <h2 className="text-3xl font-black uppercase tracking-tighter text-white font-sans drop-shadow-sm">
+          Choose a Domain 🎯
         </h2>
-        <p className="text-slate-500 text-xs font-semibold">Pick the focus area for your design challenge.</p>
+        <p className="text-white/90 text-xs font-bold font-sans">Pick the focus area for your design challenge.</p>
       </div>
 
       {/* Domain Selection */}
-      <div className="text-left w-full bg-white border border-slate-100 rounded-[32px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.04)]">
+      <div className="text-left w-full bg-white border border-slate-100 rounded-[32px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.06)]">
         <div className="flex flex-wrap justify-center gap-2">
           {DOMAINS.map((d) => (
             <Chip key={d} active={domain === d} onClick={() => setDomain(d)}>
@@ -89,7 +89,7 @@ export default function StartScreen({ onStart, loading, onBack }) {
         <button
           type="button"
           onClick={onBack}
-          className="w-full flex items-center justify-center space-x-1.5 text-slate-400 hover:text-slate-900 text-xs font-bold py-2 transition"
+          className="w-full flex items-center justify-center space-x-1.5 text-white/90 hover:text-white text-xs font-extrabold py-2 transition"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Go Back</span>

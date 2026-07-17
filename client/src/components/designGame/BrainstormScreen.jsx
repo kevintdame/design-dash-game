@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import InsightWall from "@/components/designGame/InsightWall";
 
 const ENTHU = {
-  excited: { icon: ThumbsUp, color: "text-emerald-600", ring: "ring-emerald-300/40", bg: "bg-emerald-50" },
-  interested: { icon: ThumbsUp, color: "text-blue-600", ring: "ring-blue-300/40", bg: "bg-blue-50" },
-  neutral: { icon: Meh, color: "text-amber-600", ring: "ring-amber-200/40", bg: "bg-amber-50" },
-  skeptical: { icon: ThumbsDown, color: "text-rose-600", ring: "ring-rose-300/40", bg: "bg-rose-50" }
+  excited: { icon: ThumbsUp, color: "text-emerald-600", emoji: "🔥", bg: "bg-emerald-50" },
+  interested: { icon: ThumbsUp, color: "text-blue-600", emoji: "👍", bg: "bg-blue-50" },
+  neutral: { icon: Meh, color: "text-amber-600", emoji: "😐", bg: "bg-amber-50" },
+  skeptical: { icon: ThumbsDown, color: "text-[#f74872]", emoji: "🤔", bg: "bg-rose-50" }
 };
 
 export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedbacks, setFeedbacks, insights, onContinue }) {
@@ -44,13 +44,13 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
-      className="max-w-md mx-auto"
+      className="max-w-md mx-auto font-sans"
     >
-      <div className="flex items-center gap-2 text-slate-500 mb-2">
+      <div className="flex items-center gap-2 text-white mb-2 font-extrabold">
         <Lightbulb className="h-4 w-4" />
-        <span className="text-xs font-extrabold uppercase tracking-widest">Brainstorm</span>
+        <span className="text-xs uppercase tracking-widest">Brainstorm</span>
       </div>
-      <p className="text-slate-600 text-sm font-semibold mb-4">
+      <p className="text-white/95 text-sm font-bold mb-4">
         Based on your research, write your <strong>3 best ideas</strong> for {challenge.customer_name.split(" ")[0]}.
       </p>
 
@@ -60,17 +60,16 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
         {ideas.map((idea, i) => {
           const fb = feedbacks[i];
           const enthu = fb ? ENTHU[fb.enthusiasm] || ENTHU.neutral : null;
-          const Icon = enthu?.icon;
           return (
-            <div key={i} className="bg-white border border-slate-100 rounded-[28px] p-5 shadow-[0_12px_40px_rgba(0,0,0,0.03)]">
+            <div key={i} className="bg-white border border-slate-100 rounded-[28px] p-5 shadow-[0_12px_40px_rgba(0,0,0,0.06)]">
               <div className="flex items-center gap-2 mb-2">
                 <div className="h-6 w-6 rounded-full bg-slate-900 text-white text-xs font-black flex items-center justify-center">
                   {i + 1}
                 </div>
-                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Idea {i + 1}</span>
-                {Icon && (
-                  <span className={`ml-auto flex items-center gap-1 text-[10px] font-extrabold uppercase ${enthu.color}`}>
-                    <Icon className="h-3.5 w-3.5" /> {fb.enthusiasm}
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Idea {i + 1} 💡</span>
+                {enthu && (
+                  <span className={`ml-auto flex items-center gap-1 text-[10px] font-black uppercase ${enthu.color}`}>
+                    {enthu.emoji} {fb.enthusiasm}
                   </span>
                 )}
               </div>
@@ -85,7 +84,7 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
                 placeholder={`Describe idea ${i + 1}...`}
                 rows={2}
                 disabled={hasFeedback}
-                className="w-full text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none resize-none bg-transparent"
+                className="w-full text-xs font-bold text-slate-800 placeholder:text-slate-400 outline-none resize-none bg-transparent"
               />
               <AnimatePresence>
                 {fb && (

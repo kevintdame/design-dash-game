@@ -134,7 +134,7 @@ export default function Game() {
 
   return (
     <div className="h-[100dvh] w-full bg-[#eef3f0] overflow-hidden flex flex-col">
-      <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-gradient-to-br from-[#fbf5f2] via-[#f7eef5] to-[#f0f6f8]">
+      <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-gradient-to-tr from-[#ff8e6e] via-[#f74872] to-[#ffd269]">
         <div className="min-h-full flex flex-col px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto justify-center">
           {showProgress && (
             <div className="mb-6 shrink-0 flex items-center justify-between">

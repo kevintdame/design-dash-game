@@ -36,22 +36,22 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
-      className="max-w-md mx-auto flex flex-col h-full"
+      className="max-w-md mx-auto flex flex-col h-full font-sans"
     >
-      <div className="flex items-center gap-2 text-slate-500 mb-2">
+      <div className="flex items-center gap-2 text-white/95 mb-2 font-extrabold">
         <MessageCircle className="h-4 w-4" />
-        <span className="text-xs font-extrabold uppercase tracking-widest">
-          Interview · {questionsLeft} {questionsLeft === 1 ? "question" : "questions"} left
+        <span className="text-xs uppercase tracking-widest">
+          Interview · {questionsLeft} {questionsLeft === 1 ? "question" : "questions"} left 💬
         </span>
       </div>
-      <p className="text-slate-600 text-sm font-semibold mb-4">
+      <p className="text-white/95 text-sm font-bold mb-4">
         Ask {challenge.customer_name.split(" ")[0]} anything to understand their needs.
       </p>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-1 -mr-1 mb-4 min-h-[200px] sm:min-h-[280px]">
         {qa.length === 0 && !loading && (
           <div className="h-full flex items-center justify-center text-center py-10">
-            <p className="text-slate-400 text-xs font-semibold max-w-[15rem] leading-relaxed">
+            <p className="text-white/90 text-xs font-bold max-w-[15rem] leading-relaxed">
               Start the conversation — ask about their frustrations, daily routine, or what they wish existed.
             </p>
           </div>
@@ -65,7 +65,7 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
                 className="flex justify-end"
               >
                 <div className="bg-slate-900 text-white rounded-3xl rounded-tr-sm px-4.5 py-3 max-w-[85%] shadow-sm">
-                  <p className="text-xs leading-relaxed font-semibold">{item.question}</p>
+                  <p className="text-xs leading-relaxed font-bold">{item.question}</p>
                 </div>
               </motion.div>
               <motion.div
@@ -73,8 +73,8 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex justify-start mt-2"
               >
-                <div className="bg-white border border-slate-100 text-slate-800 rounded-3xl rounded-tl-sm px-4.5 py-3 max-w-[85%] shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-                  <p className="text-xs leading-relaxed font-semibold">{item.answer}</p>
+                <div className="bg-white border border-slate-100 text-slate-800 rounded-3xl rounded-tl-sm px-4.5 py-3 max-w-[85%] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                  <p className="text-xs leading-relaxed font-bold">{item.answer}</p>
                 </div>
               </motion.div>
             </div>
@@ -82,8 +82,8 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
         </AnimatePresence>
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-slate-100 text-slate-400 rounded-3xl rounded-tl-sm px-5 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
-              <Loader2 className="h-4 w-4 animate-spin" />
+            <div className="bg-white border border-slate-100 text-slate-400 rounded-3xl rounded-tl-sm px-5 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
             </div>
           </div>
         )}

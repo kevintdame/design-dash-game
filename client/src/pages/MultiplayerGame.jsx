@@ -242,7 +242,7 @@ export default function MultiplayerGame() {
   // Render components
   return (
     <div className="h-[100dvh] w-full bg-[#eef3f0] overflow-hidden flex flex-col">
-      <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-gradient-to-br from-[#fbf5f2] via-[#f7eef5] to-[#f0f6f8]">
+      <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-gradient-to-tr from-[#ff8e6e] via-[#f74872] to-[#ffd269]">
         <div className="min-h-full flex flex-col px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto justify-center">
           
           {error && (
@@ -519,9 +519,9 @@ export default function MultiplayerGame() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              <div className="text-center space-y-2">
-                <h1 className="text-3xl font-black uppercase tracking-tighter bg-gradient-to-r from-[#c93c76] via-[#de573a] to-[#f09c35] bg-clip-text text-transparent font-sans">🏆 Pitch Battle Results</h1>
-                <p className="text-slate-500 text-xs sm:text-sm font-semibold">Evaluated by your customer, {room.challenge.customer_name}</p>
+              <div className="text-center space-y-2 mb-2">
+                <h1 className="text-3xl font-black uppercase tracking-tighter text-white font-sans drop-shadow-md">🏆 Pitch Battle Results</h1>
+                <p className="text-white/95 text-xs sm:text-sm font-bold">Evaluated by your customer, {room.challenge.customer_name}</p>
               </div>
 
               {/* RATING LEADERS */}
