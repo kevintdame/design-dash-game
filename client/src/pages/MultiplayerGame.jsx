@@ -65,8 +65,8 @@ export default function MultiplayerGame() {
   const [actionLoading, setActionLoading] = useState(false);
 
   // Setup form states
-  const [setupDomain, setSetupDomain] = useState("Education");
-  const [setupConstraint, setSetupConstraint] = useState("app");
+  const queryParams = new URLSearchParams(window.location.search);
+  const [setupDomain, setSetupDomain] = useState(queryParams.get("domain") || "Education");
   const [setupTimer, setSetupTimer] = useState(480); // 8 mins
 
   // Poll room status when in lobby or waiting
@@ -107,13 +107,16 @@ export default function MultiplayerGame() {
     setActionLoading(true);
     setError(null);
     try {
+      const constraintsList = ["app", "product", "service", "event"];
+      const randomConstraint = constraintsList[Math.floor(Math.random() * constraintsList.length)];
+
       const res = await fetch("/api/rooms/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           creatorName: playerName.trim(),
           domain: setupDomain,
-          constraint: setupConstraint,
+          constraint: randomConstraint,
           timerDuration: setupTimer
         })
       });
@@ -290,33 +293,18 @@ export default function MultiplayerGame() {
                 <TabsContent value="create">
                   <Card className="bg-white/10 border-white/20 text-white backdrop-blur-md shadow-2xl">
                     <CardContent className="space-y-4 pt-6">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-xs text-white/60 uppercase font-bold">Domain</label>
-                          <select 
-                            value={setupDomain}
-                            onChange={e => setSetupDomain(e.target.value)}
-                            className="w-full bg-black/30 border border-white/20 rounded-md p-2 text-white"
-                          >
-                            <option value="Education">Education</option>
-                            <option value="Health & Wellness">Health</option>
-                            <option value="Finance">Finance</option>
-                            <option value="Productivity">Productivity</option>
-                          </select>
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs text-white/60 uppercase font-bold">Constraint</label>
-                          <select 
-                            value={setupConstraint}
-                            onChange={e => setSetupConstraint(e.target.value)}
-                            className="w-full bg-black/30 border border-white/20 rounded-md p-2 text-white"
-                          >
-                            <option value="app">Mobile App</option>
-                            <option value="product">Physical Product</option>
-                            <option value="service">Service Experience</option>
-                            <option value="event">Event Experience</option>
-                          </select>
-                        </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-white/60 uppercase font-bold">Domain</label>
+                        <select 
+                          value={setupDomain}
+                          onChange={e => setSetupDomain(e.target.value)}
+                          className="w-full bg-black/30 border border-white/20 rounded-md p-2 text-white"
+                        >
+                          <option value="Education">Education</option>
+                          <option value="Health & Wellness">Health</option>
+                          <option value="Finance">Finance</option>
+                          <option value="Productivity">Productivity</option>
+                        </select>
                       </div>
 
                       <div className="space-y-1.5">
