@@ -57,6 +57,7 @@ export default function MultiplayerGame() {
   const [stage, setStage] = useState("challenge"); // challenge | interview | brainstorm | finalConcept
   const [qa, setQa] = useState([]);
   const [ideas, setIdeas] = useState(["", "", ""]);
+  const [feedbacks, setFeedbacks] = useState([]);
   const [insights, setInsights] = useState([]);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const [localConcept, setLocalConcept] = useState({ problem: "", solutionOverview: "", features: [] });
@@ -438,7 +439,7 @@ export default function MultiplayerGame() {
                 {stage === "challenge" && (
                   <ChallengeScreen 
                     challenge={room.challenge}
-                    onNext={() => setStage("interview")}
+                    onContinue={() => setStage("interview")}
                   />
                 )}
 
@@ -447,7 +448,7 @@ export default function MultiplayerGame() {
                     challenge={room.challenge}
                     qa={qa}
                     setQa={setQa}
-                    onNext={handleInterviewDone}
+                    onContinue={handleInterviewDone}
                   />
                 )}
 
@@ -458,7 +459,9 @@ export default function MultiplayerGame() {
                     insightsLoading={insightsLoading}
                     ideas={ideas}
                     setIdeas={setIdeas}
-                    onNext={() => setStage("finalConcept")}
+                    feedbacks={feedbacks}
+                    setFeedbacks={setFeedbacks}
+                    onContinue={() => setStage("finalConcept")}
                   />
                 )}
 
@@ -466,7 +469,7 @@ export default function MultiplayerGame() {
                   <FinalConceptScreen 
                     challenge={room.challenge}
                     ideas={ideas}
-                    onNext={(concept) => {
+                    onSubmit={(concept) => {
                       setLocalConcept(concept);
                       submitConcept(concept);
                     }}
