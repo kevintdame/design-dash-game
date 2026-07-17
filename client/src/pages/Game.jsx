@@ -141,8 +141,17 @@ export default function Game() {
       <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
         <div className="min-h-full flex flex-col px-4 pt-5 pb-[calc(1rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto">
           {showProgress && (
-            <div className="mb-6 shrink-0">
-              <ProgressHeader currentIndex={currentIndex < 0 ? 0 : currentIndex} />
+            <div className="mb-6 shrink-0 flex items-center justify-between">
+              <div className="flex-1">
+                <ProgressHeader currentIndex={currentIndex < 0 ? 0 : currentIndex} />
+              </div>
+              <button 
+                onClick={handleRestart}
+                className="text-white/60 hover:text-white text-sm font-bold bg-white/10 hover:bg-white/20 rounded-full h-8 w-8 flex items-center justify-center transition ml-4 shrink-0 shadow-sm"
+                title="Exit to Main Menu"
+              >
+                ✕
+              </button>
             </div>
           )}
 

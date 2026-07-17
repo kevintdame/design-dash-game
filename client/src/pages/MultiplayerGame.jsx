@@ -419,11 +419,25 @@ export default function MultiplayerGame() {
             <div className="flex-1 flex flex-col">
               <TimerBanner deadline={room.deadline} onTimeout={handleTimeout} />
               
-              <div className="shrink-0 mb-6">
-                <ProgressHeader 
-                  currentIndex={STAGES.findIndex(s => s.key === stage) || 0} 
-                  stages={STAGES} 
-                />
+              <div className="shrink-0 mb-6 flex items-center justify-between">
+                <div className="flex-1">
+                  <ProgressHeader 
+                    currentIndex={STAGES.findIndex(s => s.key === stage) || 0} 
+                    stages={STAGES} 
+                  />
+                </div>
+                <button 
+                  onClick={() => {
+                    if (confirm("Exit game? This will remove you from the multiplayer room.")) {
+                      setMode("setup");
+                      setRoom(null);
+                    }
+                  }}
+                  className="text-white/60 hover:text-white text-sm font-bold bg-white/10 hover:bg-white/20 rounded-full h-8 w-8 flex items-center justify-center transition ml-4 shrink-0 shadow-sm"
+                  title="Exit to Setup"
+                >
+                  ✕
+                </button>
               </div>
 
               <div className="flex-1 flex flex-col justify-center">
