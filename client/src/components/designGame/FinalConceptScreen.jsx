@@ -12,10 +12,7 @@ export default function FinalConceptScreen({ challenge, onSubmit, loading }) {
     { title: "", description: "" }
   ]);
 
-  const ready =
-    problem.trim().length > 0 &&
-    solutionOverview.trim().length > 0 &&
-    features.every((f) => f.title.trim().length > 0 && f.description.trim().length > 0);
+  const ready = solutionOverview.trim().length > 0;
 
   function updateFeature(i, field, val) {
     const next = [...features];
@@ -25,10 +22,14 @@ export default function FinalConceptScreen({ challenge, onSubmit, loading }) {
 
   function submit() {
     if (!ready || loading) return;
+    const activeFeatures = features
+      .filter((f) => f.title.trim().length > 0)
+      .map((f) => ({ title: f.title.trim(), description: f.description.trim() }));
+
     onSubmit({
       problem: problem.trim(),
       solutionOverview: solutionOverview.trim(),
-      features: features.map((f) => ({ title: f.title.trim(), description: f.description.trim() }))
+      features: activeFeatures
     });
   }
 
