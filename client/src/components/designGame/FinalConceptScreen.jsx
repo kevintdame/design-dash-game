@@ -49,34 +49,34 @@ export default function FinalConceptScreen({ challenge, onSubmit, loading }) {
       </p>
 
       <div className="space-y-4">
-        <div className="bg-white border border-slate-100 rounded-[28px] p-5 shadow-[0_12px_40px_rgba(0,0,0,0.06)]">
-          <label className="text-[10px] font-black uppercase tracking-widest text-[#f74872]">User Problem ⚡</label>
+        <div className="bg-[#191d3d] border border-[#2e3366] rounded-[28px] p-5 shadow-2xl">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[#ffc83b]">User Problem ⚡</label>
           <textarea
             value={problem}
             onChange={(e) => setProblem(e.target.value)}
             placeholder="The core problem your customer is facing..."
             rows={2}
-            className="w-full mt-2 text-xs font-bold text-slate-800 placeholder:text-slate-400 outline-none resize-none leading-relaxed bg-transparent"
+            className="w-full mt-2 text-xs font-bold text-white placeholder:text-slate-500 outline-none resize-none leading-relaxed bg-transparent"
           />
         </div>
 
-        <div className="bg-white border border-slate-100 rounded-[28px] p-5 shadow-[0_12px_40px_rgba(0,0,0,0.06)]">
-          <label className="text-[10px] font-black uppercase tracking-widest text-[#f74872]">Solution Overview 💡</label>
+        <div className="bg-[#191d3d] border border-[#2e3366] rounded-[28px] p-5 shadow-2xl">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[#ffc83b]">Solution Overview 💡</label>
           <textarea
             value={solutionOverview}
             onChange={(e) => setSolutionOverview(e.target.value)}
             placeholder="A high-level description of your solution..."
             rows={3}
-            className="w-full mt-2 text-xs font-bold text-slate-800 placeholder:text-slate-400 outline-none resize-none leading-relaxed bg-transparent"
+            className="w-full mt-2 text-xs font-bold text-white placeholder:text-slate-500 outline-none resize-none leading-relaxed bg-transparent"
           />
         </div>
 
         <div className="text-white text-xs font-extrabold uppercase tracking-widest pt-2">3 Key Features 🌟</div>
 
         {features.map((f, i) => (
-          <div key={i} className="bg-white border border-slate-100 rounded-[28px] p-5 shadow-[0_12px_40px_rgba(0,0,0,0.06)]">
+          <div key={i} className="bg-[#191d3d] border border-[#2e3366] rounded-[28px] p-5 shadow-2xl">
             <div className="flex items-center gap-2 mb-3">
-              <div className="h-6 w-6 rounded-full bg-slate-900 text-white text-xs font-black flex items-center justify-center">
+              <div className="h-6 w-6 rounded-full bg-[#ffc83b] text-[#0b0c16] text-xs font-black flex items-center justify-center">
                 {i + 1}
               </div>
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Feature {i + 1} 🌟</span>
@@ -85,14 +85,14 @@ export default function FinalConceptScreen({ challenge, onSubmit, loading }) {
               value={f.title}
               onChange={(e) => updateFeature(i, "title", e.target.value)}
               placeholder={`Feature ${i + 1} name`}
-              className="w-full text-xs font-bold text-slate-800 placeholder:text-slate-400 outline-none bg-transparent pb-2 border-b border-slate-100"
+              className="w-full text-xs font-bold text-white placeholder:text-slate-500 outline-none bg-transparent pb-2 border-b border-[#2e3366]"
             />
             <textarea
               value={f.description}
               onChange={(e) => updateFeature(i, "description", e.target.value)}
               placeholder="Describe how this feature works..."
               rows={2}
-              className="w-full mt-2.5 text-xs font-semibold text-slate-800 placeholder:text-slate-450 outline-none resize-none leading-relaxed bg-transparent"
+              className="w-full mt-2.5 text-xs font-semibold text-[#d1d5f5] placeholder:text-slate-500 outline-none resize-none leading-relaxed bg-transparent"
             />
           </div>
         ))}
@@ -101,10 +101,10 @@ export default function FinalConceptScreen({ challenge, onSubmit, loading }) {
       <Button
         onClick={submit}
         disabled={!ready || loading}
-        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl h-14 mt-5 shadow-lg disabled:opacity-50 transition-transform active:scale-95"
+        className="w-full bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black rounded-2xl h-14 mt-5 shadow-lg disabled:opacity-50 transition-transform active:scale-95"
       >
         {loading ? (
-          <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Generating your concept...</span>
+          <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin text-[#0b0c16]" /> Generating your concept...</span>
         ) : (
           <span className="flex items-center gap-2">Present final concept <ArrowRight className="h-5 w-5" /></span>
         )}

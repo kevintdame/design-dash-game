@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Target, User, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CustomerAvatar from "@/components/designGame/CustomerAvatar";
 
 export default function ChallengeScreen({ challenge, onContinue }) {
   return (
@@ -10,33 +11,31 @@ export default function ChallengeScreen({ challenge, onContinue }) {
       exit={{ opacity: 0, x: -30 }}
       className="max-w-md mx-auto font-sans"
     >
-      <div className="flex items-center gap-2 text-white/95 mb-3 font-bold">
+      <div className="flex items-center gap-2 text-white mb-3 font-extrabold">
         <Target className="h-4 w-4" />
         <span className="text-xs uppercase tracking-widest">Your Challenge ⚡</span>
       </div>
 
-      <div className="bg-white border border-slate-100 rounded-[32px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.06)] mb-5">
-        <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900 mb-3 leading-tight font-sans">
+      <div className="bg-[#191d3d] border border-[#2e3366] rounded-[32px] p-6 shadow-2xl mb-5">
+        <h2 className="text-3xl font-black uppercase tracking-tighter text-white mb-3 leading-tight font-sans">
           {challenge.title}
         </h2>
-        <p className="text-slate-655 text-sm font-semibold leading-relaxed">{challenge.scenario}</p>
+        <p className="text-[#d1d5f5] text-xs font-semibold leading-relaxed">{challenge.scenario}</p>
       </div>
 
-      <div className="bg-white border border-slate-100 rounded-[32px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.06)] mb-6">
-        <div className="flex items-center gap-2 text-slate-400 mb-3 font-extrabold">
+      <div className="bg-[#191d3d] border border-[#2e3366] rounded-[32px] p-6 shadow-2xl mb-6">
+        <div className="flex items-center gap-2 text-[#a5b4fc] mb-4 font-extrabold">
           <User className="h-3.5 w-3.5" />
           <span className="text-[10px] uppercase tracking-widest">Meet your customer 👤</span>
         </div>
-        <div className="flex items-center gap-3 mb-1">
-          <div className="h-11 w-11 rounded-full bg-gradient-to-br from-[#ffda77] to-[#f7567c] flex items-center justify-center shrink-0 shadow-md">
-            <User className="h-5 w-5 text-white" />
-          </div>
+        <div className="flex items-center gap-4 mb-1">
+          <CustomerAvatar name={challenge.customer_name} className="h-16 w-16" />
           <div>
-            <div className="text-slate-900 font-black text-sm">{challenge.customer_name}</div>
-            <div className="text-slate-500 text-xs font-bold">{challenge.customer_role}</div>
+            <div className="text-white font-black text-base">{challenge.customer_name}</div>
+            <div className="text-[#a5b4fc] text-xs font-bold">{challenge.customer_role}</div>
           </div>
         </div>
-        <p className="text-slate-600 text-xs font-semibold leading-relaxed mt-3 pt-3 border-t border-slate-100">
+        <p className="text-[#d1d5f5] text-xs font-semibold leading-relaxed mt-3 pt-3 border-t border-[#2e3366]">
           {challenge.customer_persona}
         </p>
       </div>
@@ -44,7 +43,7 @@ export default function ChallengeScreen({ challenge, onContinue }) {
       <Button
         onClick={onContinue}
         size="lg"
-        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl shadow-lg h-14"
+        className="w-full bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black rounded-2xl shadow-lg h-14"
       >
         <span className="flex items-center gap-2">
           Interview {challenge.customer_name.split(" ")[0]} <ArrowRight className="h-4 w-4" />

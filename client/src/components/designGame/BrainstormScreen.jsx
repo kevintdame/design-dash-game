@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb, ArrowRight, Loader2, ThumbsUp, ThumbsDown, Meh } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import InsightWall from "@/components/designGame/InsightWall";
+import CustomerAvatar from "@/components/designGame/CustomerAvatar";
 
 const ENTHU = {
-  excited: { icon: ThumbsUp, color: "text-emerald-600", emoji: "🔥", bg: "bg-emerald-50" },
-  interested: { icon: ThumbsUp, color: "text-blue-600", emoji: "👍", bg: "bg-blue-50" },
-  neutral: { icon: Meh, color: "text-amber-600", emoji: "😐", bg: "bg-amber-50" },
-  skeptical: { icon: ThumbsDown, color: "text-[#f74872]", emoji: "🤔", bg: "bg-rose-50" }
+  excited: { icon: ThumbsUp, color: "text-emerald-400", emoji: "🔥", bg: "bg-emerald-950/30" },
+  interested: { icon: ThumbsUp, color: "text-blue-400", emoji: "👍", bg: "bg-blue-950/30" },
+  neutral: { icon: Meh, color: "text-amber-400", emoji: "😐", bg: "bg-amber-950/30" },
+  skeptical: { icon: ThumbsDown, color: "text-rose-400", emoji: "🤔", bg: "bg-rose-950/30" }
 };
 
 export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedbacks, setFeedbacks, insights, onContinue }) {
@@ -61,9 +62,9 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
           const fb = feedbacks[i];
           const enthu = fb ? ENTHU[fb.enthusiasm] || ENTHU.neutral : null;
           return (
-            <div key={i} className="bg-white border border-slate-100 rounded-[28px] p-5 shadow-[0_12px_40px_rgba(0,0,0,0.06)]">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-6 w-6 rounded-full bg-slate-900 text-white text-xs font-black flex items-center justify-center">
+            <div key={i} className="bg-[#191d3d] border border-[#2e3366] rounded-[28px] p-5 shadow-2xl">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-6 w-6 rounded-full bg-[#ffc83b] text-[#0b0c16] text-xs font-black flex items-center justify-center">
                   {i + 1}
                 </div>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Idea {i + 1} 💡</span>
@@ -84,7 +85,7 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
                 placeholder={`Describe idea ${i + 1}...`}
                 rows={2}
                 disabled={hasFeedback}
-                className="w-full text-xs font-bold text-slate-800 placeholder:text-slate-400 outline-none resize-none bg-transparent"
+                className="w-full text-xs font-bold text-white placeholder:text-slate-500 outline-none resize-none bg-transparent"
               />
               <AnimatePresence>
                 {fb && (
@@ -92,15 +93,18 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className={`mt-3 pt-3 border-t border-slate-100 ${fb.error ? 'bg-rose-50' : enthu.bg} rounded-2xl px-3.5 py-2.5`}
+                    className="mt-3 pt-3 border-t border-[#2e3366] flex items-start gap-2.5"
                   >
-                    {fb.error ? (
-                      <p className="text-xs text-rose-600 font-bold leading-relaxed">{fb.feedback}</p>
-                    ) : (
-                      <p className="text-xs text-slate-700 font-semibold leading-relaxed italic">
-                        "{challenge.customer_name.split(" ")[0]}: {fb.feedback}"
-                      </p>
-                    )}
+                    <CustomerAvatar name={challenge.customer_name} className="h-8 w-8 border border-[#2e3366] shrink-0" />
+                    <div className={`flex-1 ${fb.error ? 'bg-rose-950/40 text-rose-350 border border-rose-900/30' : 'bg-[#24174d]/80 text-[#d1d5f5] border border-[#3b2885]'} rounded-2xl px-3.5 py-2.5`}>
+                      {fb.error ? (
+                        <p className="text-xs font-bold leading-relaxed">{fb.feedback}</p>
+                      ) : (
+                        <p className="text-xs font-semibold leading-relaxed italic">
+                          "{fb.feedback}"
+                        </p>
+                      )}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -113,10 +117,10 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
         <Button
           onClick={handleGetFeedback}
           disabled={!hasAtLeastOne || loading}
-          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl h-14 shadow-lg disabled:opacity-50 transition-transform active:scale-95"
+          className="w-full bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black rounded-2xl h-14 shadow-lg disabled:opacity-50 transition-transform active:scale-95"
         >
           {loading ? (
-            <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Getting feedback...</span>
+            <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin text-[#0b0c16]" /> Getting feedback...</span>
           ) : (
             "Share ideas with customer"
           )}
@@ -124,7 +128,7 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
       ) : (
         <Button
           onClick={onContinue}
-          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl h-14 shadow-lg transition-transform active:scale-95"
+          className="w-full bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black rounded-2xl h-14 shadow-lg transition-transform active:scale-95"
         >
           <span className="flex items-center justify-center gap-2">Iterate into final concept <ArrowRight className="h-5 w-5" /></span>
         </Button>

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, Send, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CustomerAvatar from "@/components/designGame/CustomerAvatar";
 
 export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
   const [input, setInput] = useState("");
@@ -38,20 +39,21 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
       exit={{ opacity: 0, x: -30 }}
       className="max-w-md mx-auto flex flex-col h-full font-sans"
     >
-      <div className="flex items-center gap-2 text-white/95 mb-2 font-extrabold">
+      <div className="flex items-center gap-2 text-white mb-2 font-extrabold">
         <MessageCircle className="h-4 w-4" />
         <span className="text-xs uppercase tracking-widest">
           Interview · {questionsLeft} {questionsLeft === 1 ? "question" : "questions"} left 💬
         </span>
       </div>
-      <p className="text-white/95 text-sm font-bold mb-4">
+      <p className="text-[#a5b4fc] text-sm font-extrabold mb-4">
         Ask {challenge.customer_name.split(" ")[0]} anything to understand their needs.
       </p>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-1 -mr-1 mb-4 min-h-[200px] sm:min-h-[280px]">
         {qa.length === 0 && !loading && (
-          <div className="h-full flex items-center justify-center text-center py-10">
-            <p className="text-white/90 text-xs font-bold max-w-[15rem] leading-relaxed">
+          <div className="h-full flex flex-col items-center justify-center text-center py-10 space-y-3">
+            <CustomerAvatar name={challenge.customer_name} className="h-20 w-20" />
+            <p className="text-[#d1d5f5] text-xs font-bold max-w-[15rem] leading-relaxed">
               Start the conversation — ask about their frustrations, daily routine, or what they wish existed.
             </p>
           </div>
@@ -64,16 +66,17 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex justify-end"
               >
-                <div className="bg-slate-900 text-white rounded-3xl rounded-tr-sm px-4.5 py-3 max-w-[85%] shadow-sm">
+                <div className="bg-[#ffc83b] text-[#0b0c16] rounded-3xl rounded-tr-sm px-4.5 py-3 max-w-[82%] shadow-md">
                   <p className="text-xs leading-relaxed font-bold">{item.question}</p>
                 </div>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex justify-start mt-2"
+                className="flex justify-start items-start gap-2.5 mt-2"
               >
-                <div className="bg-white border border-slate-100 text-slate-800 rounded-3xl rounded-tl-sm px-4.5 py-3 max-w-[85%] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <CustomerAvatar name={challenge.customer_name} className="h-9 w-9 border border-[#2e3366]" />
+                <div className="bg-[#191d3d] border border-[#2e3366] text-white rounded-3xl rounded-tl-sm px-4.5 py-3 max-w-[78%] shadow-md">
                   <p className="text-xs leading-relaxed font-bold">{item.answer}</p>
                 </div>
               </motion.div>
@@ -81,9 +84,10 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
           ))}
         </AnimatePresence>
         {loading && (
-          <div className="flex justify-start">
-            <div className="bg-white border border-slate-100 text-slate-400 rounded-3xl rounded-tl-sm px-5 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-              <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+          <div className="flex justify-start items-start gap-2.5 mt-2">
+            <CustomerAvatar name={challenge.customer_name} className="h-9 w-9 border border-[#2e3366]" />
+            <div className="bg-[#191d3d] border border-[#2e3366] text-[#a5b4fc] rounded-3xl rounded-tl-sm px-5 py-3 shadow-md">
+              <Loader2 className="h-4 w-4 animate-spin text-[#ffc83b]" />
             </div>
           </div>
         )}
@@ -97,12 +101,12 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAsk()}
               placeholder="Type your question..."
-              className="flex-1 bg-white border border-slate-200 rounded-2xl px-4 py-3.5 text-xs font-semibold text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-400 shadow-sm"
+              className="flex-1 bg-[#191d3d] border border-[#2e3366] text-white placeholder:text-slate-400 rounded-2xl px-4 py-3.5 text-xs font-semibold outline-none focus:border-[#a5b4fc] shadow-sm"
             />
             <Button
               onClick={handleAsk}
               disabled={!canAsk}
-              className="bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-12 w-12 p-0 shadow-md transition-transform active:scale-95"
+              className="bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black rounded-2xl h-12 w-12 p-0 shadow-md transition-transform active:scale-95"
             >
               <Send className="h-4 w-4" />
             </Button>
@@ -112,7 +116,7 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
         <Button
           onClick={onContinue}
           disabled={loading}
-          className="w-full bg-slate-950 hover:bg-slate-800 text-white font-extrabold rounded-2xl h-14 shadow-lg"
+          className="w-full bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black rounded-2xl h-14 shadow-lg transition-transform active:scale-95"
         >
           {qa.length === 0 ? (
             "Skip to brainstorm →"
