@@ -122,13 +122,22 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
         )}
       </Button>
 
-      <button
-        type="button"
-        onClick={onPortfolio}
-        className="mt-3 text-white/70 hover:text-white text-xs font-medium underline-offset-2 hover:underline"
-      >
-        View my portfolio →
-      </button>
+      <div className="mt-4 flex flex-col items-center space-y-3">
+        <button
+          type="button"
+          onClick={onPortfolio}
+          className="text-white/70 hover:text-white text-xs font-medium underline-offset-2 hover:underline"
+        >
+          View my portfolio →
+        </button>
+        <button
+          type="button"
+          onClick={() => window.location.href = '/multiplayer'}
+          className="text-amber-300 hover:text-amber-200 text-xs font-extrabold bg-black/25 hover:bg-black/40 rounded-full px-5 py-2 transition shadow-lg border border-amber-500/30"
+        >
+          🎮 Play Multiplayer Battle Mode
+        </button>
+      </div>
     </motion.div>
   );
 }

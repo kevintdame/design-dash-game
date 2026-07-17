@@ -638,6 +638,361 @@ app.get('/api/portfolio/:id', async (req, res) => {
   }
 });
 
+const ROOMS_DB_PATH = path.resolve('rooms_db.json');
+
+function readRoomsDB() {
+  try {
+    if (!fs.existsSync(ROOMS_DB_PATH)) {
+      fs.writeFileSync(ROOMS_DB_PATH, JSON.stringify({}));
+    }
+    return JSON.parse(fs.readFileSync(ROOMS_DB_PATH, 'utf8'));
+  } catch (e) {
+    return {};
+  }
+}
+
+function writeRoomsDB(data) {
+  fs.writeFileSync(ROOMS_DB_PATH, JSON.stringify(data, null, 2));
+}
+
+async function getRoom(roomId) {
+  if (firestoreDb) {
+    try {
+      const doc = await firestoreDb.collection('game_rooms').doc(roomId).get();
+      return doc.exists ? doc.data() : null;
+    } catch (e) {
+      console.error("Firestore getRoom failed, falling back to local rooms DB:", e);
+    }
+  }
+  const db = readRoomsDB();
+  return db[roomId] || null;
+}
+
+async function saveRoom(room) {
+  if (firestoreDb) {
+    try {
+      await firestoreDb.collection('game_rooms').doc(room.id).set(room);
+      return;
+    } catch (e) {
+      console.error("Firestore saveRoom failed, falling back to local rooms DB:", e);
+    }
+  }
+  const db = readRoomsDB();
+  db[room.id] = room;
+  writeRoomsDB(db);
+}
+
+function generateRoomCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let code = '';
+  for (let i = 0; i < 4; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+async function evaluateRoomBattle(room) {
+  const challenge = room.challenge;
+  const playersList = [];
+  for (const pid of Object.keys(room.players)) {
+    const p = room.players[pid];
+    playersList.push({
+      id: pid,
+      name: p.name,
+      concept: p.concept
+    });
+  }
+
+  if (isOfflineMode) {
+    const ranking = playersList.map(p => p.id);
+    const scores = playersList.map(p => ({
+      player_id: p.id,
+      value: 80,
+      creativity: 85,
+      uniqueness: 78
+    }));
+    return {
+      ranking: ranking,
+      scores: scores,
+      review: "Offline Demo Mode: All submitted concepts show a strong understanding of the customer's needs and lifestyle."
+    };
+  }
+
+  const prompt = `You are role-playing as the customer: ${challenge.customer_name} (${challenge.customer_role}).
+${playersList.length} designers have built competing concepts to solve your frustrations.
+
+CUSTOMER CONTEXT:
+${challenge.customer_context}
+
+${playersList.map((p, i) => `
+CONCEPT ${i + 1} (by ${p.name}, Player ID: ${p.id}):
+- Problem Statement: ${p.concept ? p.concept.problem : "No problem statement submitted"}
+- Solution Overview: ${p.concept ? p.concept.solutionOverview : "No solution overview submitted"}
+- Features: ${p.concept && p.concept.features ? p.concept.features.map(f => f.title + ": " + f.description).join("; ") : "No features submitted"}
+`).join("\n")}
+
+STRICT EVALUATION RULES:
+- Evaluate each concept strictly based ONLY on the text provided above.
+- Do NOT invent, assume, or hallucinate details, features, or problem statements for any player. If a player's concept is incomplete, empty, or missing sections, evaluate it strictly as empty, award a score of 0 for those incomplete dimensions, and state the omission in your review.
+
+Task:
+Compare all concepts side-by-side. 
+Rate each concept 1-100 on value, creativity, and uniqueness.
+Rank the designers from 1st to last.
+Write a 3-5 sentence review explaining your rankings and why you selected the 1st place concept as the winner.`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.1-flash-lite',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            ranking: {
+              type: "ARRAY",
+              items: { type: "STRING" }
+            },
+            scores: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  player_id: { type: "STRING" },
+                  value: { type: "INTEGER" },
+                  creativity: { type: "INTEGER" },
+                  uniqueness: { type: "INTEGER" }
+                },
+                required: ["player_id", "value", "creativity", "uniqueness"]
+              }
+            },
+            review: { type: "STRING" }
+          },
+          required: ["ranking", "scores", "review"]
+        }
+      }
+    });
+
+    return JSON.parse(response.text.trim());
+  } catch (err) {
+    console.error("Gemini Battle Evaluation failed:", err);
+    return {
+      ranking: playersList.map(p => p.id),
+      scores: playersList.map(p => ({
+        player_id: p.id,
+        value: 70,
+        creativity: 70,
+        uniqueness: 70
+      })),
+      review: "An error occurred during evaluation. All designs have been graded equally."
+    };
+  }
+}
+
+// --- Multiplayer Room Endpoints ---
+
+// 1. Create Room
+app.post('/api/rooms/create', async (req, res) => {
+  const { creatorName, domain, constraint, timerDuration } = req.body;
+
+  let roomId = generateRoomCode();
+  let existing = await getRoom(roomId);
+  while (existing) {
+    roomId = generateRoomCode();
+    existing = await getRoom(roomId);
+  }
+
+  let challenge = null;
+  if (isOfflineMode) {
+    challenge = offlineScenarios[domain]?.[constraint];
+    if (!challenge) {
+      challenge = {
+        title: `${domain} Sprint Challenge`,
+        scenario: `Design a solution in the domain of ${domain} under a ${constraint} constraint.`,
+        customer_name: "Alex Taylor",
+        customer_role: "End User",
+        customer_persona: "Alex is a busy user seeking simplified experiences.",
+        customer_context: "Alex is easily overwhelmed by complexity."
+      };
+    }
+  } else {
+    const constraintLabel = {
+      app: "a mobile app",
+      product: "a physical product",
+      service: "a service experience",
+      event: "an event or live experience"
+    }[constraint] || constraint;
+
+    const prompt = `You are a design thinking game master. Generate ONE compelling, realistic design challenge for a player to solve.
+PLAYER-CHOSEN PARAMETERS:
+- Domain: ${domain}
+- Constraint: the player's solution MUST take the form of ${constraintLabel}. Frame the challenge and the customer so their problem naturally calls for ${constraintLabel}, and the player's ideas/final concept should be shaped around building ${constraintLabel}.
+Requirements same as normal challenges.`;
+
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.1-flash-lite',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              title: { type: "STRING" },
+              scenario: { type: "STRING" },
+              customer_name: { type: "STRING" },
+              customer_role: { type: "STRING" },
+              customer_persona: { type: "STRING" },
+              customer_context: { type: "STRING" }
+            },
+            required: ["title", "scenario", "customer_name", "customer_role", "customer_persona", "customer_context"]
+          }
+        }
+      });
+      challenge = JSON.parse(response.text.trim());
+    } catch (err) {
+      console.error("Multiplayer challenge generation failed, using offline fallback:", err);
+      challenge = offlineScenarios[domain]?.[constraint] || {
+        title: `${domain} Sprint Challenge`,
+        scenario: `Design a solution in the domain of ${domain} under a ${constraint} constraint.`,
+        customer_name: "Alex Taylor",
+        customer_role: "End User",
+        customer_persona: "Alex is a busy user seeking simplified experiences.",
+        customer_context: "Alex is easily overwhelmed by complexity."
+      };
+    }
+  }
+
+  const room = {
+    id: roomId,
+    domain,
+    constraint,
+    challenge,
+    status: 'lobby',
+    creator_name: creatorName,
+    timer_duration: timerDuration || 480,
+    start_time: null,
+    deadline: null,
+    players: {
+      "player_1": { name: creatorName, submitted: false, concept: null }
+    },
+    results: null
+  };
+
+  await saveRoom(room);
+  res.json(room);
+});
+
+// 2. Join Room
+app.post('/api/rooms/join', async (req, res) => {
+  const { roomId, playerName } = req.body;
+  if (!roomId || !playerName) {
+    return res.status(400).json({ error: "Missing roomId or playerName" });
+  }
+
+  const room = await getRoom(roomId.toUpperCase());
+  if (!room) {
+    return res.status(404).json({ error: "Room not found" });
+  }
+  if (room.status !== 'lobby') {
+    return res.status(400).json({ error: "Game has already started in this room" });
+  }
+
+  const currentPlayers = Object.keys(room.players);
+  if (currentPlayers.length >= 5) {
+    return res.status(400).json({ error: "Room is full (max 5 players)" });
+  }
+
+  // Check if player name already exists in room
+  const nameExists = currentPlayers.some(pid => room.players[pid].name.toLowerCase() === playerName.toLowerCase());
+  if (nameExists) {
+    return res.status(400).json({ error: "Name is already taken in this room" });
+  }
+
+  const nextPlayerId = `player_${currentPlayers.length + 1}`;
+  room.players[nextPlayerId] = { name: playerName, submitted: false, concept: null };
+
+  await saveRoom(room);
+  res.json(room);
+});
+
+// 3. Start Game (Host only)
+app.post('/api/rooms/:id/start', async (req, res) => {
+  const { id } = req.params;
+  const room = await getRoom(id.toUpperCase());
+  if (!room) return res.status(404).json({ error: "Room not found" });
+  if (room.status !== 'lobby') {
+    return res.status(400).json({ error: "Game already started" });
+  }
+
+  const startTime = new Date();
+  const deadline = new Date(startTime.getTime() + room.timer_duration * 1000);
+
+  room.status = 'playing';
+  room.start_time = startTime.toISOString();
+  room.deadline = deadline.toISOString();
+
+  await saveRoom(room);
+  res.json(room);
+});
+
+// 4. Get Room Status (with auto-evaluation trigger on deadline pass)
+app.get('/api/rooms/:id', async (req, res) => {
+  const { id } = req.params;
+  const room = await getRoom(id.toUpperCase());
+  if (!room) return res.status(404).json({ error: "Room not found" });
+
+  if (room.status === 'playing' && room.deadline) {
+    const now = new Date();
+    const deadlineTime = new Date(room.deadline);
+    if (now > deadlineTime) {
+      console.log(`Room ${room.id} deadline passed. Auto-triggering battle evaluation.`);
+      room.status = 'evaluating';
+      await saveRoom(room);
+
+      const results = await evaluateRoomBattle(room);
+      room.results = results;
+      room.status = 'finished';
+      await saveRoom(room);
+    }
+  }
+
+  res.json(room);
+});
+
+// 5. Submit Player Concept
+app.post('/api/rooms/:id/submit', async (req, res) => {
+  const { id } = req.params;
+  const { playerName, concept } = req.body;
+  
+  const room = await getRoom(id.toUpperCase());
+  if (!room) return res.status(404).json({ error: "Room not found" });
+
+  const playerId = Object.keys(room.players).find(pid => room.players[pid].name === playerName);
+  if (!playerId) {
+    return res.status(400).json({ error: "Player not found in this room" });
+  }
+
+  room.players[playerId].submitted = true;
+  room.players[playerId].concept = concept;
+  await saveRoom(room);
+
+  // Check if all joined players have submitted
+  const allSubmitted = Object.keys(room.players).every(pid => room.players[pid].submitted);
+  if (allSubmitted && room.status === 'playing') {
+    room.status = 'evaluating';
+    await saveRoom(room);
+
+    const results = await evaluateRoomBattle(room);
+    room.results = results;
+    room.status = 'finished';
+    await saveRoom(room);
+  }
+
+  res.json(room);
+});
+
 // Serve static client assets in production
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
