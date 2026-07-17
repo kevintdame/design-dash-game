@@ -286,41 +286,18 @@ export default function MultiplayerGame() {
                 {/* CREATE ROOM TAB */}
                 <TabsContent value="create">
                   <Card className="bg-white/10 border-white/20 text-white backdrop-blur-md shadow-2xl">
-                    <CardContent className="space-y-4 pt-6">
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-white/60 uppercase font-bold">Domain</label>
-                        <select 
-                          value={setupDomain}
-                          onChange={e => setSetupDomain(e.target.value)}
-                          className="w-full bg-black/30 border border-white/20 rounded-md p-2 text-white"
-                        >
-                          <option value="Education">Education</option>
-                          <option value="Health & Wellness">Health</option>
-                          <option value="Finance">Finance</option>
-                          <option value="Productivity">Productivity</option>
-                        </select>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-white/60 uppercase font-bold">Timer Limit</label>
-                        <select 
-                          value={setupTimer}
-                          onChange={e => setSetupTimer(Number(e.target.value))}
-                          className="w-full bg-black/30 border border-white/20 rounded-md p-2 text-white"
-                        >
-                          <option value={300}>5 Minutes</option>
-                          <option value={480}>8 Minutes (Recommended)</option>
-                          <option value={600}>10 Minutes</option>
-                          <option value={900}>15 Minutes</option>
-                        </select>
-                      </div>
+                    <CardContent className="space-y-5 pt-6 text-center">
+                      <p className="text-xs text-white/70 leading-relaxed">
+                        Create a multiplayer battle lobby for <strong className="text-amber-300">{setupDomain}</strong>. 
+                        All players will have a default time limit of <strong className="text-amber-300">8 minutes</strong> to submit their designs.
+                      </p>
 
                       <Button 
                         onClick={handleCreateRoom}
                         disabled={actionLoading}
-                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold"
+                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-5 text-sm rounded-xl"
                       >
-                        {actionLoading ? "Creating..." : "Create Lobby"}
+                        {actionLoading ? "Creating..." : "🚀 Create Lobby"}
                       </Button>
                     </CardContent>
                   </Card>
