@@ -342,7 +342,7 @@ app.post('/api/insights', async (req, res) => {
   }
 
   const transcript = qa.map((qa, i) => `Q${i + 1}: ${qa.question}\nA: ${qa.answer}`).join("\n\n");
-  const prompt = `You are a design researcher. A designer just interviewed a potential customer. Synthesize the interview into 4-7 concise "sticky notes" capturing the most important things to remember for ideation.
+  const prompt = `You are a design researcher. A designer just interviewed a potential customer. Synthesize the interview into concise "sticky notes" (minimum 0, maximum 7) capturing the most important things to remember for ideation.
 
 CUSTOMER: ${challenge.customer_name} (${challenge.customer_role})
 
@@ -350,10 +350,10 @@ INTERVIEW TRANSCRIPT:
 ${transcript}
 
 Rules:
-- Base notes ONLY on what the customer actually said in the interview. Do not invent information.
+- STRICT GROUNDING: Base notes ONLY on what the customer actually said in the provided INTERVIEW TRANSCRIPT. Do NOT invent, assume, or extrapolate any information.
+- If the transcript is empty, contains only greeting exchanges, or contains no meaningful details/frustrations/needs, you MUST return an empty list of insights (i.e., return "insights": []).
 - Each "text" must be short and punchy — like a real post-it note, max ~14 words.
 - Classify each as one of: "insight" (a notable realization/behavior), "pain_point" (a frustration or obstacle), "need" (a latent need or wish).
-- Aim for a mix of types when the interview supports it.
 - NO SOLUTIONS: Ensure these stickies represent user insights, pain points, or needs, NOT solutions or technology features.
 `;
 
