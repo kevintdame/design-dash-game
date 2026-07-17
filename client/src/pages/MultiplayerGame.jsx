@@ -256,46 +256,51 @@ export default function MultiplayerGame() {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex-1 flex flex-col justify-center space-y-6"
+              className="flex-1 flex flex-col justify-center space-y-5"
             >
-              <div className="text-center text-white space-y-2 mb-4">
+              <div className="text-center text-white space-y-2 mb-2">
                 <h1 className="text-4xl font-extrabold tracking-tight">Multiplayer Battle</h1>
-                <p className="text-white/80 text-sm">Compete head-to-head in a design thinking sprint!</p>
+                <p className="text-pink-100/80 text-sm">Compete head-to-head in a design thinking sprint!</p>
               </div>
 
-              <Card className="bg-white/10 border-white/20 text-white backdrop-blur-md shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="text-lg">1. Choose your Name</CardTitle>
+              <Card className="bg-white/10 border-white/25 text-white backdrop-blur-md shadow-2xl rounded-3xl">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-bold text-white">1. Choose your Name</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-5">
                   <Input 
                     placeholder="Enter your name..."
                     value={playerName}
                     onChange={e => setPlayerName(e.target.value)}
-                    className="bg-black/20 border-white/20 text-white placeholder-white/40 focus:ring-amber-500"
+                    className="bg-black/25 border-white/20 text-white placeholder:text-pink-100/60 focus:border-white/40 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-2xl h-12 text-sm"
                   />
                 </CardContent>
               </Card>
 
               <Tabs defaultValue="create" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 bg-black/20 text-white/60">
-                  <TabsTrigger value="create" className="data-[state=active]:bg-white/20 data-[state=active]:text-white">Create Room</TabsTrigger>
-                  <TabsTrigger value="join" className="data-[state=active]:bg-white/20 data-[state=active]:text-white">Join Room</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 bg-black/25 text-pink-100/60 rounded-2xl h-12 p-1.5 border border-white/5">
+                  <TabsTrigger 
+                    value="create" 
+                    className="rounded-xl font-bold text-xs transition data-[state=active]:bg-white/20 data-[state=active]:text-white text-pink-100/70"
+                  >
+                    Create Room
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="join" 
+                    className="rounded-xl font-bold text-xs transition data-[state=active]:bg-white/20 data-[state=active]:text-white text-pink-100/70"
+                  >
+                    Join Room
+                  </TabsTrigger>
                 </TabsList>
 
                 {/* CREATE ROOM TAB */}
-                <TabsContent value="create">
-                  <Card className="bg-white/10 border-white/20 text-white backdrop-blur-md shadow-2xl">
-                    <CardContent className="space-y-5 pt-6 text-center">
-                      <p className="text-xs text-white/70 leading-relaxed">
-                        Create a multiplayer battle lobby for <strong className="text-amber-300">{setupDomain}</strong>. 
-                        All players will have a default time limit of <strong className="text-amber-300">8 minutes</strong> to submit their designs.
-                      </p>
-
+                <TabsContent value="create" className="mt-3">
+                  <Card className="bg-white/10 border-white/25 text-white backdrop-blur-md shadow-2xl rounded-3xl">
+                    <CardContent className="pt-5 pb-5">
                       <Button 
                         onClick={handleCreateRoom}
                         disabled={actionLoading}
-                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-5 text-sm rounded-xl"
+                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-extrabold h-13 text-sm rounded-2xl shadow-lg transition-transform active:scale-[0.98]"
                       >
                         {actionLoading ? "Creating..." : "🚀 Create Lobby"}
                       </Button>
@@ -304,23 +309,23 @@ export default function MultiplayerGame() {
                 </TabsContent>
 
                 {/* JOIN ROOM TAB */}
-                <TabsContent value="join">
-                  <Card className="bg-white/10 border-white/20 text-white backdrop-blur-md shadow-2xl">
-                    <CardContent className="space-y-4 pt-6">
+                <TabsContent value="join" className="mt-3">
+                  <Card className="bg-white/10 border-white/25 text-white backdrop-blur-md shadow-2xl rounded-3xl">
+                    <CardContent className="space-y-4 pt-5 pb-5">
                       <div className="space-y-1.5">
-                        <label className="text-xs text-white/60 uppercase font-bold">Room Code</label>
+                        <label className="text-xs text-pink-100/80 uppercase font-bold tracking-wider">Room Code</label>
                         <Input 
                           placeholder="Enter 4-letter code..."
                           value={inputRoomId}
                           onChange={e => setInputRoomId(e.target.value)}
-                          className="bg-black/20 border-white/20 text-white placeholder-white/40 focus:ring-amber-500 uppercase tracking-widest text-center text-xl font-bold"
+                          className="bg-black/25 border-white/20 text-white placeholder:text-pink-100/60 focus:border-white/40 focus-visible:ring-0 focus-visible:ring-offset-0 uppercase tracking-widest text-center text-lg font-bold rounded-2xl h-12"
                           maxLength={4}
                         />
                       </div>
                       <Button 
                         onClick={handleJoinRoom}
                         disabled={actionLoading}
-                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold"
+                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-extrabold h-13 text-sm rounded-2xl shadow-lg transition-transform active:scale-[0.98]"
                       >
                         {actionLoading ? "Joining..." : "Join Game"}
                       </Button>
@@ -329,9 +334,13 @@ export default function MultiplayerGame() {
                 </TabsContent>
               </Tabs>
               
-              <Button variant="ghost" onClick={() => navigate("/")} className="text-white hover:text-amber-200">
+              <button 
+                type="button" 
+                onClick={() => navigate("/")} 
+                className="text-pink-100/80 hover:text-white text-xs font-semibold py-2 transition underline underline-offset-4"
+              >
                 ← Back to Single Player
-              </Button>
+              </button>
             </motion.div>
           )}
 
