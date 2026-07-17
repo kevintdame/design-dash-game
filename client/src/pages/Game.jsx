@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import ProgressHeader, { STAGES } from "@/components/designGame/ProgressHeader";
 import StartScreen from "@/components/designGame/StartScreen";
+import ModeSelectScreen from "@/components/designGame/ModeSelectScreen";
 import ChallengeScreen from "@/components/designGame/ChallengeScreen";
 import InterviewScreen from "@/components/designGame/InterviewScreen";
 import BrainstormScreen from "@/components/designGame/BrainstormScreen";
@@ -14,7 +15,7 @@ import InsightWall from "@/components/designGame/InsightWall";
 
 export default function Game() {
   const navigate = useNavigate();
-  const [stage, setStage] = useState("start");
+  const [stage, setStage] = useState("mode");
   const [challenge, setChallenge] = useState(null);
   const [domain, setDomain] = useState(null);
   const [constraint, setConstraint] = useState(null);
@@ -32,7 +33,7 @@ export default function Game() {
   const [error, setError] = useState(null);
 
   const currentIndex = STAGES.findIndex((s) => s.key === stage);
-  const showProgress = stage !== "start";
+  const showProgress = stage !== "mode" && stage !== "start";
 
   async function handleStart(d, c) {
     setLoadingChallenge(true);
@@ -51,7 +52,7 @@ export default function Game() {
   }
 
   function handleRestart() {
-    setStage("start");
+    setStage("mode");
     setChallenge(null);
     setDomain(null);
     setConstraint(null);
@@ -160,8 +161,21 @@ export default function Game() {
               </div>
             ) : (
               <AnimatePresence mode="wait">
+                {stage === "mode" && (
+                  <ModeSelectScreen 
+                    key="mode" 
+                    onSelectSingle={() => setStage("start")} 
+                    onSelectMulti={() => navigate("/multiplayer")} 
+                    onPortfolio={() => navigate("/portfolio")} 
+                  />
+                )}
                 {stage === "start" && (
-                  <StartScreen key="start" onStart={handleStart} loading={loadingChallenge} onPortfolio={() => navigate("/portfolio")} />
+                  <StartScreen 
+                    key="start" 
+                    onStart={handleStart} 
+                    loading={loadingChallenge} 
+                    onBack={() => setStage("mode")} 
+                  />
                 )}
                 {stage === "challenge" && challenge && (
                   <ChallengeScreen key="challenge" challenge={challenge} onContinue={() => setStage("interview")} />
