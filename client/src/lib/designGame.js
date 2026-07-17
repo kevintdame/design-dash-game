@@ -1,8 +1,8 @@
-export async function generateChallenge(domain, constraint) {
+export async function generateChallenge(domain) {
   const res = await fetch("/api/challenge", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ domain, constraint })
+    body: JSON.stringify({ domain })
   });
   if (!res.ok) {
     throw new Error("Couldn't generate a challenge.");
@@ -68,11 +68,11 @@ export async function rateFinalConcept(challenge, concept) {
   };
 }
 
-export async function generateFeatureImages(features, domain, constraint) {
+export async function generateFeatureImages(features, domain) {
   const res = await fetch("/api/generate-images", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ features, domain, constraint })
+    body: JSON.stringify({ features, domain })
   });
   if (!res.ok) {
     return features.map(f => ({ ...f, image_url: null }));

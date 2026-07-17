@@ -1,0 +1,27 @@
+{
+  "NYIL": {
+    "id": "NYIL",
+    "domain": "Education",
+    "challenge": {
+      "title": "Bridging the Gap: Accessible Literacy for Remote Learners",
+      "scenario": "In a rural mountainous region with inconsistent internet connectivity, primary school teachers are struggling to maintain literacy progress for students who are physically isolated from the classroom for weeks at a time.",
+      "customer_name": "Elena Vance",
+      "customer_role": "Regional Education Coordinator",
+      "customer_persona": "A pragmatic and deeply empathetic educator who values tangible, analog-digital hybrid solutions over high-tech software that requires reliable bandwidth.",
+      "customer_context": "Elena needs a self-contained learning tool that functions entirely offline, fits into a backpack, and provides automated phonetic feedback to students without needing a live teacher connection, ultimately requiring the player to design a physical, interactive learning interface."
+    },
+    "status": "lobby",
+    "creator_name": "Kevin",
+    "timer_duration": 480,
+    "start_time": null,
+    "deadline": null,
+    "players": {
+      "player_1": {
+        "name": "Kevin",
+        "submitted": false,
+        "concept": null
+      }
+    },
+    "results": null
+  }
+}

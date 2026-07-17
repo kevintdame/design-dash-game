@@ -107,16 +107,12 @@ export default function MultiplayerGame() {
     setActionLoading(true);
     setError(null);
     try {
-      const constraintsList = ["app", "product", "service", "event"];
-      const randomConstraint = constraintsList[Math.floor(Math.random() * constraintsList.length)];
-
       const res = await fetch("/api/rooms/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           creatorName: playerName.trim(),
           domain: setupDomain,
-          constraint: randomConstraint,
           timerDuration: setupTimer
         })
       });
@@ -214,11 +210,9 @@ export default function MultiplayerGame() {
   async function submitConcept(conceptToSubmit) {
     setError(null);
     try {
-      // Auto-fetch features with placeholder images to save time
       const featuresWithImages = await generateFeatureImages(
         conceptToSubmit.features || [],
-        room.domain,
-        room.constraint
+        room.domain
       );
       
       const res = await fetch(`/api/rooms/${room.id}/submit`, {

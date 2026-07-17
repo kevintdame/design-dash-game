@@ -215,27 +215,21 @@ const offlineDialogues = {
 
 // 1. Generate Challenge
 app.post('/api/challenge', async (req, res) => {
-  const { domain, constraint } = req.body;
+  const { domain } = req.body;
 
   if (isOfflineMode) {
-    const sc = offlineScenarios[domain]?.[constraint];
-    if (sc) return res.json(sc);
+    const domainScenarios = offlineScenarios[domain] || {};
+    const firstScenario = Object.values(domainScenarios)[0];
+    if (firstScenario) return res.json(firstScenario);
     return res.json({
       title: `${domain} Sprint Challenge`,
-      scenario: `Design ${constraint === 'product' ? 'a physical product' : constraint === 'service' ? 'a service' : 'a mobile app'} resolving needs in ${domain}.`,
+      scenario: `Design a solution resolving needs in ${domain}.`,
       customer_name: "Alex Taylor",
       customer_role: "End User",
       customer_persona: "Alex is a busy user seeking simplified experiences.",
       customer_context: "Alex is easily overwhelmed by complexity and values clean, elegant workflows."
     });
   }
-
-  const constraintLabel = {
-    app: "a mobile app",
-    product: "a physical product",
-    service: "a service experience",
-    event: "an event or live experience"
-  }[constraint] || constraint;
 
   const randomSeed = Math.random().toString(36).substring(7);
   const prompt = `You are a design thinking game master. Generate ONE compelling, realistic design challenge for a player to solve.
@@ -244,11 +238,11 @@ app.post('/api/challenge', async (req, res) => {
 
 PLAYER-CHOSEN PARAMETERS:
 - Domain: ${domain}
-- Constraint: the player's solution MUST take the form of ${constraintLabel}. Frame the challenge and the customer so their problem naturally calls for ${constraintLabel}, and the player's ideas/final concept should be shaped around building ${constraintLabel}.
 
 Requirements:
 - A real-world design problem in the "${domain}" domain. Keep the challenge title and scenario BROAD, intuitive, and extremely easy for anyone to understand at a glance.
 - PUNCHY & SIMPLE LANGUAGE: Write in plain, everyday English. Do NOT use academic, dry, corporate, or technical jargon (e.g., avoid terms like "closing the loop", "waste management practices", "municipal infrastructure", "decentralized networks", "optimization"). Keep the scenario description under 2 sentences.
+- Open-Ended Challenge: Do NOT force any solution format (like an app, product, or service). The challenge must be open-ended, allowing the player to design any solution that helps the customer.
 - Do NOT reveal the customer's specific frustrations, needs, or pain points in the scenario. Those must be discovered through the interview.
 - "customer_persona" is the ONLY thing the player sees about the customer up front. It MUST be a neutral, high-level introduction: their name, age, role/profession, and a sentence or two of general context (where they work, their lifestyle broadly). Do NOT mention any frustrations, problems, struggles, pain points, needs, desires, or what they wish were different. The player should learn those only by interviewing.
 - "customer_context" is internal context the LLM uses to answer interview questions and rate ideas consistently as this customer. Put ALL the rich detail here: their hidden frustrations, specific needs, deal-breakers, budget concerns, daily life details, emotional drivers, and what they secretly wish existed. The player NEVER sees this field.
@@ -566,7 +560,7 @@ Then write a short, in-character review (2-4 sentences) as this customer reactin
 
 // 6. Generate Feature Mockups (Cost-Free SVG Vector generator)
 app.post('/api/generate-images', async (req, res) => {
-  const { features, domain, constraint } = req.body;
+  const { features, domain } = req.body;
   const featuresWithImages = features.map((f, index) => {
     const hues = [280, 340, 45, 170];
     const hue = hues[index % hues.length];
@@ -820,7 +814,7 @@ Write a 3-5 sentence review explaining your rankings and why you selected the 1s
 
 // 1. Create Room
 app.post('/api/rooms/create', async (req, res) => {
-  const { creatorName, domain, constraint, timerDuration } = req.body;
+  const { creatorName, domain, timerDuration } = req.body;
 
   let roomId = generateRoomCode();
   let existing = await getRoom(roomId);
@@ -831,11 +825,12 @@ app.post('/api/rooms/create', async (req, res) => {
 
   let challenge = null;
   if (isOfflineMode) {
-    challenge = offlineScenarios[domain]?.[constraint];
+    const domainScenarios = offlineScenarios[domain] || {};
+    challenge = Object.values(domainScenarios)[0];
     if (!challenge) {
       challenge = {
         title: `${domain} Sprint Challenge`,
-        scenario: `Design a solution in the domain of ${domain} under a ${constraint} constraint.`,
+        scenario: `Design a solution in the domain of ${domain}.`,
         customer_name: "Alex Taylor",
         customer_role: "End User",
         customer_persona: "Alex is a busy user seeking simplified experiences.",
@@ -843,17 +838,9 @@ app.post('/api/rooms/create', async (req, res) => {
       };
     }
   } else {
-    const constraintLabel = {
-      app: "a mobile app",
-      product: "a physical product",
-      service: "a service experience",
-      event: "an event or live experience"
-    }[constraint] || constraint;
-
     const prompt = `You are a design thinking game master. Generate ONE compelling, realistic design challenge for a player to solve.
 PLAYER-CHOSEN PARAMETERS:
 - Domain: ${domain}
-- Constraint: the player's solution MUST take the form of ${constraintLabel}. Frame the challenge and the customer so their problem naturally calls for ${constraintLabel}, and the player's ideas/final concept should be shaped around building ${constraintLabel}.
 Requirements same as normal challenges.`;
 
     try {
@@ -861,6 +848,7 @@ Requirements same as normal challenges.`;
         model: 'gemini-3.1-flash-lite',
         contents: prompt,
         config: {
+          temperature: 1.0,
           responseMimeType: 'application/json',
           responseSchema: {
             type: "OBJECT",
@@ -879,9 +867,10 @@ Requirements same as normal challenges.`;
       challenge = JSON.parse(response.text.trim());
     } catch (err) {
       console.error("Multiplayer challenge generation failed, using offline fallback:", err);
-      challenge = offlineScenarios[domain]?.[constraint] || {
+      const domainScenarios = offlineScenarios[domain] || {};
+      challenge = Object.values(domainScenarios)[0] || {
         title: `${domain} Sprint Challenge`,
-        scenario: `Design a solution in the domain of ${domain} under a ${constraint} constraint.`,
+        scenario: `Design a solution in the domain of ${domain}.`,
         customer_name: "Alex Taylor",
         customer_role: "End User",
         customer_persona: "Alex is a busy user seeking simplified experiences.",
@@ -893,7 +882,7 @@ Requirements same as normal challenges.`;
   const room = {
     id: roomId,
     domain,
-    constraint,
+    constraint: "",
     challenge,
     status: 'lobby',
     creator_name: creatorName,

@@ -18,7 +18,6 @@ export default function Game() {
   const [stage, setStage] = useState("mode");
   const [challenge, setChallenge] = useState(null);
   const [domain, setDomain] = useState(null);
-  const [constraint, setConstraint] = useState(null);
   const [qa, setQa] = useState([]);
   const [ideas, setIdeas] = useState(["", "", ""]);
   const [feedbacks, setFeedbacks] = useState([]);
@@ -35,13 +34,12 @@ export default function Game() {
   const currentIndex = STAGES.findIndex((s) => s.key === stage);
   const showProgress = stage !== "mode" && stage !== "start";
 
-  async function handleStart(d, c) {
+  async function handleStart(d) {
     setLoadingChallenge(true);
     setError(null);
     try {
-      const ch = await generateChallenge(d, c);
+      const ch = await generateChallenge(d);
       setDomain(d);
-      setConstraint(c);
       setChallenge(ch);
       setStage("challenge");
     } catch (e) {
@@ -55,7 +53,6 @@ export default function Game() {
     setStage("mode");
     setChallenge(null);
     setDomain(null);
-    setConstraint(null);
     setQa([]);
     setIdeas(["", "", ""]);
     setFeedbacks([]);
@@ -90,7 +87,7 @@ export default function Game() {
     setRatingLoading(true);
     setError(null);
     try {
-      const featuresWithImages = await generateFeatureImages(c.features, domain, constraint);
+      const featuresWithImages = await generateFeatureImages(c.features, domain);
       const fullConcept = { ...c, features: featuresWithImages };
       const r = await rateFinalConcept(challenge, fullConcept);
       setConcept(fullConcept);
@@ -113,7 +110,6 @@ export default function Game() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           domain,
-          constraint,
           challenge_title: challenge.title,
           challenge_scenario: challenge.scenario,
           customer_name: challenge.customer_name,
