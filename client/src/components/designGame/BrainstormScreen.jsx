@@ -31,7 +31,7 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
       });
       setFeedbacks(mappedFeedbacks);
     } catch (e) {
-      setFeedbacks(ideas.map(idea => idea.trim() ? { feedback: "I couldn't process this idea.", enthusiasm: "neutral" } : null));
+      setFeedbacks(ideas.map(idea => idea.trim() ? { feedback: "Connection error: Could not retrieve feedback from customer. Please try again.", error: true } : null));
     } finally {
       setLoading(false);
     }
@@ -93,9 +93,15 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className={`mt-2 pt-2 border-t border-slate-100 ${enthu.bg} rounded-xl px-3 py-2`}
+                    className={`mt-2 pt-2 border-t border-slate-100 ${fb.error ? 'bg-rose-50' : enthu.bg} rounded-xl px-3 py-2`}
                   >
-                    <p className="text-xs text-slate-700 leading-relaxed italic">"{challenge.customer_name.split(" ")[0]}: {fb.feedback}"</p>
+                    {fb.error ? (
+                      <p className="text-xs text-rose-600 font-medium leading-relaxed">{fb.feedback}</p>
+                    ) : (
+                      <p className="text-xs text-slate-700 leading-relaxed italic">
+                        "{challenge.customer_name.split(" ")[0]}: {fb.feedback}"
+                      </p>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>

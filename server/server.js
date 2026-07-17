@@ -23,6 +23,25 @@ if (isOfflineMode) {
 
 const ai = isOfflineMode ? null : new GoogleGenAI({ apiKey });
 
+async function generateContentWithRetry(params, retries = 2, delay = 1000) {
+  if (isOfflineMode) return null;
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await ai.models.generateContent(params);
+    } catch (err) {
+      const status = err.status || (err.error && err.error.code);
+      const isTransient = status === 503 || status === 429 || (err.message && err.message.toLowerCase().includes("demand"));
+      if (isTransient && i < retries) {
+        console.warn(`Gemini call failed with transient error (status ${status}). Retrying in ${delay}ms... (Attempt ${i + 1}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2;
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 // Initialize Firebase Admin or Fallback Database
 let firestoreDb = null;
 const LOCAL_DB_PATH = path.resolve('portfolio_db.json');
@@ -229,10 +248,11 @@ Requirements:
 - "customer_persona" is the ONLY thing the player sees about the customer up front. It MUST be a neutral, high-level introduction: their name, age, role/profession, and a sentence or two of general context (where they work, their lifestyle broadly). Do NOT mention any frustrations, problems, struggles, pain points, needs, desires, or what they wish were different. The player should learn those only by interviewing.
 - "customer_context" is internal context the LLM uses to answer interview questions and rate ideas consistently as this customer. Put ALL the rich detail here: their hidden frustrations, specific needs, deal-breakers, budget concerns, daily life details, emotional drivers, and what they secretly wish existed. The player NEVER sees this field.
 - NO SOLUTIONS IN INTERVIEW: The customer's context and behavior must only focus on their daily life, feelings, and frustrations. Never mention, suggest, or discuss specific solutions, technology formats, or product features.
+- DIVERSITY: Ensure the customer name, age, specific profession, and background vary widely. Choose from a rich set of unique names and distinct roles (e.g. students, retail managers, elderly gardeners, night security guards, etc.) to keep the game fresh. Never generate the same name or profile twice.
 `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
@@ -307,7 +327,7 @@ RULES OF CONVERSATION:
   console.log("Question:", question);
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: contents,
       config: {
@@ -358,7 +378,7 @@ Rules:
 `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
@@ -433,7 +453,7 @@ For EACH idea (in order), give honest, specific feedback from your perspective a
 `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
@@ -507,7 +527,7 @@ Then write a short, in-character review (2-4 sentences) as this customer reactin
 `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
@@ -742,7 +762,7 @@ Rank the designers from 1st to last.
 Write a 3-5 sentence review explaining your rankings and why you selected the 1st place concept as the winner.`;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: prompt,
       config: {
@@ -831,7 +851,7 @@ PLAYER-CHOSEN PARAMETERS:
 Requirements same as normal challenges.`;
 
     try {
-      const response = await ai.models.generateContent({
+      const response = await generateContentWithRetry({
         model: 'gemini-3.1-flash-lite',
         contents: prompt,
         config: {
