@@ -1,0 +1,17 @@
+- [x] Copy project files from reference folder to client directory
+- [x] Install local standalone Node.js and NPM binary inside workspace
+- [x] Refactor client dependencies (remove @base44/sdk and @base44/vite-plugin)
+- [x] Refactor client-side designGame.js library to make REST calls to backend API
+- [x] Bypassed Base44 auth wall with mock AuthProvider in client AuthContext
+- [x] Create server directory with Express backend server configuration (server.js)
+- [x] Integrate official Google Gen AI SDK for gemini-3.5-flash secure backend execution
+- [x] Integrate Firestore client database connection with local JSON fallback database adapter
+- [x] Create environment variable configuration example files (.env.example)
+- [x] Run npm install in both client and server directories
+- [x] Start backend server and client dev server tasks successfully in the background
+- [x] Re-document changes in walkthrough.md
+- [x] Configure Express to serve production static files in server.js (Step A)
+- [x] Create root package.json for unified build scripts (Step A)
+- [x] Create PWA configuration files (manifest.json, sw.js, icon.svg) in client/public (Step B1)
+- [x] Register PWA service worker in client main.jsx (Step B1)
+- [x] Document deployment and installation guide in DEPLOYMENT.md

@@ -1,0 +1,69 @@
+{
+  "name": "GameSession",
+  "type": "object",
+  "properties": {
+    "domain": {
+      "type": "string"
+    },
+    "constraint": {
+      "type": "string"
+    },
+    "challenge_title": {
+      "type": "string"
+    },
+    "challenge_scenario": {
+      "type": "string"
+    },
+    "customer_name": {
+      "type": "string"
+    },
+    "customer_role": {
+      "type": "string"
+    },
+    "problem": {
+      "type": "string"
+    },
+    "solution_overview": {
+      "type": "string"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "description"
+        ]
+      }
+    },
+    "value_score": {
+      "type": "number"
+    },
+    "creativity_score": {
+      "type": "number"
+    },
+    "uniqueness_score": {
+      "type": "number"
+    },
+    "review": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "challenge_title",
+    "problem",
+    "solution_overview",
+    "features"
+  ]
+}
