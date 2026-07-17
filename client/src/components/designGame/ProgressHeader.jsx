@@ -21,20 +21,20 @@ export default function ProgressHeader({ currentIndex }) {
               initial={false}
               animate={{
                 scale: active ? 1.15 : 1,
-                backgroundColor: done || active ? "rgb(255 255 255)" : "rgba(255,255,255,0.25)",
-                color: done || active ? "rgb(88 28 135)" : "rgb(255 255 255)"
+                backgroundColor: done || active ? "rgb(15 23 42)" : "rgb(240 244 242)",
+                color: done || active ? "rgb(255 255 255)" : "rgb(100 116 139)"
               }}
-              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full flex items-center justify-center text-[11px] sm:text-xs font-bold shrink-0 shadow-sm"
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full flex items-center justify-center text-[11px] sm:text-xs font-black shrink-0 shadow-sm"
             >
               {done ? "✓" : i + 1}
             </motion.div>
             {i < STAGES.length - 1 && (
-              <div className="flex-1 h-0.5 rounded-full bg-white/30 overflow-hidden">
+              <div className="flex-1 h-0.5 rounded-full bg-slate-200 overflow-hidden">
                 <motion.div
                   initial={false}
                   animate={{ width: done ? "100%" : "0%" }}
                   transition={{ duration: 0.4 }}
-                  className="h-full bg-white"
+                  className="h-full bg-slate-950"
                 />
               </div>
             )}

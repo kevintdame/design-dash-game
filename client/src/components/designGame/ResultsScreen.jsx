@@ -14,7 +14,7 @@ export default function ResultsScreen({ challenge, concept, ratings, onSave, sav
     if (fired.current) return;
     fired.current = true;
     const count = overall >= 80 ? 180 : overall >= 60 ? 100 : 40;
-    const colors = ["#fde047", "#f0abfc", "#a78bfa", "#fb7185"];
+    const colors = ["#de573a", "#c93c76", "#f09c35", "#a78bfa"];
     confetti({ particleCount: count, spread: 100, origin: { y: 0.5 }, colors, scalar: 1.1 });
   }, [overall]);
 
@@ -24,20 +24,22 @@ export default function ResultsScreen({ challenge, concept, ratings, onSave, sav
       animate={{ opacity: 1, y: 0 }}
       className="max-w-md mx-auto"
     >
-      <div className="text-center mb-4">
-        <div className="text-white/70 text-xs font-semibold uppercase tracking-wider">Final Score</div>
-        <div className="text-5xl font-extrabold text-white font-display leading-none">{overall}</div>
-        <div className="text-amber-200 font-bold text-sm mt-1">{tier}</div>
+      <div className="text-center mb-5">
+        <div className="text-slate-500 text-xs font-extrabold uppercase tracking-widest">Final Score</div>
+        <div className="text-6xl font-black bg-gradient-to-r from-[#c93c76] via-[#de573a] to-[#f09c35] bg-clip-text text-transparent font-sans my-1">
+          {overall}
+        </div>
+        <div className="text-[#de573a] font-extrabold text-sm">{tier}</div>
       </div>
 
       <ConceptCarousel challenge={challenge} concept={concept} ratings={ratings} />
 
-      <div className="mt-5 space-y-2">
+      <div className="mt-6 space-y-3">
         {!saved ? (
           <Button
             onClick={onSave}
             disabled={saving}
-            className="w-full bg-white text-purple-700 hover:bg-white/90 font-bold rounded-2xl h-12 shadow-md disabled:opacity-50"
+            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl h-14 shadow-lg disabled:opacity-50 transition-transform active:scale-95"
           >
             {saving ? (
               <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Saving...</span>
@@ -48,21 +50,23 @@ export default function ResultsScreen({ challenge, concept, ratings, onSave, sav
         ) : (
           <Button
             onClick={onGoPortfolio}
-            className="w-full bg-white text-purple-700 hover:bg-white/90 font-bold rounded-2xl h-12 shadow-md"
+            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl h-14 shadow-lg transition-transform active:scale-95"
           >
             <span className="flex items-center gap-2"><FolderOpen className="h-4 w-4" /> View portfolio</span>
           </Button>
         )}
         {saved && (
-          <div className="flex items-center justify-center gap-1.5 text-emerald-200 text-xs font-semibold">
-            <Check className="h-3.5 w-3.5" /> Saved to your portfolio
+          <div className="flex items-center justify-center gap-1.5 text-emerald-600 text-xs font-extrabold">
+            <Check className="h-3.5 w-3.5 text-emerald-600 bg-emerald-100 rounded-full p-0.5" /> Saved to your portfolio
           </div>
         )}
         <Button
           onClick={onRestart}
-          className="w-full bg-white/15 backdrop-blur text-white hover:bg-white/25 ring-1 ring-white/30 font-bold rounded-2xl h-12"
+          className="w-full bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 font-extrabold rounded-2xl h-14 shadow-sm transition-transform active:scale-95"
         >
-          <span className="flex items-center gap-2"><RotateCcw className="h-4 w-4" /> Play again</span>
+          <span className="flex items-center justify-center gap-2">
+            <RotateCcw className="h-4 w-4" /> Play again
+          </span>
         </Button>
       </div>
     </motion.div>

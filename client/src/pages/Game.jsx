@@ -133,9 +133,9 @@ export default function Game() {
   }
 
   return (
-    <div className="h-[100dvh] w-full bg-gradient-to-br from-violet-600 via-fuchsia-600 to-amber-500 overflow-hidden flex flex-col">
-      <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
-        <div className="min-h-full flex flex-col px-4 pt-5 pb-[calc(1rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto">
+    <div className="h-[100dvh] w-full bg-[#eef3f0] overflow-hidden flex flex-col">
+      <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-gradient-to-br from-[#fbf5f2] via-[#f7eef5] to-[#f0f6f8]">
+        <div className="min-h-full flex flex-col px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto justify-center">
           {showProgress && (
             <div className="mb-6 shrink-0 flex items-center justify-between">
               <div className="flex-1">
@@ -143,7 +143,7 @@ export default function Game() {
               </div>
               <button 
                 onClick={handleRestart}
-                className="text-white/60 hover:text-white text-sm font-bold bg-white/10 hover:bg-white/20 rounded-full h-8 w-8 flex items-center justify-center transition ml-4 shrink-0 shadow-sm"
+                className="text-slate-500 hover:text-slate-900 text-sm font-extrabold bg-[#f0f4f2] hover:bg-slate-200 rounded-full h-8 w-8 flex items-center justify-center transition ml-4 shrink-0 shadow-sm"
                 title="Exit to Main Menu"
               >
                 ✕
@@ -152,7 +152,7 @@ export default function Game() {
           )}
 
           {error && (
-            <div className="bg-rose-500/90 text-white text-sm text-center rounded-2xl px-4 py-2.5 mb-4">
+            <div className="bg-rose-50 border border-rose-150 text-rose-600 text-sm text-center rounded-2xl px-4 py-2.5 mb-4 shadow-sm font-semibold">
               {error}
             </div>
           )}

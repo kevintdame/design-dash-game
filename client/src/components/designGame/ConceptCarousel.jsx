@@ -5,11 +5,11 @@ import { ChevronLeft, ChevronRight, Quote, ImageIcon } from "lucide-react";
 function ScoreBar({ label, score, color }) {
   return (
     <div>
-      <div className="flex justify-between text-[11px] font-semibold text-white/80 mb-1">
-        <span className="uppercase tracking-wide">{label}</span>
+      <div className="flex justify-between text-[10px] font-extrabold text-slate-500 mb-1">
+        <span className="uppercase tracking-widest">{label}</span>
         <span>{score}/100</span>
       </div>
-      <div className="h-2 rounded-full bg-white/15 overflow-hidden">
+      <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${score}%` }}
@@ -33,13 +33,19 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
   function renderSlide() {
     if (idx === 0) {
       return (
-        <div className="w-full p-5 text-left overflow-y-auto max-h-[360px] [-webkit-overflow-scrolling:touch]">
-          <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold mb-1">The Challenge</div>
-          <p className="text-white/90 text-xs mb-4 leading-relaxed">{challenge?.title}</p>
-          <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold mb-1">User Problem</div>
-          <p className="text-white text-sm mb-4 leading-relaxed">{concept.problem}</p>
-          <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold mb-1">Solution Overview</div>
-          <p className="text-white text-sm leading-relaxed">{concept.solutionOverview}</p>
+        <div className="w-full p-6 text-left overflow-y-auto max-h-[360px] [-webkit-overflow-scrolling:touch] space-y-4">
+          <div>
+            <div className="text-slate-400 text-[10px] uppercase tracking-widest font-extrabold mb-1.5">The Challenge</div>
+            <p className="text-slate-800 text-xs font-semibold leading-relaxed">{challenge?.title}</p>
+          </div>
+          <div>
+            <div className="text-slate-400 text-[10px] uppercase tracking-widest font-extrabold mb-1.5">User Problem</div>
+            <p className="text-slate-800 text-xs font-semibold leading-relaxed">{concept.problem}</p>
+          </div>
+          <div>
+            <div className="text-slate-400 text-[10px] uppercase tracking-widest font-extrabold mb-1.5">Solution Overview</div>
+            <p className="text-slate-800 text-xs font-semibold leading-relaxed">{concept.solutionOverview}</p>
+          </div>
         </div>
       );
     }
@@ -47,34 +53,36 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
       const f = features[idx - 1];
       return (
         <div className="w-full text-left">
-          <div className="aspect-[4/3] bg-white/10 flex items-center justify-center">
+          <div className="aspect-[4/3] bg-slate-50 border-b border-slate-100 flex items-center justify-center">
             {f.image_url ? (
               <img src={f.image_url} alt={f.title} className="w-full h-full object-cover" />
             ) : (
-              <ImageIcon className="h-10 w-10 text-white/30" />
+              <ImageIcon className="h-10 w-10 text-slate-300 animate-pulse" />
             )}
           </div>
-          <div className="p-5">
-            <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold mb-1">Feature {idx}</div>
-            <h3 className="text-white font-bold text-base mb-1.5">{f.title}</h3>
-            <p className="text-white/85 text-sm leading-relaxed">{f.description}</p>
+          <div className="p-6">
+            <div className="text-slate-400 text-[10px] uppercase tracking-widest font-extrabold mb-1.5">Feature {idx}</div>
+            <h3 className="text-slate-900 font-extrabold text-base mb-1.5">{f.title}</h3>
+            <p className="text-slate-600 text-xs font-semibold leading-relaxed">{f.description}</p>
           </div>
         </div>
       );
     }
     return (
-      <div className="w-full p-5 text-center">
-        <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold mb-1">{challenge?.customer_name}'s Verdict</div>
-        <div className="text-5xl font-extrabold text-white font-display mb-0.5">{overall}</div>
-        <div className="text-amber-200 font-bold text-xs mb-4">{tier}</div>
-        <div className="space-y-2.5 text-left mb-4">
-          <ScoreBar label="Value" score={ratings.value} color="bg-emerald-400" />
-          <ScoreBar label="Creativity" score={ratings.creativity} color="bg-fuchsia-400" />
-          <ScoreBar label="Uniqueness" score={ratings.uniqueness} color="bg-violet-400" />
+      <div className="w-full p-6 text-center">
+        <div className="text-slate-400 text-[10px] uppercase tracking-widest font-extrabold mb-2">{challenge?.customer_name}'s Verdict</div>
+        <div className="text-5xl font-black bg-gradient-to-r from-[#c93c76] via-[#de573a] to-[#f09c35] bg-clip-text text-transparent font-sans mb-1">{overall}</div>
+        <div className="text-[#de573a] font-extrabold text-xs mb-4">{tier}</div>
+        
+        <div className="space-y-3 text-left mb-5">
+          <ScoreBar label="Value" score={ratings.value} color="bg-emerald-500" />
+          <ScoreBar label="Creativity" score={ratings.creativity} color="bg-fuchsia-500" />
+          <ScoreBar label="Uniqueness" score={ratings.uniqueness} color="bg-violet-500" />
         </div>
-        <div className="bg-white/10 ring-1 ring-white/20 rounded-2xl p-3 text-left">
-          <Quote className="h-4 w-4 text-amber-200 mb-1" />
-          <p className="text-white/90 text-xs leading-relaxed italic">{ratings.review}</p>
+        
+        <div className="bg-amber-50/80 border border-amber-100 rounded-2xl p-4 text-left">
+          <Quote className="h-4 w-4 text-amber-500 mb-1" />
+          <p className="text-slate-700 text-xs font-semibold leading-relaxed italic">"{ratings.review}"</p>
         </div>
       </div>
     );
@@ -82,7 +90,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
 
   return (
     <div className="relative">
-      <div className="relative bg-white/10 backdrop-blur ring-1 ring-white/25 rounded-3xl overflow-hidden">
+      <div className="relative bg-white border border-slate-100 rounded-[32px] overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.04)]">
         <div className="min-h-[360px] flex items-stretch">
           <AnimatePresence mode="wait">
             <motion.div
@@ -91,7 +99,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.25 }}
-              className="w-full flex flex-col"
+              className="w-full flex flex-col justify-center"
             >
               {renderSlide()}
             </motion.div>
@@ -99,23 +107,29 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
         </div>
 
         {idx > 0 && (
-          <button onClick={() => go(-1)} className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 text-purple-700 flex items-center justify-center shadow-md hover:bg-white">
+          <button 
+            onClick={() => go(-1)} 
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-md hover:bg-slate-800 transition active:scale-90"
+          >
             <ChevronLeft className="h-5 w-5" />
           </button>
         )}
         {idx < total - 1 && (
-          <button onClick={() => go(1)} className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 text-purple-700 flex items-center justify-center shadow-md hover:bg-white">
+          <button 
+            onClick={() => go(1)} 
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-md hover:bg-slate-800 transition active:scale-90"
+          >
             <ChevronRight className="h-5 w-5" />
           </button>
         )}
       </div>
 
-      <div className="flex justify-center gap-1.5 mt-3">
+      <div className="flex justify-center gap-1.5 mt-4">
         {Array.from({ length: total }).map((_, i) => (
           <button
             key={i}
             onClick={() => setIdx(i)}
-            className={`h-1.5 rounded-full transition-all ${i === idx ? "w-5 bg-white" : "w-1.5 bg-white/40"}`}
+            className={`h-1.5 rounded-full transition-all ${i === idx ? "w-5 bg-slate-900" : "w-1.5 bg-slate-350"}`}
           />
         ))}
       </div>

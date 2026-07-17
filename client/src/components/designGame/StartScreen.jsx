@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const DOMAINS = [
@@ -14,21 +14,19 @@ const DOMAINS = [
   "Work & Productivity"
 ];
 
-const CONSTRAINTS = ["app", "product", "service", "event"];
-
 function Chip({ active, onClick, children }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`relative text-sm font-semibold rounded-2xl px-4 py-2.5 transition-all ring-1 ${
+      className={`relative text-xs font-extrabold rounded-2xl px-4 py-3 transition-all ${
         active
-          ? "bg-white text-purple-700 ring-white shadow-md"
-          : "bg-white/10 text-white ring-white/25 hover:bg-white/20"
+          ? "bg-slate-900 text-white shadow-md"
+          : "bg-[#f0f4f2] text-slate-700 hover:bg-[#e3eae5]"
       }`}
     >
       {children}
-      {active && <Check className="absolute -top-1 -right-1 h-3.5 w-3.5 text-purple-700 bg-white rounded-full p-0.5" />}
+      {active && <Check className="absolute -top-1 -right-1 h-3.5 w-3.5 text-white bg-slate-900 rounded-full p-0.5" />}
     </button>
   );
 }
@@ -38,8 +36,7 @@ export default function StartScreen({ onStart, loading, onBack }) {
 
   function handleStartSingle() {
     if (!domain) return;
-    const randomConstraint = CONSTRAINTS[Math.floor(Math.random() * CONSTRAINTS.length)];
-    onStart(domain, randomConstraint);
+    onStart(domain);
   }
 
   return (
@@ -51,13 +48,15 @@ export default function StartScreen({ onStart, loading, onBack }) {
     >
       {/* Header */}
       <div className="flex flex-col items-center space-y-2 text-center">
-        <div className="text-[10px] uppercase font-bold text-white/50 tracking-widest">Step 2 of 3</div>
-        <h2 className="text-2xl font-extrabold text-white font-display">Choose a Domain</h2>
-        <p className="text-white/80 text-xs">Pick the focus area for your design challenge.</p>
+        <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Step 2 of 3</div>
+        <h2 className="text-3xl font-black uppercase tracking-tighter bg-gradient-to-r from-[#c93c76] to-[#de573a] bg-clip-text text-transparent font-sans">
+          Choose a Domain
+        </h2>
+        <p className="text-slate-500 text-xs font-semibold">Pick the focus area for your design challenge.</p>
       </div>
 
       {/* Domain Selection */}
-      <div className="text-left w-full bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-5 shadow-inner">
+      <div className="text-left w-full bg-white border border-slate-100 rounded-[32px] p-6 shadow-[0_12px_40px_rgba(0,0,0,0.04)]">
         <div className="flex flex-wrap justify-center gap-2">
           {DOMAINS.map((d) => (
             <Chip key={d} active={domain === d} onClick={() => setDomain(d)}>
@@ -73,11 +72,11 @@ export default function StartScreen({ onStart, loading, onBack }) {
           onClick={handleStartSingle}
           disabled={!domain || loading}
           size="lg"
-          className="w-full bg-white text-purple-700 hover:bg-white/95 font-extrabold rounded-2xl shadow-xl h-14 text-sm disabled:opacity-50"
+          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl shadow-lg h-14 text-sm disabled:opacity-50 transition-transform active:scale-[0.98]"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="h-4 w-4 border-2 border-purple-700/30 border-t-purple-700 rounded-full animate-spin" />
+              <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               Generating Challenge...
             </span>
           ) : (
@@ -90,7 +89,7 @@ export default function StartScreen({ onStart, loading, onBack }) {
         <button
           type="button"
           onClick={onBack}
-          className="w-full flex items-center justify-center space-x-1.5 text-white/70 hover:text-white text-xs font-semibold py-2 transition"
+          className="w-full flex items-center justify-center space-x-1.5 text-slate-400 hover:text-slate-900 text-xs font-bold py-2 transition"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Go Back</span>

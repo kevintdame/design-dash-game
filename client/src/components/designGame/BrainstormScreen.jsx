@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import InsightWall from "@/components/designGame/InsightWall";
 
 const ENTHU = {
-  excited: { icon: ThumbsUp, color: "text-emerald-300", ring: "ring-emerald-300/40", bg: "bg-emerald-400/15" },
-  interested: { icon: ThumbsUp, color: "text-sky-300", ring: "ring-sky-300/40", bg: "bg-sky-400/15" },
-  neutral: { icon: Meh, color: "text-amber-200", ring: "ring-amber-200/40", bg: "bg-amber-400/15" },
-  skeptical: { icon: ThumbsDown, color: "text-rose-300", ring: "ring-rose-300/40", bg: "bg-rose-400/15" }
+  excited: { icon: ThumbsUp, color: "text-emerald-600", ring: "ring-emerald-300/40", bg: "bg-emerald-50" },
+  interested: { icon: ThumbsUp, color: "text-blue-600", ring: "ring-blue-300/40", bg: "bg-blue-50" },
+  neutral: { icon: Meh, color: "text-amber-600", ring: "ring-amber-200/40", bg: "bg-amber-50" },
+  skeptical: { icon: ThumbsDown, color: "text-rose-600", ring: "ring-rose-300/40", bg: "bg-rose-50" }
 };
 
 export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedbacks, setFeedbacks, insights, onContinue }) {
@@ -46,11 +46,11 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
       exit={{ opacity: 0, x: -30 }}
       className="max-w-md mx-auto"
     >
-      <div className="flex items-center gap-2 text-white/80 mb-2">
+      <div className="flex items-center gap-2 text-slate-500 mb-2">
         <Lightbulb className="h-4 w-4" />
-        <span className="text-xs font-semibold uppercase tracking-wider">Brainstorm</span>
+        <span className="text-xs font-extrabold uppercase tracking-widest">Brainstorm</span>
       </div>
-      <p className="text-white text-sm mb-4">
+      <p className="text-slate-600 text-sm font-semibold mb-4">
         Based on your research, write your <strong>3 best ideas</strong> for {challenge.customer_name.split(" ")[0]}.
       </p>
 
@@ -62,14 +62,14 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
           const enthu = fb ? ENTHU[fb.enthusiasm] || ENTHU.neutral : null;
           const Icon = enthu?.icon;
           return (
-            <div key={i} className="bg-white rounded-2xl p-4 shadow-lg">
+            <div key={i} className="bg-white border border-slate-100 rounded-[28px] p-5 shadow-[0_12px_40px_rgba(0,0,0,0.03)]">
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-6 w-6 rounded-full bg-purple-600 text-white text-xs font-bold flex items-center justify-center">
+                <div className="h-6 w-6 rounded-full bg-slate-900 text-white text-xs font-black flex items-center justify-center">
                   {i + 1}
                 </div>
-                <span className="text-xs font-semibold text-slate-400 uppercase">Idea {i + 1}</span>
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Idea {i + 1}</span>
                 {Icon && (
-                  <span className={`ml-auto flex items-center gap-1 text-[10px] font-bold uppercase ${enthu.color}`}>
+                  <span className={`ml-auto flex items-center gap-1 text-[10px] font-extrabold uppercase ${enthu.color}`}>
                     <Icon className="h-3.5 w-3.5" /> {fb.enthusiasm}
                   </span>
                 )}
@@ -85,7 +85,7 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
                 placeholder={`Describe idea ${i + 1}...`}
                 rows={2}
                 disabled={hasFeedback}
-                className="w-full text-base sm:text-sm text-slate-900 placeholder:text-slate-300 outline-none resize-none bg-transparent"
+                className="w-full text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none resize-none bg-transparent"
               />
               <AnimatePresence>
                 {fb && (
@@ -93,12 +93,12 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className={`mt-2 pt-2 border-t border-slate-100 ${fb.error ? 'bg-rose-50' : enthu.bg} rounded-xl px-3 py-2`}
+                    className={`mt-3 pt-3 border-t border-slate-100 ${fb.error ? 'bg-rose-50' : enthu.bg} rounded-2xl px-3.5 py-2.5`}
                   >
                     {fb.error ? (
-                      <p className="text-xs text-rose-600 font-medium leading-relaxed">{fb.feedback}</p>
+                      <p className="text-xs text-rose-600 font-bold leading-relaxed">{fb.feedback}</p>
                     ) : (
-                      <p className="text-xs text-slate-700 leading-relaxed italic">
+                      <p className="text-xs text-slate-700 font-semibold leading-relaxed italic">
                         "{challenge.customer_name.split(" ")[0]}: {fb.feedback}"
                       </p>
                     )}
@@ -114,7 +114,7 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
         <Button
           onClick={handleGetFeedback}
           disabled={!hasAtLeastOne || loading}
-          className="w-full bg-white text-purple-700 hover:bg-white/90 font-bold rounded-2xl h-12 shadow-md disabled:opacity-50"
+          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl h-14 shadow-lg disabled:opacity-50 transition-transform active:scale-95"
         >
           {loading ? (
             <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Getting feedback...</span>
@@ -125,7 +125,7 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
       ) : (
         <Button
           onClick={onContinue}
-          className="w-full bg-white text-purple-700 hover:bg-white/90 font-bold rounded-2xl h-12 shadow-md"
+          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl h-14 shadow-lg transition-transform active:scale-95"
         >
           <span className="flex items-center justify-center gap-2">Iterate into final concept <ArrowRight className="h-5 w-5" /></span>
         </Button>
