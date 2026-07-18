@@ -623,36 +623,108 @@ Then write a short, in-character review (2-4 sentences) as this customer reactin
   }
 });
 
-// 6. Generate Feature Mockups (Cost-Free SVG Vector generator)
-app.post('/api/generate-images', async (req, res) => {
-  const { features, domain } = req.body;
-  const featuresWithImages = features.map((f, index) => {
-    const hues = [280, 340, 45, 170];
-    const hue = hues[index % hues.length];
-    const svgString = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-        <defs>
-          <linearGradient id="g_${index}" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="hsl(${hue}, 80%, 60%)" />
-            <stop offset="100%" stop-color="hsl(${(hue + 40) % 360}, 80%, 45%)" />
-          </linearGradient>
-        </defs>
-        <rect width="100" height="100" rx="16" fill="url(#g_${index})" />
-        <circle cx="50" cy="50" r="24" fill="white" fill-opacity="0.2" />
-        <path d="M35 50 L45 60 L65 40" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      </svg>
-    `.trim().replace(/\s+/g, ' ');
-    
-    const base64Svg = Buffer.from(svgString).toString('base64');
-    const dataUrl = `data:image/svg+xml;base64,${base64Svg}`;
-    
-    return {
-      ...f,
-      image_url: dataUrl
-    };
-  });
+// 6. Generate Concept Image using Google AI Studio Imagen 3
+app.post('/api/generate-concept-image', async (req, res) => {
+  const { prompt } = req.body;
+  const apiKey = process.env.GEMINI_API_KEY;
 
-  res.json({ features: featuresWithImages });
+  if (isOfflineMode || !apiKey) {
+    console.log("Offline/fallback concept image generation triggered");
+    // Return a clean programmatic SVG fallback
+    const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="200" height="150"><rect width="200" height="150" fill="#20262e" rx="16" /><rect x="15" y="15" width="170" height="80" fill="#282d5a" rx="8" /><circle cx="50" cy="55" r="18" fill="#00d4ff" /><rect x="80" y="44" width="90" height="6" fill="#ffffff" rx="3" opacity="0.9" /><rect x="80" y="58" width="70" height="5" fill="#ffffff" rx="2.5" opacity="0.5" /><rect x="15" y="110" width="170" height="1" fill="#2e3366" /><text x="18" y="130" fill="#00d4ff" font-family="sans-serif" font-size="9" font-weight="bold">PROTOTYPE CONCEPT</text></svg>`;
+    const dataUrl = `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`;
+    return res.json({ url: dataUrl });
+  }
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateImages?key=${apiKey}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: prompt,
+        numberOfImages: 1,
+        outputMimeType: 'image/jpeg',
+        aspectRatio: '4:3'
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Imagen 3 API failed: ${errText}`);
+    }
+
+    const data = await response.json();
+    const base64Image = data.generatedImages?.[0]?.image?.imageBytes;
+    if (!base64Image) {
+      throw new Error("No image data returned from Imagen 3.");
+    }
+
+    res.json({ url: `data:image/jpeg;base64,${base64Image}` });
+  } catch (err) {
+    console.error("Imagen 3 concept generation failed:", err);
+    res.status(500).json({ error: "Failed to generate image via Imagen 3" });
+  }
+});
+
+// 6b. Generate Feature Images using Google AI Studio Imagen 3
+app.post('/api/generate-feature-images', async (req, res) => {
+  const { features, domain } = req.body;
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (isOfflineMode || !apiKey) {
+    console.log("Offline/fallback feature image generation triggered");
+    const featuresWithImages = features.map((f, index) => {
+      const hues = [280, 340, 45, 170];
+      const hue = hues[index % hues.length];
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><defs><linearGradient id="g_${index}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="hsl(${hue}, 80%, 60%)" /><stop offset="100%" stop-color="hsl(${(hue + 40) % 360}, 80%, 45%)" /></linearGradient></defs><rect width="100" height="100" rx="16" fill="url(#g_${index})" /><circle cx="50" cy="50" r="24" fill="white" fill-opacity="0.2" /><path d="M35 50 L45 60 L65 40" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" /></svg>`;
+      return {
+        ...f,
+        image_url: `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`
+      };
+    });
+    return res.json({ features: featuresWithImages });
+  }
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateImages?key=${apiKey}`;
+    const featuresWithImages = await Promise.all(
+      features.map(async (f, index) => {
+        const prompt = `Clean, modern product concept illustration for a "${domain}" design challenge. Feature concept: "${f.title}" — ${f.description}. Render a polished, realistic mockup-style image, Swiss minimalist design aesthetic: deep charcoal background (#2B303A), electric cyan (#00D4FF) accents, clean bold silhouettes, simple geometric shapes, minimal shading, solid color blocks, friendly stylized illustration style. Solid dark background. No text, words, or logos in the image.`;
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prompt: prompt,
+              numberOfImages: 1,
+              outputMimeType: 'image/jpeg',
+              aspectRatio: '1:1'
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`Feature ${index} Imagen 3 API failed`);
+          }
+
+          const data = await response.json();
+          const base64Image = data.generatedImages?.[0]?.image?.imageBytes;
+          return {
+            ...f,
+            image_url: base64Image ? `data:image/jpeg;base64,${base64Image}` : null
+          };
+        } catch (err) {
+          console.error(`Imagen 3 feature ${index} generation failed:`, err);
+          return { ...f, image_url: null };
+        }
+      })
+    );
+
+    res.json({ features: featuresWithImages });
+  } catch (err) {
+    console.error("Imagen 3 feature generation failed:", err);
+    res.status(500).json({ error: "Failed to generate feature images via Imagen 3" });
+  }
 });
 
 // 7. Database / Portfolio saving

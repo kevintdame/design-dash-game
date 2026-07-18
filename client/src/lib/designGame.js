@@ -69,19 +69,29 @@ export async function rateFinalConcept(challenge, concept) {
 }
 
 export async function generateFeatureImages(features, domain) {
-  return features.map((f, index) => {
-    const prompt = `Clean, modern product concept illustration for a "${domain}" design challenge. Feature concept: "${f.title}" — ${f.description}. Render a polished, realistic mockup-style image, Swiss minimalist design aesthetic: deep charcoal background (#2B303A), electric cyan (#00D4FF) accents, clean bold silhouettes, simple geometric shapes, minimal shading, solid color blocks, friendly stylized illustration style. Solid dark background. No text, words, or logos in the image.`;
-    const seed = Math.floor(Math.random() * 100000) + index;
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=300&height=300&nologo=true&seed=${seed}`;
-    return {
-      ...f,
-      image_url: imageUrl
-    };
+  const res = await fetch("/api/generate-feature-images", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ features, domain })
   });
+  if (!res.ok) {
+    return features.map(f => ({ ...f, image_url: null }));
+  }
+  const data = await res.json();
+  return data.features || features;
 }
 
 export async function generateConceptImage(solutionOverview, domain) {
   const prompt = `Flat vector illustration showing the ACTUAL product or service described below, depicted as concretely and specifically as possible — render the real physical object, app screen, device, or service moment a user would interact with, not abstract shapes or generic icons. Concept: ${solutionOverview}. Show specific product details: form factor, screen layouts, buttons, physical components, or the service-in-use moment that this concept implies. Swiss minimalist design aesthetic: deep charcoal background (#2B303A), electric cyan (#00D4FF) accents, clean bold silhouettes, simple geometric shapes, minimal shading, solid color blocks, friendly stylized illustration style. Solid dark background. No text, words, or logos in the image.`;
-  const seed = Math.floor(Math.random() * 100000);
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=400&height=300&nologo=true&seed=${seed}`;
+  
+  const res = await fetch("/api/generate-concept-image", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
+  });
+  if (!res.ok) {
+    throw new Error("Imagen 3 generation failed on the server");
+  }
+  const data = await res.json();
+  return data.url;
 }
