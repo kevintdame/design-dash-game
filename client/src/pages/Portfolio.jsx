@@ -55,24 +55,32 @@ export default function Portfolio() {
                   to={`/portfolio/${s.id}`}
                   className="block bg-card rounded-2xl p-4 ring-1 ring-black/5 shadow-sm hover:shadow-md transition-shadow"
                 >
+                  {s.concept_image && (
+                    <div className="aspect-[16/9] w-full rounded-xl overflow-hidden bg-black/5 ring-1 ring-black/5 mb-3">
+                      <img src={s.concept_image} alt={s.concept_name || "Concept mockup"} className="w-full h-full object-cover" />
+                    </div>
+                  )}
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="text-cyan-500 text-[10px] uppercase tracking-wider font-bold mb-0.5">{s.domain}</div>
-                      <h3 className="text-card-foreground font-bold text-sm leading-snug truncate">{s.challenge_title}</h3>
-                      <p className="text-slate-500 text-xs mt-1">for {s.customer_name}</p>
+                      <h3 className="text-card-foreground font-bold text-sm leading-snug truncate">{s.concept_name || s.challenge_title}</h3>
+                      <p className="text-slate-400 text-xs mt-1 truncate">{s.solution_overview}</p>
+                      <p className="text-slate-500 text-[10px] mt-1.5">Challenge: {s.challenge_title} for {s.customer_name}</p>
                     </div>
                     <div className="text-center shrink-0">
                       <div className="text-2xl font-extrabold font-display text-gradient">{overallOf(s)}</div>
                       <div className="text-slate-400 text-[10px]">score</div>
                     </div>
                   </div>
-                  <div className="flex gap-1.5 mt-3">
-                    {(s.features || []).slice(0, 3).map((f, i) => (
-                      <div key={i} className="h-10 w-10 rounded-lg bg-black/5 overflow-hidden">
-                        {f.image_url && <img src={f.image_url} alt="" className="w-full h-full object-cover" />}
-                      </div>
-                    ))}
-                  </div>
+                  {s.features && s.features.length > 0 && (
+                    <div className="flex gap-1.5 mt-3">
+                      {s.features.slice(0, 3).map((f, i) => (
+                        <div key={i} className="h-10 w-10 rounded-lg bg-black/5 overflow-hidden">
+                          {f.image_url && <img src={f.image_url} alt="" className="w-full h-full object-cover" />}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </Link>
               </motion.div>
             ))}

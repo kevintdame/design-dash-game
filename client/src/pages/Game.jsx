@@ -119,6 +119,8 @@ export default function Game() {
           challenge_scenario: challenge.scenario,
           customer_name: challenge.customer_name,
           customer_role: challenge.customer_role,
+          concept_name: concept.name,
+          concept_image: concept.image,
           problem: concept.problem,
           solution_overview: concept.solutionOverview,
           features: concept.features,
