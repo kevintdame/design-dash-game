@@ -82,7 +82,7 @@ export async function generateFeatureImages(features, domain) {
 }
 
 export async function generateConceptImage(solutionOverview, domain) {
-  const prompt = `Flat vector illustration showing the ACTUAL product or service described below, depicted as concretely and specifically as possible — render the real physical object, app screen, device, or service moment a user would interact with, not abstract shapes or generic icons. Concept: ${solutionOverview}. Show specific product details: form factor, screen layouts, buttons, physical components, or the service-in-use moment that this concept implies. Swiss minimalist design aesthetic: deep charcoal background (#2B303A), electric cyan (#00D4FF) accents, clean bold silhouettes, simple geometric shapes, minimal shading, solid color blocks, friendly stylized illustration style. Solid dark background. No text, words, or logos in the image.`;
+  const prompt = `Flat vector illustration showing the ACTUAL product or service described below, depicted as concretely and specifically as possible — render the real physical object, app screen, device, or service-in-use moment with a user character interacting with it, not abstract shapes or generic icons. Concept: ${solutionOverview}. Show specific details: screen layouts, buttons, or the user in action. Swiss minimalist 2D design aesthetic: deep charcoal dark gray background, bright electric cyan and blue accents, clean bold silhouettes, simple geometric shapes, minimal shading, solid flat color blocks, friendly stylized illustration style, SVG style. No text, words, or logos in the image.`;
   
   const res = await fetch("/api/generate-concept-image", {
     method: "POST",
