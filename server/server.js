@@ -519,9 +519,10 @@ Internal context: ${challenge.customer_context}
 THE DESIGNER'S FINAL CONCEPT:
 ${conceptText}
 
-Rate this concept on three dimensions, each 1-100, based on how it lands for YOU as this customer:
+Rate this concept on three dimensions, each 1-100, based on how it lands for YOU as this customer.
+Please be encouraging and constructive. If the concept solves your needs or covers the requested aspects, lean towards higher ratings (typically between 85 and 98). Do not score below 75 unless it is completely off-topic or fails to address any needs:
 - value_score: How much it solves a real problem you actually have and would pay/use for.
-- creativity_score: How inventive and fresh the approach feels (not a generic solution).
+- creativity_score: How inventive and fresh the approach feels.
 - uniqueness_score: How differentiated it is from existing solutions on the market.
 
 Then write a short, in-character review (2-4 sentences) as this customer reacting to the final concept.
@@ -753,6 +754,7 @@ CONCEPT ${i + 1} (by ${p.name}, Player ID: ${p.id}):
 `).join("\n")}
 
 STRICT EVALUATION RULES:
+- Please be encouraging and constructive. If a concept solves your needs or covers the requested aspects, lean towards higher ratings (typically between 85 and 98). Do not score below 75 unless it is completely off-topic or fails to address any needs.
 - Evaluate each concept strictly based ONLY on the text provided above.
 - Do NOT invent, assume, or hallucinate details, features, or problem statements for any player. If a player's concept is incomplete, empty, or missing sections, evaluate it strictly as empty, award a score of 0 for those incomplete dimensions, and state the omission in your review.
 

@@ -33,7 +33,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
   function renderSlide() {
     if (idx === 0) {
       return (
-        <div className="w-full text-left overflow-y-auto max-h-[360px] [-webkit-overflow-scrolling:touch]">
+        <div className="w-full text-left overflow-y-auto max-h-[480px] [-webkit-overflow-scrolling:touch]">
           {concept.image && (
             <div className="aspect-[4/3] bg-black/5">
               <img src={concept.image} alt={concept.name || "Concept"} className="w-full h-full object-cover" />
@@ -68,7 +68,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
       );
     }
     return (
-      <div className="w-full p-5 text-center overflow-y-auto max-h-[360px] [-webkit-overflow-scrolling:touch]">
+      <div className="w-full p-5 text-center overflow-y-auto max-h-[480px] [-webkit-overflow-scrolling:touch]">
         <div className="space-y-2.5 text-left mb-4">
           <ScoreBar label="Value" score={ratings.value} />
           <ScoreBar label="Creativity" score={ratings.creativity} />
@@ -85,7 +85,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
   return (
     <div className="relative">
       <div className="relative bg-card ring-1 ring-black/5 rounded-2xl overflow-hidden shadow-lg">
-        <div className="min-h-[360px] flex items-stretch">
+        <div className="min-h-[440px] flex items-stretch">
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}

@@ -139,26 +139,26 @@ export default function Game() {
 
   return (
     <div className="relative h-[100dvh] w-full bg-transparent overflow-hidden flex flex-col">
-      {showProgress && (
-        <button
-          type="button"
-          onClick={() => {
-            if (window.confirm("Exit this game and start a new one? Your current progress will be lost.")) {
-              handleRestart();
-            }
-          }}
-          className="absolute top-4 right-4 z-20 h-9 w-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 ring-1 ring-black/5 flex items-center justify-center transition-colors shadow-md"
-          aria-label="Exit game"
-          title="Exit game"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      )}
       <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
         <div className="min-h-full flex flex-col px-4 pt-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto">
           {showProgress && (
-            <div className="mb-4 shrink-0">
-              <ProgressHeader currentIndex={currentIndex < 0 ? 0 : currentIndex} />
+            <div className="flex items-center justify-between gap-4 mb-4 shrink-0">
+              <div className="flex-1">
+                <ProgressHeader currentIndex={currentIndex < 0 ? 0 : currentIndex} />
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm("Exit this game and start a new one? Your current progress will be lost.")) {
+                    handleRestart();
+                  }
+                }}
+                className="h-9 w-9 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition-colors shadow-md border border-slate-700/60 shrink-0"
+                aria-label="Exit game"
+                title="Exit game"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
           )}
 
