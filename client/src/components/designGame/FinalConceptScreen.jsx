@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Rocket, ArrowRight, Loader2, ImageIcon, Sparkles, RefreshCw } from "lucide-react";
+import { Rocket, ArrowRight, Loader2, ImageIcon, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { generateConceptImage } from "@/lib/designGame";
 
@@ -10,6 +10,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
   const [solutionOverview, setSolutionOverview] = useState("");
   const [image, setImage] = useState(null);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState(false);
   const [features, setFeatures] = useState([
     { title: "", description: "" },
     { title: "", description: "" },
@@ -28,6 +29,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
 
   async function handleGenerateImage() {
     if (!canGenerateImage || generatingImage) return;
+    setImageLoadError(false);
     setGeneratingImage(true);
     try {
       const url = await generateConceptImage(solutionOverview, domain);
@@ -98,9 +100,14 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
             className="w-full mt-1 text-base sm:text-sm text-card-foreground placeholder:text-slate-300 outline-none resize-none leading-relaxed"
           />
           <div className="mt-3">
-            {image ? (
+            {image && !imageLoadError ? (
               <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5">
-                <img src={image} alt="Concept visual" className="w-full aspect-[4/3] object-cover" />
+                <img 
+                  src={image} 
+                  alt="Concept visual" 
+                  className="w-full aspect-[4/3] object-cover animate-fade-in" 
+                  onError={() => setImageLoadError(true)}
+                />
                 {generatingImage && (
                   <div className="absolute inset-0 bg-black/55 flex items-center justify-center backdrop-blur-[1px]">
                     <Loader2 className="h-7 w-7 text-cyan-400 animate-spin" />
@@ -115,6 +122,23 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
                 >
                   {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                 </button>
+              </div>
+            ) : image && imageLoadError ? (
+              <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 aspect-[4/3] bg-card border border-cyan-400/20 flex flex-col items-center justify-center p-6 text-center">
+                <AlertCircle className="h-8 w-8 text-cyan-400 mb-2" />
+                <div className="text-white font-bold text-xs">Image Generation Overloaded</div>
+                <div className="text-slate-400 text-[10px] mt-1 max-w-[240px] leading-relaxed">
+                  The free image generation server is currently busy. Please wait a moment and click retry.
+                </div>
+                <Button
+                  type="button"
+                  onClick={handleGenerateImage}
+                  disabled={generatingImage}
+                  className="mt-3 bg-cyan-400 text-[#20262e] hover:bg-cyan-300 text-xs font-bold px-4 py-1.5 h-8 rounded-lg"
+                >
+                  {generatingImage ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
+                  Retry generation
+                </Button>
               </div>
             ) : (
               <Button

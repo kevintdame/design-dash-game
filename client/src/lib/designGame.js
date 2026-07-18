@@ -82,7 +82,7 @@ export async function generateFeatureImages(features, domain) {
 }
 
 export async function generateConceptImage(solutionOverview, domain) {
-  const prompt = `Flat 2D vector illustration showing a clean minimalist product or app UI mockup representing the concept: "${solutionOverview}". Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, no text.`;
+  const prompt = `Flat 2D vector illustration showing the portrait mobile phone UI screen mockup of a "${solutionOverview}" app. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, no text.`;
   
   const res = await fetch("/api/generate-concept-image", {
     method: "POST",
