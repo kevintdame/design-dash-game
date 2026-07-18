@@ -69,31 +69,19 @@ export async function rateFinalConcept(challenge, concept) {
 }
 
 export async function generateFeatureImages(features, domain) {
-  const res = await fetch("/api/generate-images", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ features, domain })
+  return features.map((f, index) => {
+    const prompt = `Minimalist vector icon illustration of a product feature: "${f.title}" — ${f.description}. UI element/mockup style, flat design, clean bold outlines, deep charcoal gray background, electric cyan and blue details. Friendly stylized design vector. No text, words, labels, or logos in the image.`;
+    const seed = Math.floor(Math.random() * 100000) + index;
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=300&height=300&nologo=true&seed=${seed}`;
+    return {
+      ...f,
+      image_url: imageUrl
+    };
   });
-  if (!res.ok) {
-    return features.map(f => ({ ...f, image_url: null }));
-  }
-  const data = await res.json();
-  return data.features || features;
 }
 
 export async function generateConceptImage(solutionOverview, domain) {
-  const domStr = domain ? String(domain).toUpperCase() : "PROTOTYPE";
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="200" height="150">
-      <rect width="200" height="150" fill="#20262e" rx="16" />
-      <rect x="15" y="15" width="170" height="80" fill="#282d5a" rx="8" />
-      <circle cx="50" cy="55" r="18" fill="#00d4ff" />
-      <rect x="80" y="44" width="90" height="6" fill="#ffffff" rx="3" opacity="0.9" />
-      <rect x="80" y="58" width="70" height="5" fill="#ffffff" rx="2.5" opacity="0.5" />
-      <rect x="15" y="110" width="170" height="1" fill="#2e3366" />
-      <text x="18" y="130" fill="#00d4ff" font-family="sans-serif" font-size="9" font-weight="bold">${domStr} CONCEPT</text>
-    </svg>
-  `.trim();
-  const base64 = btoa(encodeURIComponent(svg).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode(parseInt(p1, 16))));
-  return `data:image/svg+xml;base64,${base64}`;
+  const prompt = `Flat vector illustration showing the product concept: "${solutionOverview}" in the domain of "${domain}". Swiss minimalist design aesthetic: deep charcoal slate background, electric cyan (#00d4ff) and blue accents, clean bold silhouettes, simple geometric shapes, minimal shading, solid color blocks, friendly stylized illustration style. No text, words, labels, or logos in the image.`;
+  const seed = Math.floor(Math.random() * 100000);
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=400&height=300&nologo=true&seed=${seed}`;
 }
