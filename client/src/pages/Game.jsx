@@ -8,7 +8,6 @@ import InterviewScreen from "@/components/designGame/InterviewScreen";
 import BrainstormScreen from "@/components/designGame/BrainstormScreen";
 import FinalConceptScreen from "@/components/designGame/FinalConceptScreen";
 import ResultsScreen from "@/components/designGame/ResultsScreen";
-import { base44 } from "@/api/base44Client";
 import { generateChallenge, rateFinalConcept, synthesizeInsights, generateFeatureImages } from "@/lib/designGame";
 import InsightWall from "@/components/designGame/InsightWall";
 import { X } from "lucide-react";
