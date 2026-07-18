@@ -817,8 +817,8 @@ CONCEPT ${i + 1} (by ${p.name}, Player ID: ${p.id}):
 `).join("\n")}
 
 STRICT EVALUATION RULES:
-- Please be encouraging and constructive. If a concept solves your needs or covers the requested aspects, lean towards higher ratings (typically between 85 and 98). Do not score below 75 unless it is completely off-topic or fails to address any needs.
-- Evaluate each concept strictly based ONLY on the text provided above.
+- Evaluate each concept strictly and honestly based ONLY on the text provided above.
+- Compare each concept to your actual problems, frustrations, and needs. Do not be nice or give pity scores. If a concept is off-topic, incomplete, or fails to address your needs, rate it very low (below 35).
 - Do NOT invent, assume, or hallucinate details, features, or problem statements for any player. If a player's concept is incomplete, empty, or missing sections, evaluate it strictly as empty, award a score of 0 for those incomplete dimensions, and state the omission in your review.
 
 Task:
