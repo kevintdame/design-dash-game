@@ -20,6 +20,12 @@
     "customer_role": {
       "type": "string"
     },
+    "concept_name": {
+      "type": "string"
+    },
+    "concept_image": {
+      "type": "string"
+    },
     "problem": {
       "type": "string"
     },

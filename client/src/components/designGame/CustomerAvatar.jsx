@@ -13,11 +13,11 @@ function hashCode(str) {
 export default function CustomerAvatar({ name, className = "h-16 w-16" }) {
   const hash = hashCode(name || "Alex");
 
-  // Palette matching the reference illustration
-  const bgColors = ["#3b82f6", "#8b5cf6", "#ec4899", "#10b981", "#f43f5e", "#f59e0b"];
+  // Palette matching the cool teal, cyan, and slate theme
+  const bgColors = ["#0891b2", "#0ea5e9", "#0284c7", "#0d9488", "#4f46e5", "#6366f1"];
   const skinTones = ["#ffc5a1", "#ffd8b3", "#d98b6c", "#ab684f", "#e69c73"];
-  const hairColors = ["#1e293b", "#475569", "#7c2d12", "#b45309", "#8b5cf6", "#3f3f46"];
-  const shirtColors = ["#2563eb", "#d946ef", "#eab308", "#10b981", "#f43f5e", "#8b5cf6"];
+  const hairColors = ["#1e293b", "#475569", "#7c2d12", "#b45309", "#4f46e5", "#3f3f46"];
+  const shirtColors = ["#00d4ff", "#3b82f6", "#0d9488", "#4f46e5", "#ec4899", "#8b5cf6"];
 
   const bgColor = bgColors[hash % bgColors.length];
   const skinTone = skinTones[(hash >> 1) % skinTones.length];

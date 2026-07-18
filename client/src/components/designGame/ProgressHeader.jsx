@@ -21,18 +21,10 @@ export default function ProgressHeader({ currentIndex }) {
               initial={false}
               animate={{
                 scale: active ? 1.15 : 1,
-                backgroundColor: active 
-                  ? "#ffc83b" 
-                  : done 
-                  ? "#a855f7" 
-                  : "rgba(255, 255, 255, 0.12)",
-                color: active 
-                  ? "#0b0c16" 
-                  : done 
-                  ? "#ffffff" 
-                  : "rgba(255, 255, 255, 0.4)"
+                backgroundColor: done || active ? "rgb(0 212 255)" : "rgb(44 52 61)",
+                color: done || active ? "rgb(32 38 46)" : "rgb(148 163 184)"
               }}
-              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full flex items-center justify-center text-[11px] sm:text-xs font-black shrink-0 shadow-sm"
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full flex items-center justify-center text-[11px] sm:text-xs font-bold shrink-0 shadow-sm ring-1 ring-white/5"
             >
               {done ? "✓" : i + 1}
             </motion.div>
@@ -42,7 +34,7 @@ export default function ProgressHeader({ currentIndex }) {
                   initial={false}
                   animate={{ width: done ? "100%" : "0%" }}
                   transition={{ duration: 0.4 }}
-                  className="h-full bg-[#ffc83b]"
+                  className="h-full bg-cyan-400"
                 />
               </div>
             )}

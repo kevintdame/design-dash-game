@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import ProgressHeader, { STAGES } from "@/components/designGame/ProgressHeader";
@@ -64,6 +65,11 @@ export default function MultiplayerGame() {
   const [localConcept, setLocalConcept] = useState({ problem: "", solutionOverview: "", features: [] });
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [stage, mode]);
 
   // Setup form states
   const queryParams = new URLSearchParams(window.location.search);
@@ -242,9 +248,25 @@ export default function MultiplayerGame() {
 
   // Render components
   return (
-    <div className="h-[100dvh] w-full bg-[#eef3f0] overflow-hidden flex flex-col">
-      <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] bg-gradient-to-tr from-[#ff8e6e] via-[#f74872] to-[#ffd269]">
-        <div className="min-h-full flex flex-col px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto justify-center">
+    <div className="relative h-[100dvh] w-full bg-transparent overflow-hidden flex flex-col">
+      {mode !== "setup" && (
+        <button
+          type="button"
+          onClick={() => {
+            if (window.confirm("Exit this room? Your current game session will be lost.")) {
+              setMode("setup");
+              setRoom(null);
+            }
+          }}
+          className="absolute top-4 right-4 z-20 h-9 w-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 ring-1 ring-black/5 flex items-center justify-center transition-colors shadow-md"
+          aria-label="Exit game"
+          title="Exit game"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
+        <div className="min-h-full flex flex-col px-4 pt-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto justify-center">
           
           {error && (
             <div className="bg-rose-50 border border-rose-150 text-rose-600 text-sm text-center rounded-2xl px-4 py-2.5 mb-4 shadow-sm font-semibold">
@@ -260,35 +282,35 @@ export default function MultiplayerGame() {
               className="flex-1 flex flex-col justify-center space-y-5"
             >
               <div className="text-center space-y-2 mb-4">
-                <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter bg-gradient-to-r from-[#c93c76] via-[#de573a] to-[#f09c35] bg-clip-text text-transparent font-sans">Multiplayer Battle</h1>
-                <p className="text-slate-500 text-xs sm:text-sm font-semibold">Compete head-to-head in a design thinking sprint!</p>
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 font-display text-white">Multiplayer Battle</h1>
+                <p className="text-slate-400 text-sm font-medium">Compete head-to-head in a design thinking sprint!</p>
               </div>
 
-               <Card className="bg-[#191d3d] border border-[#2e3366] text-white shadow-2xl rounded-[32px]">
+              <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-bold text-white">1. Choose your Name</CardTitle>
+                  <CardTitle className="text-base font-bold text-card-foreground">1. Choose your Name</CardTitle>
                 </CardHeader>
                 <CardContent className="pb-5">
                   <Input 
                     placeholder="Enter your name..."
                     value={playerName}
                     onChange={e => setPlayerName(e.target.value)}
-                    className="bg-[#282d5a] border border-[#3c4285] text-white placeholder:text-slate-500 focus:border-[#a5b4fc] focus-visible:ring-0 focus-visible:ring-offset-0 rounded-2xl h-12 text-sm"
+                    className="bg-white border-slate-200 text-[#20262e] placeholder:text-slate-400 focus:border-cyan-400 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl h-12 text-sm"
                   />
                 </CardContent>
               </Card>
 
               <Tabs defaultValue="create" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 bg-[#13162f] border border-[#23274e] text-[#a5b4fc] rounded-2xl h-12 p-1.5">
+                <TabsList className="grid w-full grid-cols-2 bg-slate-800 text-slate-400 rounded-xl h-12 p-1">
                   <TabsTrigger 
                     value="create" 
-                    className="rounded-xl font-bold text-xs transition data-[state=active]:bg-[#2563eb] data-[state=active]:text-white text-[#a5b4fc]/70"
+                    className="rounded-lg font-bold text-xs transition data-[state=active]:bg-cyan-400 data-[state=active]:text-[#20262e] text-slate-400"
                   >
                     Create Room
                   </TabsTrigger>
                   <TabsTrigger 
                     value="join" 
-                    className="rounded-xl font-bold text-xs transition data-[state=active]:bg-[#2563eb] data-[state=active]:text-white text-[#a5b4fc]/70"
+                    className="rounded-lg font-bold text-xs transition data-[state=active]:bg-cyan-400 data-[state=active]:text-[#20262e] text-slate-400"
                   >
                     Join Room
                   </TabsTrigger>
@@ -296,12 +318,12 @@ export default function MultiplayerGame() {
 
                 {/* CREATE ROOM TAB */}
                 <TabsContent value="create" className="mt-3">
-                  <Card className="bg-[#191d3d] border border-[#2e3366] text-white rounded-[32px]">
+                  <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5">
                     <CardContent className="pt-5 pb-5">
                       <Button 
                         onClick={handleCreateRoom}
                         disabled={actionLoading}
-                        className="w-full bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black h-13 text-sm rounded-2xl shadow-lg transition-transform active:scale-[0.98]"
+                        className="w-full bg-cyan-400 hover:bg-cyan-300 text-[#20262e] font-bold h-12 rounded-lg shadow-md transition-transform active:scale-[0.98]"
                       >
                         {actionLoading ? "Creating..." : "🚀 Create Lobby"}
                       </Button>
@@ -311,22 +333,22 @@ export default function MultiplayerGame() {
 
                 {/* JOIN ROOM TAB */}
                 <TabsContent value="join" className="mt-3">
-                  <Card className="bg-[#191d3d] border border-[#2e3366] text-white rounded-[32px]">
+                  <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5">
                     <CardContent className="space-y-4 pt-5 pb-5">
                       <div className="space-y-1.5">
-                        <label className="text-xs text-[#a5b4fc] uppercase font-bold tracking-wider">Room Code</label>
+                        <label className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Room Code</label>
                         <Input 
                           placeholder="Enter 4-letter code..."
                           value={inputRoomId}
                           onChange={e => setInputRoomId(e.target.value)}
-                          className="bg-[#282d5a] border border-[#3c4285] text-white placeholder:text-slate-500 focus:border-[#a5b4fc] focus-visible:ring-0 focus-visible:ring-offset-0 uppercase tracking-widest text-center text-lg font-bold rounded-2xl h-12"
+                          className="bg-white border-slate-200 text-[#20262e] placeholder:text-slate-450 focus:border-cyan-400 focus-visible:ring-0 focus-visible:ring-offset-0 uppercase tracking-widest text-center text-lg font-bold rounded-xl h-12"
                           maxLength={4}
                         />
                       </div>
                       <Button 
                         onClick={handleJoinRoom}
                         disabled={actionLoading}
-                        className="w-full bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black h-13 text-sm rounded-2xl shadow-lg transition-transform active:scale-[0.98]"
+                        className="w-full bg-cyan-400 hover:bg-cyan-300 text-[#20262e] font-bold h-12 rounded-lg shadow-md transition-transform active:scale-[0.98]"
                       >
                         {actionLoading ? "Joining..." : "Join Game"}
                       </Button>
@@ -338,7 +360,7 @@ export default function MultiplayerGame() {
               <button 
                 type="button" 
                 onClick={() => navigate("/")} 
-                className="text-pink-100/80 hover:text-white text-xs font-semibold py-2 transition underline underline-offset-4"
+                className="text-slate-400 hover:text-white text-xs font-semibold py-2 transition underline underline-offset-4"
               >
                 ← Back to Single Player
               </button>
@@ -352,22 +374,22 @@ export default function MultiplayerGame() {
               animate={{ opacity: 1, scale: 1 }}
               className="flex-1 flex flex-col justify-center space-y-6"
             >
-              <Card className="bg-[#191d3d] border border-[#2e3366] text-white rounded-[32px] shadow-2xl text-center">
+              <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5 text-center">
                 <CardHeader className="pb-3">
-                  <span className="text-[10px] uppercase font-extrabold tracking-widest text-[#ffc83b]">Room Code</span>
-                  <CardTitle className="text-5xl font-black tracking-widest select-all my-2 font-mono text-white">{room.id}</CardTitle>
-                  <p className="text-xs text-[#a5b4fc] font-semibold">Share this code with your friends (up to 5 players)!</p>
+                  <span className="text-xs uppercase font-semibold tracking-wider text-cyan-400">Room Code</span>
+                  <CardTitle className="text-5xl font-extrabold tracking-widest select-all my-2 font-mono text-card-foreground">{room.id}</CardTitle>
+                  <p className="text-xs text-slate-400 font-medium">Share this code with your friends (up to 5 players)!</p>
                 </CardHeader>
                 <CardContent className="space-y-5">
-                  <div className="border-t border-[#2e3366] pt-4">
-                    <h3 className="text-[10px] text-[#a5b4fc] uppercase font-extrabold mb-3 tracking-wider">Joined Players ({Object.keys(room.players).length}/5)</h3>
+                  <div className="border-t border-slate-100 pt-4">
+                    <h3 className="text-[10px] text-slate-400 uppercase font-semibold mb-3 tracking-widest">Joined Players ({Object.keys(room.players).length}/5)</h3>
                     <div className="space-y-2">
                       {Object.keys(room.players).map(pid => (
-                        <div key={pid} className="flex items-center space-x-2.5 bg-[#282d5a] px-4 py-2.5 rounded-2xl border border-[#3c4285]">
+                        <div key={pid} className="flex items-center space-x-2.5 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
                           <span className="text-lg">👤</span>
-                          <span className="font-extrabold text-sm text-white">{room.players[pid].name}</span>
+                          <span className="font-extrabold text-sm text-slate-800">{room.players[pid].name}</span>
                           {pid === "player_1" && (
-                            <span className="ml-auto text-[9px] bg-amber-500/25 text-[#ffc83b] px-2.5 py-1 rounded-full font-extrabold border border-amber-500/35">HOST</span>
+                            <span className="ml-auto text-[9px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-bold border border-slate-350">HOST</span>
                           )}
                         </div>
                       ))}
@@ -378,19 +400,19 @@ export default function MultiplayerGame() {
                     <Button 
                       onClick={handleStartGame}
                       disabled={actionLoading}
-                      className="w-full bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black py-6 text-sm shadow-lg rounded-2xl transition-transform active:scale-95"
+                      className="w-full bg-cyan-400 hover:bg-cyan-300 text-[#20262e] font-bold h-12 rounded-lg shadow-md transition-transform active:scale-[0.98]"
                     >
                       {actionLoading ? "Starting..." : "Start Game"}
                     </Button>
                   ) : (
-                    <div className="bg-[#282d5a] text-[#d1d5f5] py-3 rounded-2xl border border-[#3c4285] animate-pulse text-xs font-bold">
+                    <div className="bg-slate-50 text-slate-500 py-3 rounded-lg border border-slate-100 animate-pulse text-xs font-semibold">
                       Waiting for Host to start...
                     </div>
                   )}
                   <button 
                     type="button"
                     onClick={() => { setMode("setup"); setRoom(null); }} 
-                    className="w-full text-[#ffc83b] hover:text-white mt-2 text-xs font-black transition underline underline-offset-4"
+                    className="w-full text-slate-400 hover:text-white mt-2 text-xs font-semibold transition underline underline-offset-2"
                   >
                     Leave Room & Exit
                   </button>
@@ -476,25 +498,25 @@ export default function MultiplayerGame() {
               animate={{ opacity: 1, scale: 1 }}
               className="flex-1 flex flex-col justify-center space-y-6"
             >
-              <Card className="bg-[#191d3d] border border-[#2e3366] text-white rounded-[32px] shadow-2xl text-center">
+              <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5 text-center">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-xl font-extrabold text-white">Waiting for Designers...</CardTitle>
-                  <p className="text-xs text-[#a5b4fc] font-semibold">The AI judge will evaluate once all designers submit or the timer ends.</p>
+                  <CardTitle className="text-xl font-extrabold text-card-foreground">Waiting for Designers...</CardTitle>
+                  <p className="text-xs text-slate-400 font-medium">The AI judge will evaluate once all designers submit or the timer ends.</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <TimerBanner deadline={room.deadline} onTimeout={handleTimeout} />
                   
-                  <div className="border-t border-[#2e3366] pt-4 space-y-2">
+                  <div className="border-t border-slate-100 pt-4 space-y-2">
                     {Object.keys(room.players).map(pid => (
-                      <div key={pid} className="flex items-center justify-between bg-[#282d5a] px-4 py-2.5 rounded-2xl border border-[#3c4285]">
+                      <div key={pid} className="flex items-center justify-between bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
                         <div className="flex items-center space-x-2.5">
                           <span className="text-lg">👤</span>
-                          <span className="font-extrabold text-sm text-white">{room.players[pid].name}</span>
+                          <span className="font-extrabold text-sm text-slate-855">{room.players[pid].name}</span>
                         </div>
                         {room.players[pid].submitted ? (
-                          <span className="text-emerald-400 font-extrabold text-xs">✅ Submitted</span>
+                          <span className="text-emerald-500 font-extrabold text-xs">✅ Submitted</span>
                         ) : (
-                          <span className="text-amber-400 font-extrabold text-xs flex items-center space-x-1 animate-pulse">
+                          <span className="text-amber-500 font-extrabold text-xs flex items-center space-x-1 animate-pulse">
                             <span>✍️ Designing...</span>
                           </span>
                         )}
@@ -504,7 +526,7 @@ export default function MultiplayerGame() {
                   <button 
                     type="button"
                     onClick={() => { setMode("setup"); setRoom(null); }} 
-                    className="w-full text-[#ffc83b] hover:text-white mt-3 text-xs font-black transition underline underline-offset-4"
+                    className="w-full text-slate-400 hover:text-white mt-3 text-xs font-semibold transition underline underline-offset-2"
                   >
                     Quit Game & Exit
                   </button>
@@ -521,8 +543,8 @@ export default function MultiplayerGame() {
               className="space-y-6"
             >
               <div className="text-center space-y-2 mb-2">
-                <h1 className="text-3xl font-black uppercase tracking-tighter text-white font-sans drop-shadow-md">🏆 Pitch Battle Results</h1>
-                <p className="text-white/95 text-xs sm:text-sm font-bold">Evaluated by your customer, {room.challenge.customer_name}</p>
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 font-display text-white">🏆 Pitch Battle Results</h1>
+                <p className="text-slate-400 text-sm font-medium">Evaluated by your customer, {room.challenge.customer_name}</p>
               </div>
 
               {/* RATING LEADERS */}
@@ -533,25 +555,25 @@ export default function MultiplayerGame() {
                   const avgScore = Math.round((scores.value + scores.creativity + scores.uniqueness) / 3);
 
                   return (
-                    <Card key={pid} className={`border border-[#2e3366] shadow-2xl text-white rounded-[28px] overflow-hidden ${
-                      rankIdx === 0 ? "bg-gradient-to-tr from-[#9333ea]/35 to-[#db2777]/35 border-[#db2777]/50" : "bg-[#191d3d]"
+                    <Card key={pid} className={`bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden ${
+                      rankIdx === 0 ? "bg-gradient-to-tr from-cyan-400/5 to-cyan-400/15 border-cyan-400/30" : ""
                     }`}>
                       <CardContent className="p-5 flex items-center justify-between">
                         <div className="flex items-center space-x-3.5">
                           <span className="text-2xl font-black text-amber-500 w-6">
                             {rankIdx === 0 ? "🥇" : rankIdx === 1 ? "🥈" : rankIdx === 2 ? "🥉" : `${rankIdx + 1}`}
                           </span>
-                          <CustomerAvatar name={p.name} className="h-11 w-11 border border-[#3c4285]" />
+                          <CustomerAvatar name={p.name} className="h-11 w-11 border border-slate-200" />
                           <div>
-                            <h3 className="font-extrabold text-base text-white">{p.name}</h3>
-                            <p className="text-xs text-[#a5b4fc] font-semibold truncate max-w-[180px]">
+                            <h3 className="font-extrabold text-base text-slate-800">{p.name}</h3>
+                            <p className="text-xs text-slate-500 font-semibold truncate max-w-[180px]">
                               {p.concept ? p.concept.solutionOverview : "Failed to submit"}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="text-2xl font-black text-[#ffc83b]">{avgScore}</span>
-                          <span className="text-[9px] block text-white/50 font-extrabold">AVG Rating</span>
+                          <span className="text-2xl font-extrabold text-cyan-500">{avgScore}</span>
+                          <span className="text-[9px] block text-slate-400 font-bold">AVG Rating</span>
                         </div>
                       </CardContent>
                     </Card>
@@ -560,24 +582,24 @@ export default function MultiplayerGame() {
               </div>
 
               {/* CUSTOMER JUDGEMENT */}
-              <Card className="bg-[#191d3d] border border-[#2e3366] text-white shadow-2xl rounded-[32px] overflow-hidden">
+              <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden">
                 <CardHeader>
                   <div className="flex items-center gap-3">
-                    <CustomerAvatar name={room.challenge.customer_name} className="h-10 w-10 border border-[#2e3366]" />
-                    <CardTitle className="text-xs font-extrabold uppercase tracking-widest text-[#ffc83b]">
+                    <CustomerAvatar name={room.challenge.customer_name} className="h-10 w-10 border border-slate-200" />
+                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
                       💬 Customer Feedback ({room.challenge.customer_name})
                     </CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent className="text-xs font-semibold leading-relaxed text-[#d1d5f5] italic">
+                <CardContent className="text-xs font-semibold leading-relaxed text-slate-600 italic">
                   "{room.results.review}"
                 </CardContent>
               </Card>
 
               {/* SIDE-BY-SIDE CONCEPTS COMPARE */}
-              <Card className="bg-[#191d3d] border border-[#2e3366] text-white shadow-2xl rounded-[32px] overflow-hidden">
+              <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden">
                 <CardHeader>
-                  <CardTitle className="text-sm font-extrabold uppercase tracking-widest text-white">Compare Submissions</CardTitle>
+                  <CardTitle className="text-sm font-extrabold text-card-foreground">Compare Submissions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {Object.keys(room.players).map(pid => {
@@ -585,26 +607,26 @@ export default function MultiplayerGame() {
                     const scores = room.results.scores.find(s => s.player_id === pid) || { value: 0, creativity: 0, uniqueness: 0 };
                     
                     return (
-                      <div key={pid} className="border-t border-[#2e3366] pt-4 first:border-0 first:pt-0">
-                        <h4 className="font-extrabold text-sm text-[#ffc83b]">{p.name}'s Concept</h4>
+                      <div key={pid} className="border-t border-slate-100 pt-4 first:border-0 first:pt-0">
+                        <h4 className="font-bold text-sm text-cyan-500">{p.name}'s Concept</h4>
                         {p.concept ? (
                           <div className="mt-2 space-y-2.5 text-xs">
-                            <p className="text-[#d1d5f5] font-semibold"><strong>Problem:</strong> {p.concept.problem}</p>
-                            <p className="text-[#d1d5f5] font-semibold"><strong>Solution:</strong> {p.concept.solutionOverview}</p>
-                            <div className="grid grid-cols-3 gap-2 pt-2 text-center text-[9px] uppercase font-extrabold text-slate-400">
-                              <div className="bg-[#282d5a] p-1.5 rounded-xl border border-[#3c4285] text-[#d1d5f5]">
-                                <span className="block text-white font-black text-sm">{scores.value}</span> Value
+                            <p className="text-slate-600 font-semibold"><strong>Problem:</strong> {p.concept.problem}</p>
+                            <p className="text-slate-600 font-semibold"><strong>Solution:</strong> {p.concept.solutionOverview}</p>
+                            <div className="grid grid-cols-3 gap-2 pt-2 text-center text-[9px] uppercase font-bold text-slate-400">
+                              <div className="bg-slate-50 p-1.5 rounded-lg border border-slate-100 text-slate-500">
+                                <span className="block text-slate-800 font-black text-sm">{scores.value}</span> Value
                               </div>
-                              <div className="bg-[#282d5a] p-1.5 rounded-xl border border-[#3c4285] text-[#d1d5f5]">
-                                <span className="block text-white font-black text-sm">{scores.creativity}</span> Unique
+                              <div className="bg-slate-50 p-1.5 rounded-lg border border-slate-100 text-slate-500">
+                                <span className="block text-slate-800 font-black text-sm">{scores.creativity}</span> Unique
                               </div>
-                              <div className="bg-[#282d5a] p-1.5 rounded-xl border border-[#3c4285] text-[#d1d5f5]">
-                                <span className="block text-white font-black text-sm">{scores.uniqueness}</span> Design
+                              <div className="bg-slate-50 p-1.5 rounded-lg border border-slate-100 text-slate-500">
+                                <span className="block text-slate-800 font-black text-sm">{scores.uniqueness}</span> Design
                               </div>
                             </div>
                           </div>
                         ) : (
-                          <p className="text-rose-400 text-xs italic mt-1 font-bold">Player did not finish in time.</p>
+                          <p className="text-rose-500 text-xs italic mt-1 font-bold">Player did not finish in time.</p>
                         )}
                       </div>
                     );
@@ -615,13 +637,13 @@ export default function MultiplayerGame() {
               <div className="flex gap-4 pt-2">
                 <Button 
                   onClick={() => { setMode("setup"); setRoom(null); }}
-                  className="flex-1 bg-[#ffc83b] hover:bg-[#e0ae2b] text-[#0b0c16] font-black h-14 shadow-lg text-sm rounded-2xl transition-transform active:scale-95"
+                  className="flex-1 bg-cyan-400 hover:bg-cyan-300 text-[#20262e] font-bold h-12 rounded-lg shadow-md transition-transform active:scale-[0.98]"
                 >
                   🎮 Play Again
                 </Button>
                 <Button 
                   onClick={() => navigate("/")}
-                  className="flex-1 bg-[#191d3d] border border-[#2e3366] text-[#ffc83b] hover:bg-[#282d5a] font-extrabold h-14 shadow-sm text-sm rounded-2xl transition-transform active:scale-95"
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold h-12 rounded-lg shadow-md transition-transform active:scale-[0.98]"
                 >
                   🏠 Single Player
                 </Button>
