@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, RotateCcw } from "lucide-react";
-import { base44 } from "@/api/base44Client";
 import ConceptCarousel from "@/components/designGame/ConceptCarousel";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +14,9 @@ export default function PortfolioDetail() {
   useEffect(() => {
     (async () => {
       try {
-        const s = await base44.entities.GameSession.get(id);
+        const res = await fetch(`/api/portfolio/${id}`);
+        if (!res.ok) throw new Error("API error");
+        const s = await res.json();
         setSession(s);
       } catch {
         setNotFound(true);

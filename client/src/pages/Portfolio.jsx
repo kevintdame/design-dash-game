@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, FolderOpen } from "lucide-react";
-import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 
 function overallOf(s) {
@@ -16,8 +15,9 @@ export default function Portfolio() {
   useEffect(() => {
     (async () => {
       try {
-        const me = await base44.auth.me();
-        const list = await base44.entities.GameSession.filter({ created_by_id: me.id }, "-created_date", 100);
+        const res = await fetch("/api/portfolio");
+        if (!res.ok) throw new Error("API error");
+        const list = await res.json();
         setSessions(list);
       } catch {
         setSessions([]);
