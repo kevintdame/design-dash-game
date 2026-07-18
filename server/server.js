@@ -673,7 +673,7 @@ app.post('/api/generate-feature-images', async (req, res) => {
 
   const makePollinationsFallback = () => {
     return features.map((f, index) => {
-      const prompt = `Clean, modern product concept illustration for a "${domain}" design challenge. Feature concept: "${f.title}" — ${f.description}. Render a polished, realistic mockup-style image, Swiss minimalist design aesthetic: deep charcoal background (#2B303A), electric cyan (#00D4FF) accents, clean bold silhouettes, simple geometric shapes, minimal shading, solid color blocks, friendly stylized illustration style. Solid dark background. No text, words, or logos in the image.`;
+      const prompt = `Flat 2D vector graphic icon representing the product feature: "${f.title}" — ${f.description} for a "${domain}" app. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, no text.`;
       const seed = Math.floor(Math.random() * 100000) + index;
       return {
         ...f,
@@ -690,7 +690,7 @@ app.post('/api/generate-feature-images', async (req, res) => {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateImages?key=${apiKey}`;
     const featuresWithImages = await Promise.all(
       features.map(async (f, index) => {
-        const prompt = `Clean, modern product concept illustration for a "${domain}" design challenge. Feature concept: "${f.title}" — ${f.description}. Render a polished, realistic mockup-style image, Swiss minimalist design aesthetic: deep charcoal background (#2B303A), electric cyan (#00D4FF) accents, clean bold silhouettes, simple geometric shapes, minimal shading, solid color blocks, friendly stylized illustration style. Solid dark background. No text, words, or logos in the image.`;
+        const prompt = `Flat 2D vector graphic icon representing the product feature: "${f.title}" — ${f.description} for a "${domain}" app. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, no text.`;
         try {
           const response = await fetch(url, {
             method: 'POST',
