@@ -83,23 +83,17 @@ export async function generateFeatureImages(features, domain) {
 
 export async function generateConceptImage(solutionOverview, domain) {
   const domStr = domain ? String(domain).toUpperCase() : "PROTOTYPE";
-  // Return a clean programmatic SVG mockup representation
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="200" height="150">
       <rect width="200" height="150" fill="#20262e" rx="16" />
-      <defs>
-        <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.8" />
-          <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.8" />
-        </linearGradient>
-      </defs>
-      <rect x="15" y="15" width="170" height="80" fill="url(#cyanGrad)" rx="8" opacity="0.15" />
-      <circle cx="50" cy="55" r="18" fill="url(#cyanGrad)" />
+      <rect x="15" y="15" width="170" height="80" fill="#282d5a" rx="8" />
+      <circle cx="50" cy="55" r="18" fill="#00d4ff" />
       <rect x="80" y="44" width="90" height="6" fill="#ffffff" rx="3" opacity="0.9" />
       <rect x="80" y="58" width="70" height="5" fill="#ffffff" rx="2.5" opacity="0.5" />
       <rect x="15" y="110" width="170" height="1" fill="#2e3366" />
       <text x="18" y="130" fill="#00d4ff" font-family="sans-serif" font-size="9" font-weight="bold">${domStr} CONCEPT</text>
     </svg>
-  `;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.trim())}`;
+  `.trim();
+  const base64 = btoa(encodeURIComponent(svg).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode(parseInt(p1, 16))));
+  return `data:image/svg+xml;base64,${base64}`;
 }
