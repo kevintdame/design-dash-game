@@ -28,7 +28,6 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
 
   async function handleGenerateImage() {
     if (!canGenerateImage || generatingImage) return;
-    setImage(null); // Clear the old image so the loading indicator and placeholder render immediately
     setGeneratingImage(true);
     try {
       const url = await generateConceptImage(solutionOverview, domain);
@@ -102,11 +101,16 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
             {image ? (
               <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5">
                 <img src={image} alt="Concept visual" className="w-full aspect-[4/3] object-cover" />
+                {generatingImage && (
+                  <div className="absolute inset-0 bg-black/55 flex items-center justify-center backdrop-blur-[1px]">
+                    <Loader2 className="h-7 w-7 text-cyan-400 animate-spin" />
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={handleGenerateImage}
                   disabled={generatingImage}
-                  className="absolute top-2 right-2 h-8 w-8 rounded-full bg-[#20262e]/80 text-cyan-400 flex items-center justify-center hover:bg-[#20262e] transition-colors"
+                  className="absolute top-2 right-2 h-8 w-8 rounded-full bg-[#20262e]/80 text-cyan-400 flex items-center justify-center hover:bg-[#20262e] transition-colors z-10"
                   title="Regenerate image"
                 >
                   {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
