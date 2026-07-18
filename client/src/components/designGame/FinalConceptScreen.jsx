@@ -28,6 +28,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
 
   async function handleGenerateImage() {
     if (!canGenerateImage || generatingImage) return;
+    setImage(null); // Clear the old image so the loading indicator and placeholder render immediately
     setGeneratingImage(true);
     try {
       const url = await generateConceptImage(solutionOverview, domain);
