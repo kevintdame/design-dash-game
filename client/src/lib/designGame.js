@@ -100,6 +100,6 @@ export async function generateConceptImage(solutionOverview, domain) {
       <text x="18" y="130" fill="#00d4ff" font-family="sans-serif" font-size="9" font-weight="bold">${domain.toUpperCase()} CONCEPT</text>
     </svg>
   `;
-  const base64Svg = btoa(svg.replace(/[\r\n\t]/g, ""));
+  const base64Svg = btoa(unescape(encodeURIComponent(svg.trim())));
   return `data:image/svg+xml;base64,${base64Svg}`;
 }
