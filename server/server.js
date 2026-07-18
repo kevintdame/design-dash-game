@@ -580,12 +580,15 @@ THE DESIGNER'S FINAL CONCEPT:
 ${conceptText}
 
 Rate this concept on three dimensions, each 1-100, based on how it lands for YOU as this customer.
-Please be encouraging and constructive. If the concept solves your needs or covers the requested aspects, lean towards higher ratings (typically between 85 and 98). Do not score below 75 unless it is completely off-topic or fails to address any needs:
+CRITICAL RULES FOR ACCURACY:
+- Compare the concept strictly against YOUR actual problems, frustrations, and needs described in your "Internal context" above.
+- If the concept does NOT solve your main frustrations, is unrelated to the design challenge, or is a generic distraction (like a binge watching app for a teacher wanting nutrition/time help), you MUST score the value_score extremely low (below 35).
+- Do not be nice or give pity scores if the solution is off-topic. A high score should only be given if the designer solves your specific problems.
 - value_score: How much it solves a real problem you actually have and would pay/use for.
 - creativity_score: How inventive and fresh the approach feels.
 - uniqueness_score: How differentiated it is from existing solutions on the market.
 
-Then write a short, in-character review (2-4 sentences) as this customer reacting to the final concept.
+Then write a short, in-character review (2-4 sentences) as this customer reacting to the final concept, explaining why the concept is or isn't relevant to your needs.
 `;
 
   try {
