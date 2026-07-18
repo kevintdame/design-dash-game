@@ -480,6 +480,7 @@ export default function MultiplayerGame() {
                 {stage === "finalConcept" && (
                   <FinalConceptScreen 
                     challenge={room.challenge}
+                    domain={room.domain}
                     ideas={ideas}
                     onSubmit={(concept) => {
                       setLocalConcept(concept);

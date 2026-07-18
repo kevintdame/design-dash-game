@@ -82,9 +82,10 @@ export async function generateFeatureImages(features, domain) {
 }
 
 export async function generateConceptImage(solutionOverview, domain) {
+  const domStr = domain ? String(domain).toUpperCase() : "PROTOTYPE";
   // Return a clean programmatic SVG mockup representation
   const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="100%" height="100%">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="200" height="150">
       <rect width="200" height="150" fill="#20262e" rx="16" />
       <defs>
         <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -97,7 +98,7 @@ export async function generateConceptImage(solutionOverview, domain) {
       <rect x="80" y="44" width="90" height="6" fill="#ffffff" rx="3" opacity="0.9" />
       <rect x="80" y="58" width="70" height="5" fill="#ffffff" rx="2.5" opacity="0.5" />
       <rect x="15" y="110" width="170" height="1" fill="#2e3366" />
-      <text x="18" y="130" fill="#00d4ff" font-family="sans-serif" font-size="9" font-weight="bold">${domain.toUpperCase()} CONCEPT</text>
+      <text x="18" y="130" fill="#00d4ff" font-family="sans-serif" font-size="9" font-weight="bold">${domStr} CONCEPT</text>
     </svg>
   `;
   const base64Svg = btoa(unescape(encodeURIComponent(svg.trim())));
