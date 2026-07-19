@@ -236,56 +236,9 @@ const offlineDialogues = {
 };
 
 function assignCustomerImage(challenge) {
-  const text = ((challenge.customer_persona || "") + " " + (challenge.customer_name || "") + " " + (challenge.customer_role || "")).toLowerCase();
-  
-  let isFemale = true;
-  const femaleKeywords = ["she", "her", "herself", "woman", "lady", "girl", "mother", "grandmother", "wife", "daughter", "ms.", "mrs.", "miss"];
-  const maleKeywords = ["he", "him", "his", "himself", "man", "boy", "father", "grandfather", "husband", "son", "mr."];
-  
-  let femaleCount = 0;
-  let maleCount = 0;
-  
-  femaleKeywords.forEach(k => {
-    const regex = new RegExp("\\b" + k + "\\b", "g");
-    femaleCount += (text.match(regex) || []).length;
-  });
-  maleKeywords.forEach(k => {
-    const regex = new RegExp("\\b" + k + "\\b", "g");
-    maleCount += (text.match(regex) || []).length;
-  });
-  
-  if (maleCount > femaleCount) {
-    isFemale = false;
-  }
-  
-  let ageGroup = "middle-aged";
-  if (text.includes("retired") || text.includes("elderly") || text.includes("senior") || text.includes("older") || text.includes("grandmother") || text.includes("grandfather") || text.includes("aged 6") || text.includes("aged 7") || text.includes("60s") || text.includes("70s")) {
-    ageGroup = "senior";
-  } else if (text.includes("student") || text.includes("young") || text.includes("teen") || text.includes("college") || text.includes("university") || text.includes("20s")) {
-    ageGroup = "young";
-  }
-  
-  if (isFemale) {
-    if (ageGroup === "young") {
-      return Math.random() > 0.5
-        ? "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/8d87fecbd_generated_image.png"
-        : "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/b7f321485_generated_image.png";
-    } else if (ageGroup === "senior") {
-      return "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/9cb914b32_generated_image.png";
-    } else {
-      return "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/e5020d6de_generated_image.png";
-    }
-  } else {
-    if (ageGroup === "young") {
-      return Math.random() > 0.5
-        ? "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/c52c6f05f_generated_image.png"
-        : "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/ba3ccd9e9_generated_image.png";
-    } else if (ageGroup === "senior") {
-      return "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/a36c1d7cd_generated_image.png";
-    } else {
-      return "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/f150d8909_generated_image.png";
-    }
-  }
+  const name = challenge.customer_name || "Alex Taylor";
+  // DiceBear open-peeps style provides billions of distinct, modern hand-drawn character avatars
+  return `https://api.dicebear.com/7.x/open-peeps/svg?seed=${encodeURIComponent(name)}`;
 }
 
 // ----------------------------------------------------
