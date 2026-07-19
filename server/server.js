@@ -633,139 +633,114 @@ async function fetchAsBase64(url) {
   return `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
 }
 
-// 6. Generate Concept Image using Google AI Studio Imagen 3
-app.post('/api/generate-concept-image', async (req, res) => {
-  const { prompt } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
+// Unified multi-tier image generator cascade
+async function generateImageBase64(prompt, width = 400, height = 300) {
+  const hfApiKey = process.env.HF_API_KEY;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
 
-  if (isOfflineMode || !apiKey) {
+  // Tier 1: Google AI Studio (Imagen)
+  if (!isOfflineMode && geminiApiKey) {
     try {
-      const seed = Math.floor(Math.random() * 100000);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=400&height=300&nologo=true&seed=${seed}`;
-      const base64Data = await fetchAsBase64(imageUrl);
-      return res.json({ url: base64Data });
+      console.log("Attempting Google AI Studio Imagen generation...");
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateImages?key=${geminiApiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: prompt,
+          numberOfImages: 1,
+          outputMimeType: 'image/jpeg',
+          aspectRatio: width === height ? '1:1' : '4:3'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const base64Image = data.generatedImages?.[0]?.image?.imageBytes;
+        if (base64Image) {
+          console.log("Google AI Studio generation successful!");
+          return `data:image/jpeg;base64,${base64Image}`;
+        }
+      } else {
+        console.warn(`Google API failed with status ${response.status}`);
+      }
     } catch (err) {
-      console.error("Pollinations fallback failed:", err);
-      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="200" height="150"><rect width="200" height="150" fill="#20262e" rx="16" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#00d4ff" font-family="sans-serif" font-size="12">Mock Concept</text></svg>`;
-      return res.json({ url: `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}` });
+      console.warn("Google AI Studio generation failed, trying next tier:", err.message);
     }
   }
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateImages?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: prompt,
-        numberOfImages: 1,
-        outputMimeType: 'image/jpeg',
-        aspectRatio: '4:3'
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Google API returned status ${response.status}`);
-    }
-
-    const data = await response.json();
-    const base64Image = data.generatedImages?.[0]?.image?.imageBytes;
-    if (!base64Image) {
-      throw new Error("No image data returned from Imagen 3.");
-    }
-
-    res.json({ url: `data:image/jpeg;base64,${base64Image}` });
-  } catch (err) {
-    console.warn("Imagen 3 concept generation failed, falling back to Pollinations AI:", err.message);
+  // Tier 2: Hugging Face (FLUX.1-schnell)
+  if (hfApiKey) {
     try {
-      const seed = Math.floor(Math.random() * 100000);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=400&height=300&nologo=true&seed=${seed}`;
-      const base64Data = await fetchAsBase64(imageUrl);
-      res.json({ url: base64Data });
-    } catch (fallbackErr) {
-      console.error("Pollinations fallback failed:", fallbackErr);
-      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="200" height="150"><rect width="200" height="150" fill="#20262e" rx="16" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#00d4ff" font-family="sans-serif" font-size="12">Mock Concept</text></svg>`;
-      res.json({ url: `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}` });
+      console.log("Attempting Hugging Face FLUX.1-schnell generation...");
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+        {
+          headers: { 
+            "Authorization": `Bearer ${hfApiKey}`,
+            "Content-Type": "application/json"
+          },
+          method: "POST",
+          body: JSON.stringify({ inputs: prompt }),
+        }
+      );
+
+      if (response.ok) {
+        const buffer = await response.arrayBuffer();
+        console.log("Hugging Face FLUX.1 generation successful!");
+        return `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
+      } else {
+        const errText = await response.text();
+        console.warn(`Hugging Face API failed with status ${response.status}: ${errText}`);
+      }
+    } catch (err) {
+      console.warn("Hugging Face generation failed, trying next tier:", err.message);
     }
+  }
+
+  // Tier 3: Pollinations AI (FLUX community server)
+  try {
+    console.log("Attempting Pollinations AI generation...");
+    const seed = Math.floor(Math.random() * 100000);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&nologo=true&seed=${seed}`;
+    const base64Data = await fetchAsBase64(imageUrl);
+    console.log("Pollinations AI generation successful!");
+    return base64Data;
+  } catch (err) {
+    console.error("Pollinations AI generation failed:", err.message);
+    // Tier 4: Programmatic SVG Fallback
+    const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}"><rect width="${width}" height="${height}" fill="#20262e" rx="16" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#00d4ff" font-family="sans-serif" font-size="12">Mock Concept</text></svg>`;
+    return `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`;
+  }
+}
+
+// 6. Generate Concept Image using Google AI Studio Imagen 3
+app.post('/api/generate-concept-image', async (req, res) => {
+  const { prompt } = req.body;
+  try {
+    const url = await generateImageBase64(prompt, 400, 300);
+    res.json({ url });
+  } catch (err) {
+    console.error("Concept image generation failed:", err);
+    res.status(500).json({ error: "Failed to generate concept image" });
   }
 });
 
 // 6b. Generate Feature Images using Google AI Studio Imagen 3
 app.post('/api/generate-feature-images', async (req, res) => {
   const { features, domain } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  const makePollinationsFallback = async () => {
-    return Promise.all(
-      features.map(async (f, index) => {
-        const prompt = `Flat 2D vector graphic icon representing the product feature: "${f.title}" — ${f.description} for a "${domain}" app. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, no text.`;
-        const seed = Math.floor(Math.random() * 100000) + index;
-        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=300&height=300&nologo=true&seed=${seed}`;
-        try {
-          const base64Data = await fetchAsBase64(imageUrl);
-          return { ...f, image_url: base64Data };
-        } catch (err) {
-          console.warn(`Feature ${index} Pollinations fallback failed, using inline SVG:`, err.message);
-          const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><rect width="100" height="100" rx="16" fill="#20262e" /><circle cx="50" cy="50" r="12" fill="#00d4ff" /></svg>`;
-          return { ...f, image_url: `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}` };
-        }
-      })
-    );
-  };
-
-  if (isOfflineMode || !apiKey) {
-    const list = await makePollinationsFallback();
-    return res.json({ features: list });
-  }
-
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateImages?key=${apiKey}`;
     const featuresWithImages = await Promise.all(
-      features.map(async (f, index) => {
+      features.map(async (f) => {
         const prompt = `Flat 2D vector graphic icon representing the product feature: "${f.title}" — ${f.description} for a "${domain}" app. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, no text.`;
-        try {
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              prompt: prompt,
-              numberOfImages: 1,
-              outputMimeType: 'image/jpeg',
-              aspectRatio: '1:1'
-            })
-          });
-
-          if (!response.ok) {
-            throw new Error(`Status ${response.status}`);
-          }
-
-          const data = await response.json();
-          const base64Image = data.generatedImages?.[0]?.image?.imageBytes;
-          if (!base64Image) throw new Error("No image bytes");
-          return {
-            ...f,
-            image_url: `data:image/jpeg;base64,${base64Image}`
-          };
-        } catch (err) {
-          console.warn(`Feature ${index} generation failed, using Pollinations fallback:`, err.message);
-          const seed = Math.floor(Math.random() * 100000) + index;
-          const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=300&height=300&nologo=true&seed=${seed}`;
-          try {
-            const base64Data = await fetchAsBase64(imageUrl);
-            return { ...f, image_url: base64Data };
-          } catch (fallbackErr) {
-            const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><rect width="100" height="100" rx="16" fill="#20262e" /><circle cx="50" cy="50" r="12" fill="#00d4ff" /></svg>`;
-            return { ...f, image_url: `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}` };
-          }
-        }
+        const image_url = await generateImageBase64(prompt, 300, 300);
+        return { ...f, image_url };
       })
     );
-
     res.json({ features: featuresWithImages });
   } catch (err) {
-    console.warn("Imagen 3 feature generation overall failed, using Pollinations fallbacks:", err.message);
-    const list = await makePollinationsFallback();
-    res.json({ features: list });
+    console.error("Feature image generation failed:", err);
+    res.status(500).json({ error: "Failed to generate feature images" });
   }
 });
 
