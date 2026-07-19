@@ -10,6 +10,11 @@ import { HfInference } from '@huggingface/inference';
 
 dotenv.config();
 
+// Bypass automatic Google Cloud Metadata checks on hosted VMs (like Render)
+// to prevent conflicting OAuth 2 access token header injections
+process.env.GCP_METADATA_HOST = '127.0.0.1';
+process.env.GCE_METADATA_HOST = '127.0.0.1';
+
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
