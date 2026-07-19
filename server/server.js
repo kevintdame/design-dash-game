@@ -6,6 +6,7 @@ import { GoogleGenAI } from '@google/genai';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { HfInference } from '@huggingface/inference';
 
 dotenv.config();
 
@@ -669,33 +670,20 @@ async function generateImageBase64(prompt, width = 400, height = 300) {
     }
   }
 
-  // Tier 2: Hugging Face (FLUX.1-schnell)
+  // Tier 2: Hugging Face (FLUX.1-schnell via HfInference SDK)
   if (hfApiKey) {
     try {
-      console.log("Attempting Hugging Face FLUX.1-schnell generation...");
-      const response = await fetch(
-        "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
-        {
-          headers: { 
-            "Authorization": `Bearer ${hfApiKey}`,
-            "Content-Type": "application/json",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-          },
-          method: "POST",
-          body: JSON.stringify({ inputs: prompt }),
-        }
-      );
-
-      if (response.ok) {
-        const buffer = await response.arrayBuffer();
-        console.log("Hugging Face FLUX.1 generation successful!");
-        return `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
-      } else {
-        const errText = await response.text();
-        throw new Error(`Hugging Face API failed with status ${response.status}: ${errText}`);
-      }
+      console.log("Attempting Hugging Face FLUX.1-schnell generation via SDK...");
+      const hf = new HfInference(hfApiKey);
+      const blob = await hf.textToImage({
+        model: "black-forest-labs/FLUX.1-schnell",
+        inputs: prompt
+      });
+      const buffer = await blob.arrayBuffer();
+      console.log("Hugging Face FLUX.1 generation successful!");
+      return `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
     } catch (err) {
-      console.warn("Hugging Face generation failed:", err.message);
+      console.warn("Hugging Face SDK generation failed:", err.message);
       throw err;
     }
   }
