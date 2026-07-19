@@ -759,7 +759,8 @@ async function expandConceptVisualPrompt(conceptName, solutionOverview, features
     const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner");
     return {
       isApp,
-      visualSnippet: isApp ? "a clean food cover plate symbol next to a stopwatch icon" : "a modern functional design logo"
+      visualSnippet: isApp ? "a clean food cover plate symbol next to a stopwatch icon" : "a modern functional design logo",
+      typographySnippet: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes"
     };
   }
 
@@ -768,12 +769,13 @@ async function expandConceptVisualPrompt(conceptName, solutionOverview, features
     : "";
 
   try {
-    const prompt = `You are a logo designer. Translate the following product concept into a 1-sentence description of a centered, modern flat 2D vector brand logo or icon mark.
+    const prompt = `You are a logo designer. Translate the following product concept into a centered, modern flat 2D vector brand logo layout.
 RULES:
-1. Describe a single, centered, cohesive logo symbol or combined visual icon mark related to the theme (e.g., a simple vector stopwatch combined with a food platter icon, or a minimal shopping bag with a leaf symbol).
+1. Describe a single, simple, minimalist vector symbol (e.g., "a stopwatch with a leaf symbol", or "a silver cloche with sparkles"). Keep it extremely short (under 6 words). DO NOT describe it as "centered" or "symmetrical".
 2. DO NOT use abstract metaphors, sci-fi, or fantasy concepts (e.g., NO 'orbs', 'pulses', 'magic glows', 'hologram', 'nebula', 'energy waves', 'magical effects').
-3. DO NOT include any text, labels, numbers, letters, or placeholder words. The description must specify visual objects and shapes ONLY.
-4. DO NOT describe any physical phones, device frames, bezels, notches, app screens, layouts, dashboards, user interfaces, or realistic backgrounds. The result should look like a clean graphic mark in the center of the frame.
+3. DO NOT include any text, labels, numbers, letters, or layout words inside the visualSnippet description. It must specify visual objects and shapes ONLY.
+4. DO NOT describe any physical phones, device frames, bezels, notches, app screens, layouts, dashboards, user interfaces, or realistic backgrounds. Keep the visualSnippet purely as a brief 3-5 word label of the symbol itself.
+5. Select a highly creative, custom typographic style (font style and layout description) for the typographySnippet that matches the product's name and personality. E.g., for a natural/mindful app: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes"; for a clean/modern app: "bold, clean, modern geometric sans-serif typeface"; for an elegant app: "elegant, high-contrast serif display font with decorative swashes and ligatures".
 
 Product Concept Title: "${conceptName}"
 Product Concept Overview: "${solutionOverview}"
@@ -782,7 +784,8 @@ ${featuresText ? `Key Features:\n${featuresText}` : ""}
 Respond ONLY with a JSON object in this exact format:
 {
   "isApp": true or false,
-  "visualSnippet": "1-sentence description of a centered flat 2D logo or icon mark to render"
+  "visualSnippet": "brief 3-5 word name of the symbol",
+  "typographySnippet": "1-sentence description of the custom typography design style"
 }
 
 Do not include markdown tags, code blocks, or extra text.`;
@@ -802,7 +805,7 @@ Do not include markdown tags, code blocks, or extra text.`;
         cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
       }
       const parsed = JSON.parse(cleanText);
-      if (parsed && typeof parsed.isApp === 'boolean' && parsed.visualSnippet) {
+      if (parsed && typeof parsed.isApp === 'boolean' && parsed.visualSnippet && parsed.typographySnippet) {
         return parsed;
       }
     }
@@ -815,7 +818,8 @@ Do not include markdown tags, code blocks, or extra text.`;
   const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner");
   return {
     isApp,
-    visualSnippet: isApp ? "a clean food plate symbol next to a delivery vehicle outline" : "a modern geometric design structure with indicators"
+    visualSnippet: isApp ? "a clean food plate symbol next to a delivery vehicle outline" : "a modern geometric design structure with indicators",
+    typographySnippet: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes"
   };
 }
 
@@ -870,17 +874,26 @@ Do not include markdown tags, code blocks, or extra text.`;
 
 // 6. Generate Concept Image using Google AI Studio Imagen 3
 app.post('/api/generate-concept-image', async (req, res) => {
-  const { solutionOverview, domain, conceptName, features } = req.body;
+  const { solutionOverview, domain, conceptName, features, fontStyle } = req.body;
 
   // Use Gemini to expand the prompt and classify isApp
   const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview, features);
   console.log("Concept Image visual expansion returned:", expansion);
 
-  // Apply strict style guide with pure black (#000000) background for seamless mockup blending
-  const promptText = `A centered flat 2D vector graphic icon on a solid black (#000000) background. The icon features a simple, stylized modern vector symbol of: ${expansion.visualSnippet}. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, simple geometric shapes, clean sharp bold vector outlines, solid flat fills, absolutely no soft gradients, no airbrushing, no glow effects, no 3D shading, no highlights, no drop shadows, absolutely no text, no letters, no words.`;
+  // Setup typographic style definitions
+  const fontDescriptors = {
+    modern: "bold, clean, modern geometric sans-serif typeface",
+    elegant: "elegant, high-contrast serif display font with decorative swashes and ligatures",
+    playful: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes",
+    classic: "classic roman serif typeface with clean proportions"
+  };
+  const fontText = fontDescriptors[fontStyle] || expansion.typographySnippet;
+
+  // Premium typographic logo prompt with integrated icon elements on charcoal background
+  const promptText = `A creative typographic logo design for '${conceptName}' on a solid dark charcoal background. The design features a custom, imaginative branding logotype written in a ${fontText}. A simple, stylized vector icon of: ${expansion.visualSnippet} is woven into the letterforms. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist style, flat design, crisp vector outlines, no gradients, no 3D shading.`;
 
   try {
-    // Standardize main logo concept image to a neat, square 1:1 format (1024x1024) for ultimate crispness
+    // Standardize main logo concept image to a neat, square 1:1 format (1024x1024) for ultimate sharpness
     const url = await generateImageBase64(promptText, 1024, 1024);
     res.json({ url });
   } catch (err) {
