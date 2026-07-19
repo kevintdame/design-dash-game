@@ -693,17 +693,6 @@ async function generateImageBase64(prompt, width = 400, height = 300) {
 }
 
 // Helper to use Gemini to translate concept info into descriptive vector graphic prompts and classify if it is a mobile app
-async function expandConceptVisualPrompt(conceptName, solutionOverview) {
-  if (isOfflineMode) {
-    const lower = (solutionOverview || "").toLowerCase() + " " + (conceptName || "").toLowerCase();
-    const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner");
-    return {
-      isApp,
-      visualSnippet: isApp ? "a clean schedule dashboard with calendar grids showing food icons" : "a modern functional design device layout"
-    };
-  }
-
-// Helper to use Gemini to translate concept info into descriptive vector graphic prompts and classify if it is a mobile app
 async function expandConceptVisualPrompt(conceptName, solutionOverview, features = []) {
   if (isOfflineMode) {
     const lower = (solutionOverview || "").toLowerCase() + " " + (conceptName || "").toLowerCase();
