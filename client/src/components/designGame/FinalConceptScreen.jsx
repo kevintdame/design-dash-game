@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Rocket, ArrowRight, Loader2, ImageIcon, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { generateConceptImage } from "@/lib/designGame";
+import { generateConceptImage, getConceptAspectRatioClass } from "@/lib/designGame";
 
 export default function FinalConceptScreen({ challenge, domain, onSubmit, loading }) {
   const [conceptName, setConceptName] = useState("");
@@ -105,7 +105,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
                 <img 
                   src={image} 
                   alt="Concept visual" 
-                  className="w-full aspect-[4/3] object-cover animate-fade-in" 
+                  className={`w-full ${getConceptAspectRatioClass(solutionOverview, conceptName)} object-cover animate-fade-in`} 
                   onError={() => setImageLoadError(true)}
                 />
                 {generatingImage && (
@@ -124,7 +124,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
                 </button>
               </div>
             ) : image && imageLoadError ? (
-              <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 aspect-[4/3] bg-card border border-cyan-400/20 flex flex-col items-center justify-center p-6 text-center">
+              <div className={`relative rounded-xl overflow-hidden ring-1 ring-black/5 ${getConceptAspectRatioClass(solutionOverview, conceptName)} bg-card border border-cyan-400/20 flex flex-col items-center justify-center p-6 text-center`}>
                 <AlertCircle className="h-8 w-8 text-cyan-400 mb-2" />
                 <div className="text-white font-bold text-xs">Image Generation Overloaded</div>
                 <div className="text-slate-400 text-[10px] mt-1 max-w-[240px] leading-relaxed">

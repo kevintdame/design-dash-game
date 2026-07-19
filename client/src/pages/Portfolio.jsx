@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getConceptAspectRatioClass } from "@/lib/designGame";
 
 function overallOf(s) {
   return Math.round((s.value_score + s.creativity_score + s.uniqueness_score) / 3);
@@ -18,8 +19,9 @@ export default function Portfolio() {
         const res = await fetch("/api/portfolio");
         if (!res.ok) throw new Error("API error");
         const list = await res.json();
-        setSessions(list);
-      } catch {
+        setSessions(list.sort((a, b) => Number(b.id) - Number(a.id)));
+      } catch (err) {
+        console.error(err);
         setSessions([]);
       }
     })();
@@ -27,16 +29,19 @@ export default function Portfolio() {
 
   return (
     <div className="min-h-[100dvh] bg-transparent">
-      <div className="max-w-lg mx-auto px-4 py-6">
+      <div className="max-w-md mx-auto px-4 py-6">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => navigate("/")} className="h-9 w-9 rounded-lg bg-cyan-400 text-[#20262e] flex items-center justify-center hover:bg-cyan-300 shadow-sm">
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <h1 className="text-2xl font-extrabold font-display text-white">My Portfolio</h1>
+          <div>
+            <h1 className="text-white font-bold text-base leading-none">Saved Portfolio</h1>
+            <p className="text-slate-400 text-[10px] mt-1">Review your best design concepts.</p>
+          </div>
         </div>
 
         {sessions === null ? (
-          <div className="flex justify-center py-10">
+          <div className="min-h-[50vh] flex items-center justify-center">
             <div className="h-8 w-8 border-4 border-white/10 border-t-cyan-400 rounded-full animate-spin" />
           </div>
         ) : sessions.length === 0 ? (
@@ -56,7 +61,7 @@ export default function Portfolio() {
                   className="block bg-card rounded-2xl p-4 ring-1 ring-black/5 shadow-sm hover:shadow-md transition-shadow"
                 >
                   {s.concept_image && (
-                    <div className="aspect-[16/9] w-full rounded-xl overflow-hidden bg-black/5 ring-1 ring-black/5 mb-3">
+                    <div className={`${getConceptAspectRatioClass(s.solution_overview, s.concept_name)} w-full rounded-xl overflow-hidden bg-black/5 ring-1 ring-black/5 mb-3`}>
                       <img src={s.concept_image} alt={s.concept_name || "Concept mockup"} className="w-full h-full object-cover" />
                     </div>
                   )}

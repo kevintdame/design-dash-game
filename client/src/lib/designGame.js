@@ -93,3 +93,9 @@ export async function generateConceptImage(solutionOverview, domain, conceptName
   const data = await res.json();
   return data.url;
 }
+
+export function getConceptAspectRatioClass(solutionOverview = "", conceptName = "") {
+  const lower = (String(solutionOverview) + " " + String(conceptName)).toLowerCase();
+  const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner") || lower.includes("meditation");
+  return isApp ? "aspect-[3/4]" : "aspect-[4/3]";
+}

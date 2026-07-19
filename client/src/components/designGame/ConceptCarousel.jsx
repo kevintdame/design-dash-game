@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote, ImageIcon } from "lucide-react";
+import { getConceptAspectRatioClass } from "@/lib/designGame";
 
 function ScoreBar({ label, score }) {
   return (
@@ -35,7 +36,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
       return (
         <div className="w-full text-left overflow-y-auto max-h-[480px] [-webkit-overflow-scrolling:touch]">
           {concept.image && (
-            <div className="aspect-[4/3] bg-black/5">
+            <div className={`${getConceptAspectRatioClass(concept.solutionOverview, concept.name)} bg-black/5`}>
               <img src={concept.image} alt={concept.name || "Concept"} className="w-full h-full object-cover" />
             </div>
           )}
@@ -52,7 +53,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
       const f = features[idx - 1];
       return (
         <div className="w-full text-left">
-          <div className="aspect-[4/3] bg-black/5 flex items-center justify-center">
+          <div className="aspect-square bg-black/5 flex items-center justify-center">
             {f.image_url ? (
               <img src={f.image_url} alt={f.title} className="w-full h-full object-cover" />
             ) : (
