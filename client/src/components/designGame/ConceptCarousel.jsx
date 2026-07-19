@@ -96,11 +96,8 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
           <div className="rounded-2xl overflow-hidden w-full flex flex-col min-h-[440px] flex-1 border border-white/5 shadow-inner">
             {/* Top Half: Charcoal Header */}
             <div className="bg-[#2B303A] py-6 px-8 flex flex-col justify-center select-none min-h-[100px]">
-              <h3 
-                style={{ fontFamily: fontStyle.family }}
-                className="text-cyan-400 text-base font-extrabold uppercase tracking-wider"
-              >
-                Core Brand Features
+              <h3 className="text-cyan-400 text-lg font-display font-extrabold uppercase tracking-wider">
+                Features
               </h3>
             </div>
             
