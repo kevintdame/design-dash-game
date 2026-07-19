@@ -699,7 +699,7 @@ async function expandConceptVisualPrompt(conceptName, solutionOverview, features
     const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner");
     return {
       isApp,
-      visualSnippet: isApp ? "a clean schedule dashboard with calendar grids showing food icons" : "a modern functional design device layout"
+      visualSnippet: isApp ? "a clean food cover plate symbol next to a stopwatch icon" : "a modern functional design logo"
     };
   }
 
@@ -708,12 +708,12 @@ async function expandConceptVisualPrompt(conceptName, solutionOverview, features
     : "";
 
   try {
-    const prompt = `You are a design assistant. Translate the following product concept description into a detailed, visually rich 1-sentence description of the visual elements.
+    const prompt = `You are a logo designer. Translate the following product concept into a 1-sentence description of a centered, modern flat 2D vector brand logo or icon mark.
 RULES:
-1. Describe ONLY literal, real-world objects related to the theme (e.g., a delivery scooter, a shopping bag, fresh apples, a clock, a covered dinner plate, grocery shelves).
+1. Describe a single, centered, cohesive logo symbol or combined visual icon mark related to the theme (e.g., a simple vector stopwatch combined with a food platter icon, or a minimal shopping bag with a leaf symbol).
 2. DO NOT use abstract metaphors, sci-fi, or fantasy concepts (e.g., NO 'orbs', 'pulses', 'magic glows', 'hologram', 'nebula', 'energy waves', 'magical effects').
 3. DO NOT include any text, labels, numbers, letters, or placeholder words. The description must specify visual objects and shapes ONLY.
-4. DO NOT describe any physical phones, device frames, bezels, notches, hands holding devices, or realistic backgrounds.
+4. DO NOT describe any physical phones, device frames, bezels, notches, app screens, layouts, dashboards, user interfaces, or realistic backgrounds. The result should look like a clean graphic mark in the center of the frame.
 
 Product Concept Title: "${conceptName}"
 Product Concept Overview: "${solutionOverview}"
@@ -722,7 +722,7 @@ ${featuresText ? `Key Features:\n${featuresText}` : ""}
 Respond ONLY with a JSON object in this exact format:
 {
   "isApp": true or false,
-  "visualSnippet": "1-sentence description of literal physical objects to render"
+  "visualSnippet": "1-sentence description of a centered flat 2D logo or icon mark to render"
 }
 
 Do not include markdown tags, code blocks, or extra text.`;
@@ -755,7 +755,7 @@ Do not include markdown tags, code blocks, or extra text.`;
   const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner");
   return {
     isApp,
-    visualSnippet: isApp ? "a weekly calendar grid displaying plate and food dish icons" : "a modern geometric design structure with indicators"
+    visualSnippet: isApp ? "a clean food plate symbol next to a delivery vehicle outline" : "a modern geometric design structure with indicators"
   };
 }
 
@@ -815,21 +815,15 @@ app.post('/api/generate-concept-image', async (req, res) => {
   const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview, features);
   console.log("Concept Image visual expansion returned:", expansion);
 
-  let promptText = "";
-  if (expansion.isApp) {
-    promptText = `A clean flat 2D vector infographic mockup displaying: ${expansion.visualSnippet}. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple clean shapes, sharp outlines. Absolutely no physical phone container, no realistic device frame, no screen bezels or notches, no hands holding devices, no drop shadows, no text, no labels, no words, no letters, no gibberish characters, no annotations or details floating outside the main mockup canvas.`;
-  } else {
-    promptText = `A clean flat 2D vector infographic illustration representing: ${expansion.visualSnippet}. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple clean shapes, sharp outlines. Absolutely no physical phone container, no realistic device frame, no drop shadows, no text, no labels, no words, no letters, no gibberish characters, no annotations or details floating outside.`;
-  }
+  // We are creating a cohesive centered logo mark/brand icon in the same clean vector style
+  const promptText = `A centered, clean modern flat 2D vector graphic brand logo mark showing: ${expansion.visualSnippet}. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple clean shapes, sharp outlines, solid colors. Absolutely no realistic device frames, no phone mockups, no dashboard app layouts, no hands holding devices, no drop shadows, no text, no words, no letters, no gibberish characters, no details floating outside the main centered graphic.`;
 
   try {
-    // If it's an app, request portrait 3:4 aspect ratio (300x400), otherwise landscape 4:3 (400x300)
-    const width = expansion.isApp ? 300 : 400;
-    const height = expansion.isApp ? 400 : 300;
-    const url = await generateImageBase64(promptText, width, height);
+    // Standardize main logo concept image to a neat, square 1:1 format (300x300) to match the vector icon theme perfectly
+    const url = await generateImageBase64(promptText, 300, 300);
     res.json({ url });
   } catch (err) {
-    console.error("Concept image generation failed:", err);
+    console.error("Concept logo image generation failed:", err);
     res.status(500).json({ error: "Failed to generate concept image" });
   }
 });
