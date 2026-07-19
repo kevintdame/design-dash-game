@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { generateConceptImage, getConceptAspectRatioClass } from "@/lib/designGame";
 
 export const fonts = [
-  { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-cyan-400 font-extrabold uppercase text-xl leading-none" },
-  { name: "Elegant", family: "'Playfair Display', serif", className: "italic text-white font-medium capitalize text-2xl leading-none" },
-  { name: "Playful", family: "'Fredoka', sans-serif", className: "text-cyan-400 font-extrabold lowercase text-2xl leading-none" },
-  { name: "Classic", family: "'Cinzel', serif", className: "tracking-widest text-white font-bold uppercase text-lg leading-none" }
+  { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-cyan-400 font-black uppercase text-3xl sm:text-4.5xl leading-none" },
+  { name: "Elegant", family: "'Playfair Display', serif", className: "italic text-white font-bold capitalize text-3.5xl sm:text-5xl leading-none" },
+  { name: "Playful", family: "'Fredoka', sans-serif", className: "text-cyan-400 font-extrabold lowercase text-3.5xl sm:text-5xl leading-none" },
+  { name: "Classic", family: "'Cinzel', serif", className: "tracking-widest text-white font-extrabold uppercase text-2.5xl sm:text-4xl leading-none" }
 ];
 
 export default function FinalConceptScreen({ challenge, domain, onSubmit, loading }) {
@@ -149,8 +149,8 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400 mt-4">
         <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block mb-2">Concept Visual Mockup</label>
         {image && !imageLoadError ? (
-          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 aspect-square bg-[#2B303A] flex flex-col items-center justify-center p-8 select-none">
-            <div className="w-1/2 aspect-square flex items-center justify-center mb-6">
+          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 aspect-square bg-[#000000] flex flex-col items-center justify-center p-8 select-none">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-8">
               <img 
                 src={image} 
                 alt="Concept visual icon" 
@@ -159,10 +159,10 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
               />
             </div>
 
-            <div className="w-full text-center">
+            <div className="w-full text-center px-4">
               <div 
                 style={{ fontFamily: fonts[fontIdx].family }}
-                className={`${fonts[fontIdx].className} text-3xl font-extrabold tracking-wide drop-shadow-md`}
+                className={`${fonts[fontIdx].className} drop-shadow-md`}
               >
                 {conceptName || "Concept Name"}
               </div>

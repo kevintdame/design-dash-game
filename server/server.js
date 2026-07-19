@@ -830,6 +830,7 @@ RULES:
 1. Describe a single, literal icon object.
 2. DO NOT include the feature title, description, or any text/letters in the description. The description must specify visual shapes ONLY.
 3. DO NOT use abstract terms (orbs, pulses, glows, magic).
+4. The icon description must be strictly for a flat 2D vector graphic. Do not use words like "glowing", "3D", "embossed", "gradient", "realistic", "shaded", "highlights", or "shadows".
 
 Feature Title: "${title}"
 Feature Description: "${description}"
@@ -875,8 +876,8 @@ app.post('/api/generate-concept-image', async (req, res) => {
   const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview, features);
   console.log("Concept Image visual expansion returned:", expansion);
 
-  // We are creating a cohesive centered logo mark/brand icon in the same clean vector style (NO text baked in!)
-  const promptText = `A centered, clean flat 2D vector brand icon mark on a solid deep charcoal (#2B303A) background. The icon features a simple, stylized modern vector symbol of: ${expansion.visualSnippet}. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no text, no letters, no words, no characters, no device frames, no drop shadows.`;
+  // Apply strict style guide with pure black (#000000) background for seamless mockup blending
+  const promptText = `A centered flat 2D vector graphic icon on a solid black (#000000) background. The icon features a simple, stylized modern vector symbol of: ${expansion.visualSnippet}. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, simple geometric shapes, clean sharp bold vector outlines, solid flat fills, absolutely no soft gradients, no airbrushing, no glow effects, no 3D shading, no highlights, no drop shadows, absolutely no text, no letters, no words.`;
 
   try {
     // Standardize main logo concept image to a neat, square 1:1 format (1024x1024) for ultimate crispness
@@ -897,8 +898,8 @@ app.post('/api/generate-feature-images', async (req, res) => {
         const iconSnippet = await expandFeatureVisualPrompt(f.title, f.description, domain);
         console.log(`Feature icon translation for "${f.title}":`, iconSnippet);
         
-        // Exact copy of the clean, high-contrast flat vector icon structure used in chat
-        const prompt = `A centered flat 2D vector graphic icon on a solid deep charcoal (#2B303A) background. The icon shows a simple, stylized vector outline of: ${iconSnippet}. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, simple geometric shapes, clean sharp bold vector outlines, solid fills, no soft gradients, no airbrushing, no glow effects, no 3D shading, absolutely no text, no letters, no words.`;
+        // Exact copy of the clean, high-contrast flat vector icon structure with pure black background
+        const prompt = `A centered flat 2D vector graphic icon on a solid black (#000000) background. The icon shows a simple, stylized vector outline of: ${iconSnippet}. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, simple geometric shapes, clean sharp bold vector outlines, solid flat fills, absolutely no soft gradients, no airbrushing, no glow effects, no 3D shading, no highlights, no drop shadows, absolutely no text, no letters, no words.`;
         const image_url = await generateImageBase64(prompt, 512, 512);
         return { ...f, image_url };
       })
