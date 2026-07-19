@@ -1,41 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Rocket, ArrowRight, Loader2, Sparkles, RefreshCw } from "lucide-react";
+import { Rocket, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Dynamic Google Fonts configuration mapping concept vibes to cohesive type styles
-export const getFontsForVibe = (vibe) => {
-  switch (vibe) {
-    case "tech":
-      return [
-        { name: "Modern", family: "'Space Grotesk', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-bold uppercase text-3xl sm:text-4.5xl leading-none" },
-        { name: "Elegant", family: "'Outfit', sans-serif", className: "tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-extrabold uppercase text-3xl sm:text-4.5xl leading-none" },
-        { name: "Playful", family: "'Orbitron', sans-serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-black uppercase text-2.5xl sm:text-3.5xl leading-none" },
-        { name: "Classic", family: "'Outfit', sans-serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-medium uppercase text-2.5xl sm:text-3.5xl leading-none" }
-      ];
-    case "luxury":
-      return [
-        { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase text-3xl sm:text-4.5xl leading-none" },
-        { name: "Elegant", family: "'Prata', serif", className: "text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal capitalize text-3.5xl sm:text-5xl leading-none" },
-        { name: "Playful", family: "'Cormorant Garamond', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-bold capitalize text-4xl sm:text-5xl leading-none" },
-        { name: "Classic", family: "'Cinzel', serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-extrabold uppercase text-2.5xl sm:text-4xl leading-none" }
-      ];
-    case "playful":
-      return [
-        { name: "Modern", family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase text-3.5xl sm:text-5xl leading-none" },
-        { name: "Elegant", family: "'Lilita One', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal uppercase text-3.5xl sm:text-5xl leading-none" },
-        { name: "Playful", family: "'Rubik Bubbles', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-normal text-3.5xl sm:text-5xl leading-none" },
-        { name: "Classic", family: "'Nunito', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-black capitalize text-3.5xl sm:text-5xl leading-none" }
-      ];
-    case "organic":
-    default:
-      return [
-        { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase text-3xl sm:text-4.5xl leading-none" },
-        { name: "Elegant", family: "'Playfair Display', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-bold capitalize text-3.5xl sm:text-5xl leading-none" },
-        { name: "Playful", family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase text-3.5xl sm:text-5xl leading-none" },
-        { name: "Classic", family: "'Lora', serif", className: "italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-semibold capitalize text-3.5xl sm:text-5xl leading-none" }
-      ];
+// Pool of 16 Google Fonts representing diverse corporate branding styles
+export const fontPool = [
+  { family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase" },
+  { family: "'Playfair Display', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-bold capitalize animate-fade-in" },
+  { family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase" },
+  { family: "'Cinzel', serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-extrabold uppercase" },
+  { family: "'Orbitron', sans-serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-black uppercase" },
+  { family: "'Space Grotesk', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-bold uppercase" },
+  { family: "'Prata', serif", className: "text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal capitalize" },
+  { family: "'Cormorant Garamond', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-bold capitalize" },
+  { family: "'Lilita One', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal uppercase" },
+  { family: "'Rubik Bubbles', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-normal" },
+  { family: "'Nunito', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-black capitalize" },
+  { family: "'Lora', serif", className: "italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-semibold capitalize" },
+  { family: "'Space Mono', monospace", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-bold uppercase" },
+  { family: "'Pacifico', cursive", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-300 font-normal capitalize" },
+  { family: "'Sacramento', cursive", className: "text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-400 font-normal" },
+  { family: "'Righteous', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-normal uppercase" }
+];
+
+// Helper to shuffle fonts pool client-side
+const shuffleFonts = (array) => {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
+  return arr;
 };
 
 export default function FinalConceptScreen({ challenge, domain, onSubmit, loading }) {
@@ -43,7 +38,18 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
   const [problem, setProblem] = useState("");
   const [solutionOverview, setSolutionOverview] = useState("");
   const [fontIdx, setFontIdx] = useState(0);
-  const [vibe, setVibe] = useState("organic");
+
+  // Initialize a random selection of 4 distinct font mappings once for this concept session
+  const [activeFonts] = useState(() => {
+    const shuffled = shuffleFonts(fontPool);
+    return [
+      { ...shuffled[0], name: "Modern" },
+      { ...shuffled[1], name: "Elegant" },
+      { ...shuffled[2], name: "Playful" },
+      { ...shuffled[3], name: "Classic" }
+    ];
+  });
+
   const [features, setFeatures] = useState([
     { title: "", description: "" },
     { title: "", description: "" },
@@ -51,40 +57,15 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
   ]);
 
   const completeFeatures = features.filter((f) => f.title.trim().length > 0);
+  
+  // Removed minimum solution overview length requirements as requested
   const ready = conceptName.trim().length > 0 && solutionOverview.trim().length > 0;
-
-  // Debounced vibe classification endpoint fetcher
-  useEffect(() => {
-    if (conceptName.trim().length >= 3 && solutionOverview.trim().length >= 10) {
-      const delayDebounceFn = setTimeout(async () => {
-        try {
-          const res = await fetch("/api/concept-vibe", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ conceptName, solutionOverview })
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.vibe) {
-              setVibe(data.vibe);
-            }
-          }
-        } catch (err) {
-          console.warn("Vibe classification fetch error:", err);
-        }
-      }, 800);
-
-      return () => clearTimeout(delayDebounceFn);
-    }
-  }, [conceptName, solutionOverview]);
 
   function updateFeature(i, field, val) {
     const next = [...features];
     next[i] = { ...next[i], [field]: val };
     setFeatures(next);
   }
-
-  const activeFonts = getFontsForVibe(vibe);
 
   const handleFontCycle = () => {
     setFontIdx((prev) => (prev + 1) % activeFonts.length);
@@ -98,7 +79,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       solutionOverview: solutionOverview.trim(),
       image: null,
       fontIdx,
-      vibe,
+      fontPool: activeFonts, // Save the randomly shuffled pool to the database for this concept
       features: completeFeatures.map((f) => ({ title: f.title.trim(), description: f.description.trim() }))
     });
   }
@@ -145,7 +126,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
           <textarea
             value={solutionOverview}
             onChange={(e) => setSolutionOverview(e.target.value)}
-            placeholder="A high-level description of your solution..."
+            placeholder="A description of your solution..."
             rows={5}
             className="w-full mt-1 text-base sm:text-sm text-card-foreground placeholder:text-slate-300 outline-none resize-none leading-relaxed"
           />
@@ -178,37 +159,42 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
         ))}
       </div>
 
-      <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400 mt-4 space-y-4">
-        <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block">Brand Showcase Card</label>
+      <div className="mt-6 space-y-4">
+        <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block -mb-2">Brand Showcase Preview</label>
         
         {/* Dynamic CSS Brand Logo Card */}
-        <div className="bg-[#2B303A] rounded-2xl p-8 flex flex-col items-center justify-center min-h-[180px] shadow-xl border border-white/5 relative select-none">
-          <div className="text-center px-4 w-full">
+        <div className="bg-[#2B303A] rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px] shadow-xl border border-white/5 relative select-none w-full">
+          <div className="text-center px-4 w-full mb-6">
             <div 
               style={{ fontFamily: activeFonts[fontIdx].family }}
-              className={`${activeFonts[fontIdx].className} drop-shadow-lg`}
+              className={`${activeFonts[fontIdx].className} drop-shadow-lg text-4xl sm:text-5xl md:text-6xl break-words leading-tight`}
             >
               {conceptName || "Concept Name"}
             </div>
           </div>
 
+          {/* Solution summary directly below it in white font */}
+          <p className="text-white text-xs sm:text-sm text-center max-w-sm leading-relaxed opacity-90 mt-4 border-t border-white/10 pt-4 w-full">
+            {solutionOverview || "Your solution summary will appear here..."}
+          </p>
+
           {/* Cycle Font Button */}
           <button
             type="button"
             onClick={handleFontCycle}
-            className="absolute bottom-2 left-2 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider"
+            className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider"
             title="Cycle Font Style"
           >
             Font: {activeFonts[fontIdx].name}
           </button>
         </div>
 
-        {/* Cohesive Features Summary Board inside the Brand System */}
+        {/* Cohesive Features Summary Board (identical size to logo card) */}
         {completeFeatures.length > 0 && (
-          <div className="bg-[#1C2028] rounded-xl p-5 shadow-inner border border-white/5 space-y-4">
+          <div className="bg-[#1C2028] rounded-2xl p-8 shadow-inner border border-white/5 space-y-5 w-full">
             <h3 
               style={{ fontFamily: activeFonts[fontIdx].family }}
-              className="text-cyan-400 text-xs font-bold uppercase tracking-wider mb-2"
+              className="text-cyan-400 text-sm font-bold uppercase tracking-wider mb-2"
             >
               Core Brand Features
             </h3>
@@ -217,11 +203,11 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
                 <div key={i} className="border-l border-cyan-400/30 pl-4 py-0.5">
                   <h4 
                     style={{ fontFamily: activeFonts[fontIdx].family }}
-                    className="text-white font-semibold text-sm capitalize"
+                    className="text-white font-semibold text-sm capitalize animate-fade-in"
                   >
                     {f.title}
                   </h4>
-                  <p className="text-slate-400 text-xs mt-0.5 leading-relaxed">
+                  <p className="text-slate-400 text-xs mt-0.5 leading-relaxed animate-fade-in">
                     {f.description}
                   </p>
                 </div>
@@ -234,7 +220,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       <Button
         onClick={submit}
         disabled={!ready || loading}
-        className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-bold rounded-lg h-14 mt-5 shadow-lg disabled:opacity-40"
+        className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-bold rounded-lg h-14 mt-6 shadow-lg disabled:opacity-40"
       >
         {loading ? (
           <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Synthesizing final concept...</span>

@@ -120,6 +120,7 @@ export default function Game() {
           concept_name: concept.name,
           concept_image: concept.image,
           concept_font_idx: concept.fontIdx !== undefined ? concept.fontIdx : 0,
+          concept_font_pool: concept.fontPool,
           problem: concept.problem,
           solution_overview: concept.solutionOverview,
           features: concept.features,
