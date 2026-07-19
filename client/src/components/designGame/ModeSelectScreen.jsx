@@ -31,46 +31,58 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
       {/* Mode Selection Cards */}
       <div className="w-full flex flex-col space-y-4">
         {/* Single Player Card */}
-        <Card 
-          onClick={onSelectSingle}
-          className="bg-card text-card-foreground border border-slate-200/5 cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-xl rounded-2xl overflow-hidden ring-1 ring-black/5 hover:ring-cyan-400/30"
+        <motion.div
+          whileHover={{ scale: 1.03, y: -4 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
         >
-          <CardContent className="p-5 flex items-start space-x-4">
-            <div className="h-12 w-12 rounded-xl bg-[#20262e] ring-1 ring-cyan-400/25 text-cyan-400 flex items-center justify-center shrink-0 shadow-md">
-              <User className="h-5 w-5" />
-            </div>
-            <div className="flex-1 space-y-1 text-left">
-              <div className="font-display font-extrabold tracking-wider uppercase text-sm sm:text-base flex items-center justify-between text-card-foreground">
-                <span>Single Player Jam</span>
-                <ArrowRight className="h-5 w-5 text-slate-400" />
+          <Card 
+            onClick={onSelectSingle}
+            className="bg-card text-card-foreground border border-slate-200/5 cursor-pointer transition-all rounded-2xl overflow-hidden ring-1 ring-black/5 hover:ring-cyan-400/30"
+          >
+            <CardContent className="p-5 flex items-start space-x-4">
+              <div className="h-12 w-12 rounded-xl bg-[#20262e] ring-1 ring-cyan-400/25 text-cyan-400 flex items-center justify-center shrink-0 shadow-md">
+                <User className="h-5 w-5" />
               </div>
-              <p className="text-slate-500 text-xs font-semibold leading-relaxed">
-                Take on a concept jam solo and pitch your final solution to a virtual customer.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="flex-1 space-y-1 text-left">
+                <div className="font-display font-extrabold tracking-wider uppercase text-sm sm:text-base flex items-center justify-between text-card-foreground">
+                  <span>Single Player Jam</span>
+                  <ArrowRight className="h-5 w-5 text-slate-400" />
+                </div>
+                <p className="text-slate-500 text-xs font-semibold leading-relaxed">
+                  Take on a concept jam solo and pitch your final solution to a virtual customer.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Multiplayer Card */}
-        <Card 
-          onClick={onSelectMulti}
-          className="bg-card text-card-foreground border border-slate-200/5 cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-xl rounded-2xl overflow-hidden ring-1 ring-black/5 hover:ring-cyan-400/30"
+        <motion.div
+          whileHover={{ scale: 1.03, y: -4 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
         >
-          <CardContent className="p-5 flex items-start space-x-4">
-            <div className="h-12 w-12 rounded-xl bg-[#20262e] ring-1 ring-cyan-400/25 text-cyan-400 flex items-center justify-center shrink-0 shadow-md">
-              <Users className="h-5 w-5" />
-            </div>
-            <div className="flex-1 space-y-1 text-left">
-              <div className="font-display font-extrabold tracking-wider uppercase text-sm sm:text-base flex items-center justify-between text-card-foreground">
-                <span>Multiplayer Battle</span>
-                <ArrowRight className="h-5 w-5 text-slate-400" />
+          <Card 
+            onClick={onSelectMulti}
+            className="bg-card text-card-foreground border border-slate-200/5 cursor-pointer transition-all rounded-2xl overflow-hidden ring-1 ring-black/5 hover:ring-cyan-400/30"
+          >
+            <CardContent className="p-5 flex items-start space-x-4">
+              <div className="h-12 w-12 rounded-xl bg-[#20262e] ring-1 ring-cyan-400/25 text-cyan-400 flex items-center justify-center shrink-0 shadow-md">
+                <Users className="h-5 w-5" />
               </div>
-              <p className="text-slate-500 text-xs font-semibold leading-relaxed">
-                Create a room or join friends to compete on the same challenge side-by-side.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="flex-1 space-y-1 text-left">
+                <div className="font-display font-extrabold tracking-wider uppercase text-sm sm:text-base flex items-center justify-between text-card-foreground">
+                  <span>Multiplayer Battle</span>
+                  <ArrowRight className="h-5 w-5 text-slate-400" />
+                </div>
+                <p className="text-slate-500 text-xs font-semibold leading-relaxed">
+                  Create a room or join friends to compete on the same challenge side-by-side.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       {/* Portfolio Footer */}

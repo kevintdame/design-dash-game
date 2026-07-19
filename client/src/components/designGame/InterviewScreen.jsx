@@ -60,8 +60,9 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
           {qa.map((item, i) => (
             <div key={i}>
               <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ scale: 0.9, opacity: 0, y: 12 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 450, damping: 26 }}
                 className="flex justify-end"
               >
                 <div className="bg-cyan-400 text-[#20262e] rounded-2xl rounded-br-md px-4 py-2.5 max-w-[85%] shadow-md">
@@ -69,8 +70,9 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
                 </div>
               </motion.div>
               <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ scale: 0.9, opacity: 0, y: 12 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 450, damping: 26, delay: 0.05 }}
                 className="flex justify-start mt-2"
               >
                 <div className="bg-card text-card-foreground rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[85%] ring-1 ring-black/5 shadow-sm">

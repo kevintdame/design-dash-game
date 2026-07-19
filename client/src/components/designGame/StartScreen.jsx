@@ -16,7 +16,10 @@ const DOMAINS = [
 
 function Chip({ active, onClick, icon: Icon, children }) {
   return (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.03, y: -2 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
       type="button"
       onClick={onClick}
       className={`relative text-[10px] sm:text-xs font-display font-extrabold uppercase tracking-wide rounded-lg px-3 py-2.5 transition-all ring-1 flex items-center gap-1.5 text-left w-full ${
@@ -32,7 +35,7 @@ function Chip({ active, onClick, icon: Icon, children }) {
           <Check className="h-4 w-4 text-white bg-cyan-400 rounded-full p-0.5 ring-2 ring-[#1a1f26]" />
         </motion.span>
       )}
-    </button>
+    </motion.button>
   );
 }
 
@@ -69,23 +72,30 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
         </div>
       </div>
 
-      <Button
-        onClick={() => ready && onStart(domain)}
-        disabled={!ready || loading}
-        size="lg"
-        className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-display font-bold tracking-wider uppercase rounded-lg shadow-lg text-sm sm:text-base h-14 disabled:opacity-40 disabled:hover:bg-cyan-400"
+      <motion.div
+        whileHover={ready && !loading ? { scale: 1.02, y: -1 } : {}}
+        whileTap={ready && !loading ? { scale: 0.98 } : {}}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        className="w-full"
       >
-        {loading ? (
-          <span className="flex items-center gap-2">
-            <span className="h-4 w-4 border-2 border-[#20262e]/30 border-t-[#20262e] rounded-full animate-spin" />
-            Generating challenge...
-          </span>
-        ) : (
-          <span className="flex items-center gap-2">
-            Start Playing <ArrowRight className="h-5 w-5" />
-          </span>
-        )}
-      </Button>
+        <Button
+          onClick={() => ready && onStart(domain)}
+          disabled={!ready || loading}
+          size="lg"
+          className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-display font-bold tracking-wider uppercase rounded-lg shadow-lg text-sm sm:text-base h-14 disabled:opacity-40 disabled:hover:bg-cyan-400"
+        >
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 border-2 border-[#20262e]/30 border-t-[#20262e] rounded-full animate-spin" />
+              Generating challenge...
+            </span>
+          ) : (
+            <span className="flex items-center gap-2">
+              Start Playing <ArrowRight className="h-5 w-5" />
+            </span>
+          )}
+        </Button>
+      </motion.div>
 
       <button
         type="button"
