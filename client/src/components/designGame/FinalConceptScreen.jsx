@@ -4,6 +4,13 @@ import { Rocket, ArrowRight, Loader2, ImageIcon, Sparkles, RefreshCw, AlertCircl
 import { Button } from "@/components/ui/button";
 import { generateConceptImage, getConceptAspectRatioClass } from "@/lib/designGame";
 
+export const fonts = [
+  { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-cyan-400 font-extrabold uppercase text-xl leading-none" },
+  { name: "Elegant", family: "'Playfair Display', serif", className: "italic text-white font-medium capitalize text-2xl leading-none" },
+  { name: "Playful", family: "'Fredoka', sans-serif", className: "text-cyan-400 font-extrabold lowercase text-2xl leading-none" },
+  { name: "Classic", family: "'Cinzel', serif", className: "tracking-widest text-white font-bold uppercase text-lg leading-none" }
+];
+
 export default function FinalConceptScreen({ challenge, domain, onSubmit, loading }) {
   const [conceptName, setConceptName] = useState("");
   const [problem, setProblem] = useState("");
@@ -11,6 +18,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
   const [image, setImage] = useState(null);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
+  const [fontIdx, setFontIdx] = useState(0);
   const [features, setFeatures] = useState([
     { title: "", description: "" },
     { title: "", description: "" },
@@ -49,6 +57,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       problem: problem.trim(),
       solutionOverview: solutionOverview.trim(),
       image,
+      fontIdx,
       features: completeFeatures.map((f) => ({ title: f.title.trim(), description: f.description.trim() }))
     });
   }
@@ -131,18 +140,42 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400 mt-4">
         <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block mb-2">Concept Visual Mockup</label>
         {image && !imageLoadError ? (
-          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5">
-            <img 
-              src={image} 
-              alt="Concept visual" 
-              className={`w-full ${getConceptAspectRatioClass(solutionOverview, conceptName)} object-cover animate-fade-in`} 
-              onError={() => setImageLoadError(true)}
-            />
+          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 bg-[#2B303A] flex flex-col items-center justify-center p-8 aspect-square select-none">
+            <div className="w-1/2 aspect-square flex items-center justify-center mb-6">
+              <img 
+                src={image} 
+                alt="Concept visual" 
+                className="w-full h-full object-contain animate-fade-in" 
+                onError={() => setImageLoadError(true)}
+              />
+            </div>
+            
+            <div className="w-full text-center min-h-[40px] flex items-center justify-center">
+              <div 
+                style={{ fontFamily: fonts[fontIdx].family }}
+                className={fonts[fontIdx].className}
+              >
+                {conceptName || "Concept Name"}
+              </div>
+            </div>
+
             {generatingImage && (
-              <div className="absolute inset-0 bg-black/55 flex items-center justify-center backdrop-blur-[1px]">
+              <div className="absolute inset-0 bg-black/55 flex items-center justify-center backdrop-blur-[1px] rounded-xl">
                 <Loader2 className="h-7 w-7 text-cyan-400 animate-spin" />
               </div>
             )}
+
+            {/* Cycle Font Button */}
+            <button
+              type="button"
+              onClick={() => setFontIdx((p) => (p + 1) % fonts.length)}
+              className="absolute bottom-2 left-2 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider"
+              title="Change Font Style"
+            >
+              Font: {fonts[fontIdx].name}
+            </button>
+
+            {/* Regenerate Button */}
             <button
               type="button"
               onClick={handleGenerateImage}

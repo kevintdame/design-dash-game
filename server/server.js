@@ -875,8 +875,8 @@ app.post('/api/generate-concept-image', async (req, res) => {
   const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview, features);
   console.log("Concept Image visual expansion returned:", expansion);
 
-  // We are creating a cohesive centered logo mark/brand icon in the same clean vector style
-  const promptText = `A centered, clean flat 2D vector graphic brand logo design on a solid deep charcoal (#2B303A) background. The logo features a simple, stylized modern icon of: ${expansion.visualSnippet}. Underneath the icon, the text "${conceptName}" is written in a clean, bold, friendly sans-serif font. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no realistic phone screen bezels, no device frames, no drop shadows.`;
+  // We are creating a cohesive centered logo mark/brand icon in the same clean vector style (NO text baked in!)
+  const promptText = `A centered, clean flat 2D vector brand icon mark on a solid deep charcoal (#2B303A) background. The icon features a simple, stylized modern vector symbol of: ${expansion.visualSnippet}. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no text, no letters, no words, no characters, no device frames, no drop shadows.`;
 
   try {
     // Standardize main logo concept image to a neat, square 1:1 format (1024x1024) for ultimate crispness
@@ -896,7 +896,7 @@ app.post('/api/generate-feature-images', async (req, res) => {
       features.map(async (f) => {
         const iconSnippet = await expandFeatureVisualPrompt(f.title, f.description, domain);
         console.log(`Feature icon translation for "${f.title}":`, iconSnippet);
-        const prompt = `Flat 2D vector graphic icon showing: ${iconSnippet}. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, absolutely no text, no letters, no words, no gibberish characters.`;
+        const prompt = `Flat 2D vector graphic icon showing: ${iconSnippet}. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, simple geometric shapes, clean sharp bold vector outlines, solid fills, no soft gradients, no airbrushing, no glow effects, no 3D shading, absolutely no text, no letters, no words.`;
         const image_url = await generateImageBase64(prompt, 512, 512);
         return { ...f, image_url };
       })
