@@ -674,7 +674,7 @@ async function generateImageBase64(prompt, width = 400, height = 300) {
     try {
       console.log("Attempting Hugging Face FLUX.1-schnell generation...");
       const response = await fetch(
-        "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+        "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
         {
           headers: { 
             "Authorization": `Bearer ${hfApiKey}`,
