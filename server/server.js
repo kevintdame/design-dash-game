@@ -703,14 +703,30 @@ async function expandConceptVisualPrompt(conceptName, solutionOverview) {
     };
   }
 
+// Helper to use Gemini to translate concept info into descriptive vector graphic prompts and classify if it is a mobile app
+async function expandConceptVisualPrompt(conceptName, solutionOverview, features = []) {
+  if (isOfflineMode) {
+    const lower = (solutionOverview || "").toLowerCase() + " " + (conceptName || "").toLowerCase();
+    const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner");
+    return {
+      isApp,
+      visualSnippet: isApp ? "a clean schedule dashboard with calendar grids showing food icons" : "a modern functional design device layout"
+    };
+  }
+
+  const featuresText = Array.isArray(features) && features.length > 0 
+    ? features.map((f, i) => `- Feature ${i+1} (${f.title}): ${f.description}`).join("\n") 
+    : "";
+
   try {
-    const prompt = `You are a design assistant. Translate the following product concept description into a detailed, visually rich 1-sentence description of the visual interface elements (e.g., progress gauges, wave bars, session list cards, detailed control buttons, clean widgets). 
-The description must specify multiple distinct vector elements to avoid simple, empty layouts.
+    const prompt = `You are a design assistant. Translate the following product concept description into a detailed, visually rich 1-sentence description of the visual interface elements.
+The description must specify concrete visual objects (such as grocery baskets, fresh vegetables, delivery trucks, route lines, running characters, chef hats, depending on the product) to represent the product concept in action, rather than drawing just a phone or empty abstract UI widgets.
 Crucially, DO NOT include any mention of text, labels, words, letters, or placeholder text. The description must specify visual objects and shapes ONLY.
 Also classify if the concept represents a mobile app, software interface, or website. Classify isApp as true ONLY if the title or overview explicitly mentions words like 'app', 'mobile app', 'screen', 'interface', 'website', 'software', or 'digital dashboard'. Otherwise, classify it as false.
 
 Product Concept Title: "${conceptName}"
 Product Concept Overview: "${solutionOverview}"
+${featuresText ? `Key Features:\n${featuresText}` : ""}
 
 Respond ONLY with a JSON object in this exact format:
 {
@@ -754,10 +770,10 @@ Do not include markdown tags, code blocks, or extra text.`;
 
 // 6. Generate Concept Image using Google AI Studio Imagen 3
 app.post('/api/generate-concept-image', async (req, res) => {
-  const { solutionOverview, domain, conceptName } = req.body;
+  const { solutionOverview, domain, conceptName, features } = req.body;
 
   // Use Gemini to expand the prompt and classify isApp
-  const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview);
+  const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview, features);
   console.log("Concept Image visual expansion returned:", expansion);
 
   let promptText = "";

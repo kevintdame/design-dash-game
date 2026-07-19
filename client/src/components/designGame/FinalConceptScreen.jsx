@@ -32,7 +32,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
     setImageLoadError(false);
     setGeneratingImage(true);
     try {
-      const url = await generateConceptImage(solutionOverview, domain, conceptName);
+      const url = await generateConceptImage(solutionOverview, domain, conceptName, completeFeatures);
       setImage(url);
     } catch (err) {
       console.error("Concept image generation failed:", err);
@@ -85,7 +85,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
             value={problem}
             onChange={(e) => setProblem(e.target.value)}
             placeholder="The core problem your customer is facing..."
-            rows={2}
+            rows={3}
             className="w-full mt-1 text-base sm:text-sm text-card-foreground placeholder:text-slate-300 outline-none resize-none leading-relaxed"
           />
         </div>
@@ -96,69 +96,9 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
             value={solutionOverview}
             onChange={(e) => setSolutionOverview(e.target.value)}
             placeholder="A high-level description of your solution..."
-            rows={3}
+            rows={5}
             className="w-full mt-1 text-base sm:text-sm text-card-foreground placeholder:text-slate-300 outline-none resize-none leading-relaxed"
           />
-          <div className="mt-3">
-            {image && !imageLoadError ? (
-              <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5">
-                <img 
-                  src={image} 
-                  alt="Concept visual" 
-                  className={`w-full ${getConceptAspectRatioClass(solutionOverview, conceptName)} object-cover animate-fade-in`} 
-                  onError={() => setImageLoadError(true)}
-                />
-                {generatingImage && (
-                  <div className="absolute inset-0 bg-black/55 flex items-center justify-center backdrop-blur-[1px]">
-                    <Loader2 className="h-7 w-7 text-cyan-400 animate-spin" />
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={handleGenerateImage}
-                  disabled={generatingImage}
-                  className="absolute top-2 right-2 h-8 w-8 rounded-full bg-[#20262e]/80 text-cyan-400 flex items-center justify-center hover:bg-[#20262e] transition-colors z-10"
-                  title="Regenerate image"
-                >
-                  {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                </button>
-              </div>
-            ) : image && imageLoadError ? (
-              <div className={`relative rounded-xl overflow-hidden ring-1 ring-black/5 ${getConceptAspectRatioClass(solutionOverview, conceptName)} bg-card border border-cyan-400/20 flex flex-col items-center justify-center p-6 text-center`}>
-                <AlertCircle className="h-8 w-8 text-cyan-400 mb-2" />
-                <div className="text-white font-bold text-xs">Image Generation Overloaded</div>
-                <div className="text-slate-400 text-[10px] mt-1 max-w-[240px] leading-relaxed">
-                  The free image generation server is currently busy. Please wait a moment and click retry.
-                </div>
-                <Button
-                  type="button"
-                  onClick={handleGenerateImage}
-                  disabled={generatingImage}
-                  className="mt-3 bg-cyan-400 text-[#20262e] hover:bg-cyan-300 text-xs font-bold px-4 py-1.5 h-8 rounded-lg"
-                >
-                  {generatingImage ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
-                  Retry generation
-                </Button>
-              </div>
-            ) : (
-              <Button
-                type="button"
-                onClick={handleGenerateImage}
-                disabled={!canGenerateImage || generatingImage}
-                variant="outline"
-                className="w-full border-cyan-400/40 text-cyan-500 hover:bg-cyan-400/10 hover:text-cyan-600 font-semibold rounded-lg h-11 disabled:opacity-40"
-              >
-                {generatingImage ? (
-                  <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Generating image...</span>
-                ) : (
-                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Generate concept image</span>
-                )}
-              </Button>
-            )}
-            {!canGenerateImage && !image && (
-              <p className="text-slate-400 text-[10px] mt-1.5 text-center">Write at least a sentence of your solution to enable image generation.</p>
-            )}
-          </div>
         </div>
 
         <div className="text-cyan-400 text-xs font-semibold uppercase tracking-widest pt-1">Key Features <span className="text-slate-400 normal-case font-medium">(optional)</span></div>
@@ -186,6 +126,68 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
             />
           </div>
         ))}
+      </div>
+
+      <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400 mt-4">
+        <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block mb-2">Concept Visual Mockup</label>
+        {image && !imageLoadError ? (
+          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5">
+            <img 
+              src={image} 
+              alt="Concept visual" 
+              className={`w-full ${getConceptAspectRatioClass(solutionOverview, conceptName)} object-cover animate-fade-in`} 
+              onError={() => setImageLoadError(true)}
+            />
+            {generatingImage && (
+              <div className="absolute inset-0 bg-black/55 flex items-center justify-center backdrop-blur-[1px]">
+                <Loader2 className="h-7 w-7 text-cyan-400 animate-spin" />
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleGenerateImage}
+              disabled={generatingImage}
+              className="absolute top-2 right-2 h-8 w-8 rounded-full bg-[#20262e]/80 text-cyan-400 flex items-center justify-center hover:bg-[#20262e] transition-colors z-10"
+              title="Regenerate image"
+            >
+              {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            </button>
+          </div>
+        ) : image && imageLoadError ? (
+          <div className={`relative rounded-xl overflow-hidden ring-1 ring-black/5 ${getConceptAspectRatioClass(solutionOverview, conceptName)} bg-card border border-cyan-400/20 flex flex-col items-center justify-center p-6 text-center`}>
+            <AlertCircle className="h-8 w-8 text-cyan-400 mb-2" />
+            <div className="text-white font-bold text-xs">Image Generation Overloaded</div>
+            <div className="text-slate-400 text-[10px] mt-1 max-w-[240px] leading-relaxed">
+              The free image generation server is currently busy. Please wait a moment and click retry.
+            </div>
+            <Button
+              type="button"
+              onClick={handleGenerateImage}
+              disabled={generatingImage}
+              className="mt-3 bg-cyan-400 text-[#20262e] hover:bg-cyan-300 text-xs font-bold px-4 py-1.5 h-8 rounded-lg"
+            >
+              {generatingImage ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
+              Retry generation
+            </Button>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            onClick={handleGenerateImage}
+            disabled={!canGenerateImage || generatingImage}
+            variant="outline"
+            className="w-full border-cyan-400/40 text-cyan-500 hover:bg-cyan-400/10 hover:text-cyan-600 font-semibold rounded-lg h-11 disabled:opacity-40"
+          >
+            {generatingImage ? (
+              <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Generating image...</span>
+            ) : (
+              <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Generate concept image</span>
+            )}
+          </Button>
+        )}
+        {!canGenerateImage && !image && (
+          <p className="text-slate-400 text-[10px] mt-1.5 text-center">Write at least a sentence of your solution to enable image generation.</p>
+        )}
       </div>
 
       <Button

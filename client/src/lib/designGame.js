@@ -81,11 +81,11 @@ export async function generateFeatureImages(features, domain) {
   return data.features || features;
 }
 
-export async function generateConceptImage(solutionOverview, domain, conceptName = "") {
+export async function generateConceptImage(solutionOverview, domain, conceptName = "", features = []) {
   const res = await fetch("/api/generate-concept-image", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ solutionOverview, domain, conceptName })
+    body: JSON.stringify({ solutionOverview, domain, conceptName, features })
   });
   if (!res.ok) {
     throw new Error("Imagen 3 generation failed on the server");
