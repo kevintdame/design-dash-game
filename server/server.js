@@ -869,23 +869,14 @@ Do not include markdown tags, code blocks, or extra text.`;
 
 // 6. Generate Concept Image using Google AI Studio Imagen 3
 app.post('/api/generate-concept-image', async (req, res) => {
-  const { solutionOverview, domain, conceptName, features, fontStyle } = req.body;
+  const { solutionOverview, domain, conceptName, features } = req.body;
 
   // Use Gemini to expand the prompt and classify isApp
   const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview, features);
   console.log("Concept Image visual expansion returned:", expansion);
 
-  // Typography descriptors based on selected font style
-  const fontDescriptors = {
-    modern: "very large, clean, bold modern geometric sans-serif display font",
-    elegant: "very large, clean, elegant and stylized serif display font (modern editorial style)",
-    playful: "very large, bold, friendly, rounded blocky display font",
-    classic: "very large, classic, clean serif font"
-  };
-  const fontText = fontDescriptors[fontStyle] || fontDescriptors.modern;
-
-  // Typographic logo prompt where the text is the main hero and the icon is an integrated accent on top/around it
-  const promptText = `A centered flat 2D vector typography brand logo design on a solid deep charcoal (#2B303A) background. The logo features the brand name "${conceptName}" written in a ${fontText} as the central hero of the design. A small, simple, stylized modern vector icon of: ${expansion.visualSnippet} is integrated as a clean accent on top of the text. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no realistic phone screen bezels, no device frames, no drop shadows.`;
+  // We are creating a cohesive centered logo mark/brand icon in the same clean vector style (NO text baked in!)
+  const promptText = `A centered, clean flat 2D vector brand icon mark on a solid deep charcoal (#2B303A) background. The icon features a simple, stylized modern vector symbol of: ${expansion.visualSnippet}. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no text, no letters, no words, no characters, no device frames, no drop shadows.`;
 
   try {
     // Standardize main logo concept image to a neat, square 1:1 format (1024x1024) for ultimate crispness

@@ -35,20 +35,16 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
     setFeatures(next);
   }
 
-  const fontStyles = ["modern", "elegant", "playful", "classic"];
-
-  async function handleGenerateImage(customFontIdx = null) {
+  async function handleGenerateImage() {
     if (!canGenerateImage || generatingImage) return;
     setImageLoadError(false);
     setGeneratingImage(true);
-    const targetFontIdx = customFontIdx !== null ? customFontIdx : fontIdx;
     try {
       const url = await generateConceptImage(
         solutionOverview,
         domain,
         conceptName,
-        completeFeatures,
-        fontStyles[targetFontIdx]
+        completeFeatures
       );
       setImage(url);
     } catch (err) {
@@ -60,11 +56,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
   }
 
   const handleFontCycle = () => {
-    const nextIdx = (fontIdx + 1) % fonts.length;
-    setFontIdx(nextIdx);
-    if (image) {
-      handleGenerateImage(nextIdx);
-    }
+    setFontIdx((p) => (p + 1) % fonts.length);
   };
 
   function submit() {
@@ -157,13 +149,24 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400 mt-4">
         <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block mb-2">Concept Visual Mockup</label>
         {image && !imageLoadError ? (
-          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 aspect-square bg-[#2B303A] select-none">
-            <img 
-              src={image} 
-              alt="Concept visual" 
-              className="w-full h-full object-cover animate-fade-in" 
-              onError={() => setImageLoadError(true)}
-            />
+          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 aspect-square bg-[#2B303A] flex flex-col items-center justify-center p-8 select-none">
+            <div className="w-1/2 aspect-square flex items-center justify-center mb-6">
+              <img 
+                src={image} 
+                alt="Concept visual icon" 
+                className="w-full h-full object-contain animate-fade-in" 
+                onError={() => setImageLoadError(true)}
+              />
+            </div>
+
+            <div className="w-full text-center">
+              <div 
+                style={{ fontFamily: fonts[fontIdx].family }}
+                className={`${fonts[fontIdx].className} text-3xl font-extrabold tracking-wide drop-shadow-md`}
+              >
+                {conceptName || "Concept Name"}
+              </div>
+            </div>
 
             {generatingImage && (
               <div className="absolute inset-0 bg-black/55 flex items-center justify-center backdrop-blur-[1px] rounded-xl">
@@ -171,13 +174,12 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
               </div>
             )}
 
-            {/* Cycle Font & Regenerate Button */}
+            {/* Cycle Font Button */}
             <button
               type="button"
-              disabled={generatingImage}
               onClick={handleFontCycle}
-              className="absolute bottom-2 left-2 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider disabled:opacity-50"
-              title="Change Font Style & Regenerate"
+              className="absolute bottom-2 left-2 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider"
+              title="Change Font Style"
             >
               Font: {fonts[fontIdx].name}
             </button>
@@ -185,7 +187,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
             {/* Regenerate Button */}
             <button
               type="button"
-              onClick={() => handleGenerateImage(fontIdx)}
+              onClick={handleGenerateImage}
               disabled={generatingImage}
               className="absolute top-2 right-2 h-8 w-8 rounded-full bg-[#20262e]/80 text-cyan-400 flex items-center justify-center hover:bg-[#20262e] transition-colors z-10"
               title="Regenerate image"
