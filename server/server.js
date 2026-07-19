@@ -708,10 +708,12 @@ async function expandConceptVisualPrompt(conceptName, solutionOverview, features
     : "";
 
   try {
-    const prompt = `You are a design assistant. Translate the following product concept description into a detailed, visually rich 1-sentence description of the visual interface elements.
-The description must specify concrete visual objects (such as grocery baskets, fresh vegetables, delivery trucks, route lines, running characters, chef hats, depending on the product) to represent the product concept in action, rather than drawing just a phone or empty abstract UI widgets.
-Crucially, DO NOT include any mention of text, labels, words, letters, or placeholder text. The description must specify visual objects and shapes ONLY.
-Also classify if the concept represents a mobile app, software interface, or website. Classify isApp as true ONLY if the title or overview explicitly mentions words like 'app', 'mobile app', 'screen', 'interface', 'website', 'software', or 'digital dashboard'. Otherwise, classify it as false.
+    const prompt = `You are a design assistant. Translate the following product concept description into a detailed, visually rich 1-sentence description of the visual elements.
+RULES:
+1. Describe ONLY literal, real-world objects related to the theme (e.g., a delivery scooter, a shopping bag, fresh apples, a clock, a covered dinner plate, grocery shelves).
+2. DO NOT use abstract metaphors, sci-fi, or fantasy concepts (e.g., NO 'orbs', 'pulses', 'magic glows', 'hologram', 'nebula', 'energy waves', 'magical effects').
+3. DO NOT include any text, labels, numbers, letters, or placeholder words. The description must specify visual objects and shapes ONLY.
+4. DO NOT describe any physical phones, device frames, bezels, notches, hands holding devices, or realistic backgrounds.
 
 Product Concept Title: "${conceptName}"
 Product Concept Overview: "${solutionOverview}"
@@ -720,7 +722,7 @@ ${featuresText ? `Key Features:\n${featuresText}` : ""}
 Respond ONLY with a JSON object in this exact format:
 {
   "isApp": true or false,
-  "visualSnippet": "1-sentence description of detailed visual elements to render"
+  "visualSnippet": "1-sentence description of literal physical objects to render"
 }
 
 Do not include markdown tags, code blocks, or extra text.`;
@@ -757,6 +759,54 @@ Do not include markdown tags, code blocks, or extra text.`;
   };
 }
 
+// Helper to translate features into literal icon descriptions to prevent FLUX from rendering text labels
+async function expandFeatureVisualPrompt(title, description, domain) {
+  if (isOfflineMode) {
+    return "a simple geometric symbol";
+  }
+  try {
+    const prompt = `You are a design assistant. Translate the following product feature into a 1-sentence description of a single, simple vector icon (e.g., a speech bubble symbol, a delivery scooter, a calendar grid, a gear, a clock symbol).
+RULES:
+1. Describe a single, literal icon object.
+2. DO NOT include the feature title, description, or any text/letters in the description. The description must specify visual shapes ONLY.
+3. DO NOT use abstract terms (orbs, pulses, glows, magic).
+
+Feature Title: "${title}"
+Feature Description: "${description}"
+App Domain: "${domain}"
+
+Respond ONLY with a JSON object in this exact format:
+{
+  "iconSnippet": "1-sentence description of a single simple vector icon"
+}
+
+Do not include markdown tags, code blocks, or extra text.`;
+
+    const response = await generateContentWithRetry({
+      model: 'gemini-3.1-flash-lite',
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+
+    const text = response?.text;
+    if (text) {
+      let cleanText = text.trim();
+      if (cleanText.startsWith("```")) {
+        cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+      }
+      const parsed = JSON.parse(cleanText);
+      if (parsed && parsed.iconSnippet) {
+        return parsed.iconSnippet;
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to expand feature prompt:", err.message);
+  }
+  return "a clean minimalist symbol";
+}
+
 // 6. Generate Concept Image using Google AI Studio Imagen 3
 app.post('/api/generate-concept-image', async (req, res) => {
   const { solutionOverview, domain, conceptName, features } = req.body;
@@ -767,9 +817,9 @@ app.post('/api/generate-concept-image', async (req, res) => {
 
   let promptText = "";
   if (expansion.isApp) {
-    promptText = `A clean flat 2D vector infographic illustration showing a single portrait mobile app user interface screen layout representing: ${expansion.visualSnippet}. Simple clean shapes, sharp outlines, detailed user interface widgets. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone container, no realistic device frame, no drop shadows, no text, no labels, no words, no letters, no gibberish characters, no annotations or details floating outside the main screen.`;
+    promptText = `A clean flat 2D vector infographic mockup displaying: ${expansion.visualSnippet}. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple clean shapes, sharp outlines. Absolutely no physical phone container, no realistic device frame, no screen bezels or notches, no hands holding devices, no drop shadows, no text, no labels, no words, no letters, no gibberish characters, no annotations or details floating outside the main mockup canvas.`;
   } else {
-    promptText = `A clean flat 2D vector infographic illustration representing: ${expansion.visualSnippet}. Simple clean shapes, sharp outlines, detailed widgets. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone container, no realistic device frame, no drop shadows, no text, no labels, no words, no letters, no gibberish characters, no annotations or details floating outside.`;
+    promptText = `A clean flat 2D vector infographic illustration representing: ${expansion.visualSnippet}. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple clean shapes, sharp outlines. Absolutely no physical phone container, no realistic device frame, no drop shadows, no text, no labels, no words, no letters, no gibberish characters, no annotations or details floating outside.`;
   }
 
   try {
@@ -790,7 +840,9 @@ app.post('/api/generate-feature-images', async (req, res) => {
   try {
     const featuresWithImages = await Promise.all(
       features.map(async (f) => {
-        const prompt = `Flat 2D vector graphic icon representing the product feature: "${f.title}" — ${f.description} for a "${domain}" app. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, no text.`;
+        const iconSnippet = await expandFeatureVisualPrompt(f.title, f.description, domain);
+        console.log(`Feature icon translation for "${f.title}":`, iconSnippet);
+        const prompt = `Flat 2D vector graphic icon showing: ${iconSnippet}. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, absolutely no text, no letters, no words, no gibberish characters.`;
         const image_url = await generateImageBase64(prompt, 300, 300);
         return { ...f, image_url };
       })
