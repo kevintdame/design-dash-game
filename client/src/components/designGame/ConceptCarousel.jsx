@@ -154,7 +154,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
     <div className="relative">
       <div className="relative rounded-2xl overflow-hidden">
         {/* Expanded slide wrapper height to prevent scrolling within slide bounds */}
-        <div className="min-h-[440px] flex items-stretch">
+        <div className="min-h-[440px] flex items-stretch w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}
