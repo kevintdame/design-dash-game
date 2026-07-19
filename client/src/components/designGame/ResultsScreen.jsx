@@ -3,11 +3,11 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { RotateCcw, FolderOpen, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ConceptCarousel from "@/components/designGame/ConceptCarousel";
+import ConceptCarousel, { getHumorousTier } from "@/components/designGame/ConceptCarousel";
 
 export default function ResultsScreen({ challenge, concept, ratings, onSave, saving, saved, onRestart, onGoPortfolio }) {
   const overall = Math.round((ratings.value + ratings.creativity + ratings.uniqueness) / 3);
-  const tier = overall >= 85 ? "Design Mastermind" : overall >= 70 ? "Design Thinker" : overall >= 50 ? "Rising Designer" : "Keep Iterating";
+  const tier = getHumorousTier(overall);
   const fired = useRef(false);
 
   useEffect(() => {

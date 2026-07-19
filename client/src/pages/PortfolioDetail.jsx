@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, RotateCcw } from "lucide-react";
-import ConceptCarousel from "@/components/designGame/ConceptCarousel";
+import ConceptCarousel, { getHumorousTier } from "@/components/designGame/ConceptCarousel";
 import { Button } from "@/components/ui/button";
 
 export default function PortfolioDetail() {
@@ -63,7 +63,7 @@ export default function PortfolioDetail() {
     customer_name: session.customer_name
   };
   const overall = Math.round((ratings.value + ratings.creativity + ratings.uniqueness) / 3);
-  const tier = overall >= 85 ? "Design Mastermind" : overall >= 70 ? "Design Thinker" : overall >= 50 ? "Rising Designer" : "Keep Iterating";
+  const tier = getHumorousTier(overall);
 
   return (
     <div className="min-h-[100dvh] bg-transparent">

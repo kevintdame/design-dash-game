@@ -162,31 +162,36 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       <div className="mt-6 space-y-4">
         <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block -mb-2">Brand Showcase Preview</label>
         
-        {/* Dynamic CSS Brand Logo Card */}
-        <div className="bg-[#2B303A] rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px] shadow-xl border border-white/5 relative select-none w-full">
-          <div className="text-center px-4 w-full mb-6">
-            <div 
-              style={{ fontFamily: activeFonts[fontIdx].family }}
-              className={`${activeFonts[fontIdx].className} drop-shadow-lg text-4xl sm:text-5xl md:text-6xl break-words leading-tight`}
-            >
-              {conceptName || "Concept Name"}
+        {/* Dynamic CSS Brand Logo Card - Split Layout */}
+        <div className="rounded-2xl shadow-xl border border-white/5 overflow-hidden w-full flex flex-col min-h-[300px]">
+          {/* Top Half: Charcoal Logo */}
+          <div className="bg-[#2B303A] p-8 flex flex-col items-center justify-center flex-1 relative select-none min-h-[180px]">
+            <div className="text-center px-4 w-full">
+              <div 
+                style={{ fontFamily: activeFonts[fontIdx].family }}
+                className={`${activeFonts[fontIdx].className} drop-shadow-lg text-4xl sm:text-5xl md:text-6xl break-words leading-tight`}
+              >
+                {conceptName || "Concept Name"}
+              </div>
             </div>
+
+            {/* Cycle Font Button */}
+            <button
+              type="button"
+              onClick={handleFontCycle}
+              className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider"
+              title="Cycle Font Style"
+            >
+              Font: {activeFonts[fontIdx].name}
+            </button>
           </div>
 
-          {/* Solution summary directly below it in white font */}
-          <p className="text-white text-xs sm:text-sm text-center max-w-sm leading-relaxed opacity-90 mt-4 border-t border-white/10 pt-4 w-full">
-            {solutionOverview || "Your solution summary will appear here..."}
-          </p>
-
-          {/* Cycle Font Button */}
-          <button
-            type="button"
-            onClick={handleFontCycle}
-            className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider"
-            title="Cycle Font Style"
-          >
-            Font: {activeFonts[fontIdx].name}
-          </button>
+          {/* Bottom Half: White Solution Summary */}
+          <div className="bg-white p-6 flex items-center justify-center min-h-[120px] border-t border-slate-100">
+            <p className="text-slate-800 text-sm text-center max-w-sm leading-relaxed font-semibold">
+              {solutionOverview || "Your solution summary will appear here..."}
+            </p>
+          </div>
         </div>
 
         {/* Cohesive Features Summary Board (identical size to logo card) */}
@@ -194,20 +199,20 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
           <div className="bg-[#1C2028] rounded-2xl p-8 shadow-inner border border-white/5 space-y-5 w-full">
             <h3 
               style={{ fontFamily: activeFonts[fontIdx].family }}
-              className="text-cyan-400 text-sm font-bold uppercase tracking-wider mb-2"
+              className="text-cyan-400 text-base font-extrabold uppercase tracking-wider mb-2 border-b border-white/10 pb-2"
             >
               Core Brand Features
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {completeFeatures.map((f, i) => (
-                <div key={i} className="border-l border-cyan-400/30 pl-4 py-0.5">
+                <div key={i} className="border-l-2 border-cyan-400/40 pl-4 py-0.5">
                   <h4 
                     style={{ fontFamily: activeFonts[fontIdx].family }}
-                    className="text-white font-semibold text-sm capitalize animate-fade-in"
+                    className="text-white font-extrabold text-base sm:text-lg capitalize animate-fade-in"
                   >
                     {f.title}
                   </h4>
-                  <p className="text-slate-400 text-xs mt-0.5 leading-relaxed animate-fade-in">
+                  <p className="text-slate-300 text-xs sm:text-sm mt-1 leading-relaxed animate-fade-in">
                     {f.description}
                   </p>
                 </div>
