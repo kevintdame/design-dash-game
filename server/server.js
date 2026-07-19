@@ -704,7 +704,11 @@ async function expandConceptVisualPrompt(conceptName, solutionOverview) {
   }
 
   try {
-    const prompt = `You are a design assistant. Translate the following product concept description into a detailed, visually rich 1-sentence description of the visual interface elements (e.g., progress gauges, wave bars, session list cards, detailed control buttons, clean widgets). The description must specify multiple distinct vector elements to avoid simple, empty layouts. Also classify if the concept represents a mobile app, software interface, or website.
+    const prompt = `You are a design assistant. Translate the following product concept description into a detailed, visually rich 1-sentence description of the visual interface elements (e.g., progress gauges, wave bars, session list cards, detailed control buttons, clean widgets). 
+The description must specify multiple distinct vector elements to avoid simple, empty layouts.
+Crucially, DO NOT include any mention of text, labels, words, letters, or placeholder text. The description must specify visual objects and shapes ONLY.
+Also classify if the concept represents a mobile app, software interface, or website. Classify isApp as true ONLY if the title or overview explicitly mentions words like 'app', 'mobile app', 'screen', 'interface', 'website', 'software', or 'digital dashboard'. Otherwise, classify it as false.
+
 Product Concept Title: "${conceptName}"
 Product Concept Overview: "${solutionOverview}"
 
@@ -758,9 +762,9 @@ app.post('/api/generate-concept-image', async (req, res) => {
 
   let promptText = "";
   if (expansion.isApp) {
-    promptText = `A clean flat 2D vector infographic illustration showing a portrait mobile app interface screen layout representing: ${expansion.visualSnippet}. Simple clean shapes, sharp outlines, detailed user interface widgets. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone, no realistic device frame, no drop shadows, no text, no words.`;
+    promptText = `A clean flat 2D vector infographic illustration showing a single portrait mobile app user interface screen layout representing: ${expansion.visualSnippet}. Simple clean shapes, sharp outlines, detailed user interface widgets. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone container, no realistic device frame, no drop shadows, no text, no labels, no words, no letters, no gibberish characters, no annotations or details floating outside the main screen.`;
   } else {
-    promptText = `A clean flat 2D vector infographic illustration representing: ${expansion.visualSnippet}. Simple clean shapes, sharp outlines, detailed user interface widgets. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone, no realistic device frame, no drop shadows, no text, no words.`;
+    promptText = `A clean flat 2D vector infographic illustration representing: ${expansion.visualSnippet}. Simple clean shapes, sharp outlines, detailed widgets. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone container, no realistic device frame, no drop shadows, no text, no labels, no words, no letters, no gibberish characters, no annotations or details floating outside.`;
   }
 
   try {
