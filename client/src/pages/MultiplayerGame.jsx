@@ -320,7 +320,7 @@ export default function MultiplayerGame() {
                         disabled={actionLoading}
                         className="w-full bg-cyan-400 hover:bg-cyan-300 text-[#20262e] font-bold h-12 rounded-lg shadow-md transition-transform active:scale-[0.98]"
                       >
-                        {actionLoading ? "Creating..." : "🚀 Create Lobby"}
+                        {actionLoading ? "Creating..." : "Create Lobby"}
                       </Button>
                     </CardContent>
                   </Card>
