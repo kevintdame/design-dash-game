@@ -16,6 +16,24 @@ process.env.GCP_METADATA_HOST = '127.0.0.1';
 process.env.GCE_METADATA_HOST = '127.0.0.1';
 process.env.NO_GCE_CHECK = 'true';
 
+// Sanitize environment variables to prevent Google Gen AI SDK from automatically
+// detecting GCP VM credentials and failing with ACCESS_TOKEN_TYPE_UNSUPPORTED
+const conflictingGcpKeys = [
+  'GOOGLE_APPLICATION_CREDENTIALS',
+  'GOOGLE_GCLOUD_ADC_PATH',
+  'GOOGLE_API_KEY',
+  'GOOGLE_CLOUD_PROJECT',
+  'GOOGLE_CLOUD_LOCATION',
+  'GCP_PROJECT',
+  'GCP_PROJECT_ID'
+];
+conflictingGcpKeys.forEach(key => {
+  if (process.env[key]) {
+    console.log(`Sanitizing/removing conflicting environment variable: ${key}`);
+    delete process.env[key];
+  }
+});
+
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
