@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { fontPool } from "./FinalConceptScreen";
 
-// Humorous score tier describer - shortened as requested
+// Humorous score tier describer - shortened
 export const getHumorousTier = (score) => {
   if (score >= 85) return "Design demigod";
   if (score >= 70) return "Certified Genius";
@@ -41,7 +41,8 @@ function DonutChart({ label, score }) {
           {score}
         </div>
       </div>
-      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-2 text-center">{label}</span>
+      {/* Label is now bright white as requested */}
+      <span className="text-[10px] font-black uppercase tracking-wider text-white mt-2.5 text-center">{label}</span>
     </div>
   );
 }
@@ -130,22 +131,19 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
     // Slide 2: Ratings Scoreboard - Split Charcoal & White layout
     return (
       <div className="w-full h-full flex flex-col justify-stretch">
-        <div className="rounded-2xl overflow-hidden w-full flex flex-col min-h-[440px] flex-1 border border-white/5 shadow-inner">
-          {/* Top Half: Charcoal containing Donuts */}
-          <div className="bg-[#2B303A] p-8 flex items-center justify-around gap-4 flex-1 min-h-[220px]">
+        <div className="rounded-2xl overflow-hidden w-full flex flex-col min-h-[440px] flex-1 border border-slate-800 shadow-inner">
+          {/* Top Half: Charcoal containing Donuts (decreased height as requested) */}
+          <div className="bg-[#2B303A] p-6 flex items-center justify-around gap-4 min-h-[160px] select-none">
             <DonutChart label="Value" score={ratings.value} />
             <DonutChart label="Creativity" score={ratings.creativity} />
             <DonutChart label="Uniqueness" score={ratings.uniqueness} />
           </div>
 
-          {/* Bottom Half: White containing Quote & Customer review */}
-          <div className="bg-white p-8 flex flex-col justify-center border-t border-slate-100 min-h-[180px]">
-            <div className="relative pl-6">
-              <Quote className="absolute left-0 top-0.5 h-4.5 w-4.5 text-slate-300" />
-              <p className="text-slate-800 text-xs sm:text-sm leading-relaxed font-semibold">
-                {ratings.review}
-              </p>
-            </div>
+          {/* Bottom Half: White containing Customer review (increased height, no quotation icon, larger font) */}
+          <div className="bg-white p-10 flex flex-col justify-center border-t border-slate-100 min-h-[280px] flex-1">
+            <p className="text-slate-800 text-sm sm:text-base md:text-lg leading-relaxed font-bold text-center max-w-md mx-auto">
+              "{ratings.review}"
+            </p>
           </div>
         </div>
       </div>

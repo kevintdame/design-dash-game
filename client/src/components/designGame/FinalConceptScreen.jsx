@@ -3,35 +3,36 @@ import { motion } from "framer-motion";
 import { Rocket, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Pool of 16 Google Fonts representing diverse corporate branding styles
-export const fontPool = [
-  { family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase" },
-  { family: "'Playfair Display', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-bold capitalize animate-fade-in" },
-  { family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase" },
-  { family: "'Cinzel', serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-extrabold uppercase" },
+// Categorized pools to ensure 100% variety across different visual vibes
+export const techPool = [
   { family: "'Orbitron', sans-serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-black uppercase" },
   { family: "'Space Grotesk', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-bold uppercase" },
-  { family: "'Prata', serif", className: "text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal capitalize" },
-  { family: "'Cormorant Garamond', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-bold capitalize" },
-  { family: "'Lilita One', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal uppercase" },
-  { family: "'Rubik Bubbles', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-normal" },
-  { family: "'Nunito', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-black capitalize" },
-  { family: "'Lora', serif", className: "italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-semibold capitalize" },
   { family: "'Space Mono', monospace", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-bold uppercase" },
-  { family: "'Pacifico', cursive", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-300 font-normal capitalize" },
-  { family: "'Sacramento', cursive", className: "text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-400 font-normal" },
-  { family: "'Righteous', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-normal uppercase" }
+  { family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase" }
 ];
 
-// Helper to shuffle fonts pool client-side
-const shuffleFonts = (array) => {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-};
+export const luxuryPool = [
+  { family: "'Cinzel', serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-extrabold uppercase" },
+  { family: "'Prata', serif", className: "text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal capitalize" },
+  { family: "'Lora', serif", className: "italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-semibold capitalize" },
+  { family: "'Cormorant Garamond', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-bold capitalize" }
+];
+
+export const playfulPool = [
+  { family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase" },
+  { family: "'Lilita One', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal uppercase" },
+  { family: "'Rubik Bubbles', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-normal" },
+  { family: "'Nunito', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-black capitalize" }
+];
+
+export const creativePool = [
+  { family: "'Pacifico', cursive", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-300 font-normal capitalize" },
+  { family: "'Sacramento', cursive", className: "text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-400 font-normal" },
+  { family: "'Righteous', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-normal uppercase" },
+  { family: "'Playfair Display', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-bold capitalize" }
+];
+
+export const fontPool = [...techPool, ...luxuryPool, ...playfulPool, ...creativePool];
 
 export default function FinalConceptScreen({ challenge, domain, onSubmit, loading }) {
   const [conceptName, setConceptName] = useState("");
@@ -39,14 +40,17 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
   const [solutionOverview, setSolutionOverview] = useState("");
   const [fontIdx, setFontIdx] = useState(0);
 
-  // Initialize a random selection of 4 distinct font mappings once for this concept session
+  // Pick exactly one distinct font from each of the 4 categories for absolute variety
   const [activeFonts] = useState(() => {
-    const shuffled = shuffleFonts(fontPool);
+    const tech = techPool[Math.floor(Math.random() * techPool.length)];
+    const luxury = luxuryPool[Math.floor(Math.random() * luxuryPool.length)];
+    const playful = playfulPool[Math.floor(Math.random() * playfulPool.length)];
+    const creative = creativePool[Math.floor(Math.random() * creativePool.length)];
     return [
-      { ...shuffled[0], name: "Modern" },
-      { ...shuffled[1], name: "Elegant" },
-      { ...shuffled[2], name: "Playful" },
-      { ...shuffled[3], name: "Classic" }
+      { ...tech, name: "Modern" },
+      { ...luxury, name: "Elegant" },
+      { ...playful, name: "Playful" },
+      { ...creative, name: "Classic" }
     ];
   });
 
@@ -57,8 +61,6 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
   ]);
 
   const completeFeatures = features.filter((f) => f.title.trim().length > 0);
-  
-  // Removed minimum solution overview length requirements as requested
   const ready = conceptName.trim().length > 0 && solutionOverview.trim().length > 0;
 
   function updateFeature(i, field, val) {
@@ -79,7 +81,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       solutionOverview: solutionOverview.trim(),
       image: null,
       fontIdx,
-      fontPool: activeFonts, // Save the randomly shuffled pool to the database for this concept
+      fontPool: activeFonts, // Save the selected 4 font list to the database
       features: completeFeatures.map((f) => ({ title: f.title.trim(), description: f.description.trim() }))
     });
   }

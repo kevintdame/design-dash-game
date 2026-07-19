@@ -59,18 +59,18 @@ export default function Portfolio() {
               <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                 <Link
                   to={`/portfolio/${s.id}`}
-                  className="block bg-[#2B303A] rounded-2xl p-6 shadow-md hover:shadow-lg transition-all border border-white/5"
+                  className="block rounded-2xl shadow-md hover:shadow-lg transition-all overflow-hidden border border-slate-200 flex flex-col"
                 >
-                  {/* Dynamic Font Logo Preview Card */}
+                  {/* Top Half: Charcoal Logo container */}
                   {(() => {
                     const fontPoolActive = s.concept_font_pool || fontPool;
                     const fontIdx = s.concept_font_idx !== undefined ? s.concept_font_idx : 0;
                     const fontStyle = fontPoolActive[fontIdx] || fontPoolActive[0];
                     return (
-                      <div className="w-full min-h-[100px] flex items-center justify-center bg-[#20262e]/40 rounded-xl p-4 select-none mb-4">
+                      <div className="w-full min-h-[120px] flex items-center justify-center bg-[#2B303A] p-6 select-none">
                         <div 
                           style={{ fontFamily: fontStyle.family }}
-                          className={`${fontStyle.className} text-xl sm:text-2.5xl tracking-wide text-center leading-tight drop-shadow-md break-words`}
+                          className={`${fontStyle.className} text-2xl sm:text-3xl tracking-wide text-center leading-tight drop-shadow-md break-words`}
                         >
                           {s.concept_name || "Concept Name"}
                         </div>
@@ -78,16 +78,20 @@ export default function Portfolio() {
                     );
                   })()}
 
-                  <div className="flex items-start justify-between gap-3">
+                  {/* Bottom Half: White Info details */}
+                  <div className="bg-white p-5 flex-1 flex flex-col justify-between border-t border-slate-100 min-h-[160px]">
                     <div className="min-w-0">
-                      <div className="text-cyan-400 text-[9px] uppercase tracking-wider font-bold mb-1">{s.domain}</div>
-                      <h3 className="text-white font-extrabold text-sm leading-snug truncate">{s.concept_name || s.challenge_title}</h3>
-                      <p className="text-slate-400 text-xs mt-1 truncate">{s.solution_overview}</p>
-                      <p className="text-slate-500 text-[10px] mt-2">Challenge: {s.challenge_title} for {s.customer_name}</p>
+                      <div className="text-cyan-600 text-[10px] font-extrabold uppercase tracking-wider mb-1">{s.domain}</div>
+                      <h3 className="text-slate-800 font-extrabold text-sm truncate leading-snug">{s.concept_name || s.challenge_title}</h3>
+                      <p className="text-slate-500 text-xs mt-1 truncate">{s.solution_overview}</p>
+                      <p className="text-slate-400 text-[10px] mt-2">Challenge: {s.challenge_title} for {s.customer_name}</p>
                     </div>
-                    <div className="text-center shrink-0">
-                      <div className="text-2xl font-black text-[#00d4ff]">{overallOf(s)}</div>
-                      <div className="text-slate-400 text-[9px] uppercase tracking-widest font-bold">score</div>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
+                      <div className="text-slate-400 text-[9px] uppercase tracking-wider font-bold">Concept Rating</div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="text-lg font-black text-slate-800">{overallOf(s)}</div>
+                        <div className="text-slate-400 text-[9px] uppercase tracking-widest font-bold">score</div>
+                      </div>
                     </div>
                   </div>
                 </Link>
