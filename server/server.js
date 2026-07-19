@@ -637,10 +637,46 @@ async function fetchAsBase64(url) {
 
 // Unified multi-tier image generator cascade (No Pollinations AI fallback, strictly shows errors if keys fail)
 async function generateImageBase64(prompt, width = 400, height = 300) {
+  const deepinfraApiKey = process.env.DEEPINFRA_API_KEY;
   const hfApiKey = process.env.HF_API_KEY;
   const geminiApiKey = process.env.GEMINI_API_KEY;
 
-  // Tier 1: Google AI Studio (Imagen)
+  // Tier 1: DeepInfra (FLUX-1-dev) - highest quality
+  if (deepinfraApiKey) {
+    try {
+      console.log("Attempting DeepInfra FLUX-1-dev generation...");
+      const response = await fetch("https://api.deepinfra.com/v1/openai/images/generations", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${deepinfraApiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "black-forest-labs/FLUX-1-dev",
+          prompt: prompt,
+          size: `${width}x${height}`,
+          n: 1,
+          response_format: "b64_json"
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const base64Image = data.data?.[0]?.b64_json;
+        if (base64Image) {
+          console.log("DeepInfra generation successful!");
+          return `data:image/jpeg;base64,${base64Image}`;
+        }
+      } else {
+        const text = await response.text();
+        console.warn(`DeepInfra failed with status ${response.status}: ${text}`);
+      }
+    } catch (err) {
+      console.warn("DeepInfra generation failed, trying next tier:", err.message);
+    }
+  }
+
+  // Tier 2: Google AI Studio (Imagen)
   if (!isOfflineMode && geminiApiKey) {
     try {
       console.log("Attempting Google AI Studio Imagen generation...");
@@ -671,7 +707,7 @@ async function generateImageBase64(prompt, width = 400, height = 300) {
     }
   }
 
-  // Tier 2: Hugging Face (FLUX.1-schnell via HfInference SDK)
+  // Tier 3: Hugging Face (FLUX.1-schnell via HfInference SDK)
   if (hfApiKey) {
     try {
       console.log("Attempting Hugging Face FLUX.1-schnell generation via SDK...");
@@ -816,11 +852,11 @@ app.post('/api/generate-concept-image', async (req, res) => {
   console.log("Concept Image visual expansion returned:", expansion);
 
   // We are creating a cohesive centered logo mark/brand icon in the same clean vector style
-  const promptText = `A centered, clean modern flat 2D vector graphic brand logo mark showing: ${expansion.visualSnippet}. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple clean shapes, sharp outlines, solid colors. Absolutely no realistic device frames, no phone mockups, no dashboard app layouts, no hands holding devices, no drop shadows, no text, no words, no letters, no gibberish characters, no details floating outside the main centered graphic.`;
+  const promptText = `A centered, clean flat 2D vector graphic brand logo design on a solid deep charcoal (#2B303A) background. The logo features a simple, stylized modern icon of: ${expansion.visualSnippet}. Underneath the icon, the text "${conceptName}" is written in a clean, bold, friendly sans-serif font. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no realistic phone screen bezels, no device frames, no drop shadows.`;
 
   try {
-    // Standardize main logo concept image to a neat, square 1:1 format (300x300) to match the vector icon theme perfectly
-    const url = await generateImageBase64(promptText, 300, 300);
+    // Standardize main logo concept image to a neat, square 1:1 format (1024x1024) for ultimate crispness
+    const url = await generateImageBase64(promptText, 1024, 1024);
     res.json({ url });
   } catch (err) {
     console.error("Concept logo image generation failed:", err);
@@ -836,8 +872,8 @@ app.post('/api/generate-feature-images', async (req, res) => {
       features.map(async (f) => {
         const iconSnippet = await expandFeatureVisualPrompt(f.title, f.description, domain);
         console.log(`Feature icon translation for "${f.title}":`, iconSnippet);
-        const prompt = `Flat 2D vector graphic icon showing: ${iconSnippet}. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and blue accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, absolutely no text, no letters, no words, no gibberish characters.`;
-        const image_url = await generateImageBase64(prompt, 300, 300);
+        const prompt = `Flat 2D vector graphic icon showing: ${iconSnippet}. Colors: deep charcoal background (#2B303A), electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, simple geometric shapes, clean bold outlines, no gradients, no 3D shading, absolutely no text, no letters, no words, no gibberish characters.`;
+        const image_url = await generateImageBase64(prompt, 512, 512);
         return { ...f, image_url };
       })
     );
