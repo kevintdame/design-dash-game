@@ -714,11 +714,75 @@ async function generateImageBase64(prompt, width = 400, height = 300) {
   }
 }
 
+// Helper to use Gemini to translate concept info into descriptive vector graphic prompts and classify if it is a mobile app
+async function expandConceptVisualPrompt(conceptName, solutionOverview) {
+  if (isOfflineMode) {
+    const lower = (solutionOverview || "").toLowerCase() + " " + (conceptName || "").toLowerCase();
+    const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner");
+    return {
+      isApp,
+      visualSnippet: isApp ? "a clean schedule dashboard with calendar grids showing food icons" : "a modern functional design device layout"
+    };
+  }
+
+  try {
+    const prompt = `You are a design assistant. Translate the following product concept description into a highly concentrated 1-sentence description of the visual interface elements (no general descriptions, describe concrete icons, layout grids, or buttons). Also classify if the concept represents a mobile app, software interface, or website.
+Product Concept Title: "${conceptName}"
+Product Concept Overview: "${solutionOverview}"
+
+Respond ONLY with a JSON object in this exact format:
+{
+  "isApp": true or false,
+  "visualSnippet": "1-sentence description of concrete visual elements to render"
+}
+
+Do not include markdown tags, code blocks, or extra text.`;
+
+    const response = await generateContentWithRetry({
+      model: 'gemini-3.1-flash-lite',
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+
+    const text = response?.text?.();
+    if (text) {
+      const parsed = JSON.parse(text.trim());
+      if (parsed && typeof parsed.isApp === 'boolean' && parsed.visualSnippet) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to expand visual prompt with Gemini, using static logic:", err.message);
+  }
+
+  // Static fallback if Gemini fails
+  const lower = (solutionOverview || "").toLowerCase() + " " + (conceptName || "").toLowerCase();
+  const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner");
+  return {
+    isApp,
+    visualSnippet: isApp ? "a clean dashboard calendar grid showing simple utility icons" : "a modern geometric design structure with indicators"
+  };
+}
+
 // 6. Generate Concept Image using Google AI Studio Imagen 3
 app.post('/api/generate-concept-image', async (req, res) => {
-  const { prompt } = req.body;
+  const { solutionOverview, domain, conceptName } = req.body;
+
+  // Use Gemini to expand the prompt and classify isApp
+  const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview);
+  console.log("Concept Image visual expansion returned:", expansion);
+
+  let promptText = "";
+  if (expansion.isApp) {
+    promptText = `A clean flat 2D vector infographic illustration showing a portrait mobile app interface screen layout representing: ${expansion.visualSnippet}. Simple minimalist design interface elements, clean outlines. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone, no realistic device frame, no drop shadows, no text, no words.`;
+  } else {
+    promptText = `A clean flat 2D vector infographic illustration representing: ${expansion.visualSnippet}. Simple minimalist design elements, clean outlines. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone, no realistic device frame, no drop shadows, no text, no words.`;
+  }
+
   try {
-    const url = await generateImageBase64(prompt, 400, 300);
+    const url = await generateImageBase64(promptText, 400, 300);
     res.json({ url });
   } catch (err) {
     console.error("Concept image generation failed:", err);

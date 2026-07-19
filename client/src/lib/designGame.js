@@ -81,13 +81,11 @@ export async function generateFeatureImages(features, domain) {
   return data.features || features;
 }
 
-export async function generateConceptImage(solutionOverview, domain) {
-  const prompt = `Flat 2D vector UI mockup, portrait mobile phone screen, concept: "${solutionOverview}". Colors: charcoal gray background, electric cyan accents. Minimalist flat design.`;
-  
+export async function generateConceptImage(solutionOverview, domain, conceptName = "") {
   const res = await fetch("/api/generate-concept-image", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt })
+    body: JSON.stringify({ solutionOverview, domain, conceptName })
   });
   if (!res.ok) {
     throw new Error("Imagen 3 generation failed on the server");

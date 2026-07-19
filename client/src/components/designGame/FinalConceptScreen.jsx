@@ -32,7 +32,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
     setImageLoadError(false);
     setGeneratingImage(true);
     try {
-      const url = await generateConceptImage(solutionOverview, domain);
+      const url = await generateConceptImage(solutionOverview, domain, conceptName);
       setImage(url);
     } catch (err) {
       console.error("Concept image generation failed:", err);
