@@ -46,16 +46,9 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
       animate={{ opacity: 1, y: 0 }}
       className="text-center max-w-md mx-auto"
     >
-      <motion.div
-        animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.08, 1] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="inline-flex h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-[#20262e] ring-2 ring-cyan-400 items-center justify-center mb-6 shadow-lg"
-      >
-        <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-cyan-400" />
-      </motion.div>
-
-      <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 font-display text-white">
-        Concept Jam
+      <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter leading-none mb-6 font-display flex flex-col items-center uppercase mt-6 select-none">
+        <span className="text-white drop-shadow-md">Concept</span>
+        <span className="text-cyan-400 drop-shadow-md">Jam</span>
       </h1>
       <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-8 max-w-sm mx-auto">
         Pick a domain, then meet a real-world challenge to solve for a customer.

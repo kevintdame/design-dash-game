@@ -40,18 +40,18 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
   const [solutionOverview, setSolutionOverview] = useState("");
   const [fontIdx, setFontIdx] = useState(0);
 
-  // Pick exactly one distinct font from each of the 4 categories for absolute variety
+  // Allow cycling through all 16 interesting fonts available in the pool
   const [activeFonts] = useState(() => {
-    const tech = techPool[Math.floor(Math.random() * techPool.length)];
-    const luxury = luxuryPool[Math.floor(Math.random() * luxuryPool.length)];
-    const playful = playfulPool[Math.floor(Math.random() * playfulPool.length)];
-    const creative = creativePool[Math.floor(Math.random() * creativePool.length)];
-    return [
-      { ...tech, name: "Modern" },
-      { ...luxury, name: "Elegant" },
-      { ...playful, name: "Playful" },
-      { ...creative, name: "Classic" }
-    ];
+    // Shuffle the full font pool so the cycle order is different every session
+    const pool = [...fontPool].sort(() => Math.random() - 0.5);
+    return pool.map((f) => {
+      // Extract clean font name from the family string (e.g. "'Lilita One', sans-serif" -> "Lilita One")
+      const nameMatch = f.family.match(/'([^']+)'/);
+      return {
+        ...f,
+        name: nameMatch ? nameMatch[1] : "Custom"
+      };
+    });
   });
 
   const [features, setFeatures] = useState([
