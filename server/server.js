@@ -703,14 +703,14 @@ async function expandConceptVisualPrompt(conceptName, solutionOverview) {
   }
 
   try {
-    const prompt = `You are a design assistant. Translate the following product concept description into a highly concentrated 1-sentence description of the visual interface elements (no general descriptions, describe concrete icons, layout grids, or buttons). Also classify if the concept represents a mobile app, software interface, or website.
+    const prompt = `You are a design assistant. Translate the following product concept description into a detailed, visually rich 1-sentence description of the visual interface elements (e.g., progress gauges, wave bars, session list cards, detailed control buttons, clean widgets). The description must specify multiple distinct vector elements to avoid simple, empty layouts. Also classify if the concept represents a mobile app, software interface, or website.
 Product Concept Title: "${conceptName}"
 Product Concept Overview: "${solutionOverview}"
 
 Respond ONLY with a JSON object in this exact format:
 {
   "isApp": true or false,
-  "visualSnippet": "1-sentence description of concrete visual elements to render"
+  "visualSnippet": "1-sentence description of detailed visual elements to render"
 }
 
 Do not include markdown tags, code blocks, or extra text.`;
@@ -725,7 +725,11 @@ Do not include markdown tags, code blocks, or extra text.`;
 
     const text = response?.text;
     if (text) {
-      const parsed = JSON.parse(text.trim());
+      let cleanText = text.trim();
+      if (cleanText.startsWith("```")) {
+        cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+      }
+      const parsed = JSON.parse(cleanText);
       if (parsed && typeof parsed.isApp === 'boolean' && parsed.visualSnippet) {
         return parsed;
       }
@@ -739,7 +743,7 @@ Do not include markdown tags, code blocks, or extra text.`;
   const isApp = lower.includes("app") || lower.includes("mobile") || lower.includes("web") || lower.includes("software") || lower.includes("screen") || lower.includes("planner");
   return {
     isApp,
-    visualSnippet: isApp ? "a clean dashboard calendar grid showing simple utility icons" : "a modern geometric design structure with indicators"
+    visualSnippet: isApp ? "a weekly calendar grid displaying plate and food dish icons" : "a modern geometric design structure with indicators"
   };
 }
 
@@ -753,13 +757,16 @@ app.post('/api/generate-concept-image', async (req, res) => {
 
   let promptText = "";
   if (expansion.isApp) {
-    promptText = `A clean flat 2D vector infographic illustration showing a portrait mobile app interface screen layout representing: ${expansion.visualSnippet}. Simple minimalist design interface elements, clean outlines. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone, no realistic device frame, no drop shadows, no text, no words.`;
+    promptText = `A clean flat 2D vector infographic illustration showing a portrait mobile app interface screen layout representing: ${expansion.visualSnippet}. Simple clean shapes, sharp outlines, detailed user interface widgets. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone, no realistic device frame, no drop shadows, no text, no words.`;
   } else {
-    promptText = `A clean flat 2D vector infographic illustration representing: ${expansion.visualSnippet}. Simple minimalist design elements, clean outlines. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone, no realistic device frame, no drop shadows, no text, no words.`;
+    promptText = `A clean flat 2D vector infographic illustration representing: ${expansion.visualSnippet}. Simple clean shapes, sharp outlines, detailed user interface widgets. Colors: deep charcoal background (#2B303A), bright electric cyan (#00d4ff) and blue accents. Swiss minimalist style. Absolutely no physical phone, no realistic device frame, no drop shadows, no text, no words.`;
   }
 
   try {
-    const url = await generateImageBase64(promptText, 400, 300);
+    // If it's an app, request portrait 3:4 aspect ratio (300x400), otherwise landscape 4:3 (400x300)
+    const width = expansion.isApp ? 300 : 400;
+    const height = expansion.isApp ? 400 : 300;
+    const url = await generateImageBase64(promptText, width, height);
     res.json({ url });
   } catch (err) {
     console.error("Concept image generation failed:", err);
