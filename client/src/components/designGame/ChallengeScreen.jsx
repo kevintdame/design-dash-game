@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Target, ArrowRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CustomerAvatar from "./CustomerAvatar";
 
 export default function ChallengeScreen({ challenge, onContinue }) {
   return (
@@ -27,19 +28,11 @@ export default function ChallengeScreen({ challenge, onContinue }) {
       </div>
 
       <div className="flex flex-col items-center mb-4">
-        {challenge.customer_image ? (
-          <img
-            src={challenge.customer_image}
-            alt={challenge.customer_name}
-            className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl object-cover shadow-2xl ring-2 ring-cyan-400"
-          />
-        ) : (
-          <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl bg-[#20262e] ring-2 ring-cyan-400 flex items-center justify-center shadow-2xl">
-            <span className="text-6xl font-extrabold text-cyan-400 font-display">
-              {challenge.customer_name.charAt(0)}
-            </span>
-          </div>
-        )}
+        <CustomerAvatar
+          name={challenge.customer_name}
+          image={challenge.customer_image}
+          className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl shadow-2xl ring-2 ring-cyan-400"
+        />
         <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-display mt-4 text-center leading-tight">
           {challenge.customer_name}
         </h3>
