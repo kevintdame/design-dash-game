@@ -19,7 +19,7 @@ function Chip({ active, onClick, icon: Icon, children }) {
     <button
       type="button"
       onClick={onClick}
-      className={`relative text-xs font-semibold rounded-lg px-3 py-2.5 transition-all ring-1 flex items-center gap-1.5 text-left w-full ${
+      className={`relative text-[10px] sm:text-xs font-display font-extrabold uppercase tracking-wide rounded-lg px-3 py-2.5 transition-all ring-1 flex items-center gap-1.5 text-left w-full ${
         active
           ? "bg-cyan-400 text-[#20262e] ring-cyan-400 shadow-md"
           : "bg-white text-[#20262e] ring-black/10 hover:bg-slate-50"
@@ -55,7 +55,7 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
       </p>
 
       <div className="text-left mb-6">
-        <div className="text-cyan-400 text-xs font-semibold uppercase tracking-widest mb-3">
+        <div className="text-cyan-400 text-[11px] font-display font-extrabold uppercase tracking-widest mb-3">
           Choose a domain
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -73,7 +73,7 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
         onClick={() => ready && onStart(domain)}
         disabled={!ready || loading}
         size="lg"
-        className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-bold rounded-lg shadow-lg text-base h-14 disabled:opacity-40 disabled:hover:bg-cyan-400"
+        className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-display font-bold tracking-wider uppercase rounded-lg shadow-lg text-sm sm:text-base h-14 disabled:opacity-40 disabled:hover:bg-cyan-400"
       >
         {loading ? (
           <span className="flex items-center gap-2">

@@ -40,7 +40,7 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
               <User className="h-5 w-5" />
             </div>
             <div className="flex-1 space-y-1 text-left">
-              <div className="font-extrabold text-base flex items-center justify-between text-card-foreground">
+              <div className="font-display font-extrabold tracking-wider uppercase text-sm sm:text-base flex items-center justify-between text-card-foreground">
                 <span>Single Player Jam</span>
                 <ArrowRight className="h-5 w-5 text-slate-400" />
               </div>
@@ -61,7 +61,7 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
               <Users className="h-5 w-5" />
             </div>
             <div className="flex-1 space-y-1 text-left">
-              <div className="font-extrabold text-base flex items-center justify-between text-card-foreground">
+              <div className="font-display font-extrabold tracking-wider uppercase text-sm sm:text-base flex items-center justify-between text-card-foreground">
                 <span>Multiplayer Battle</span>
                 <ArrowRight className="h-5 w-5 text-slate-400" />
               </div>
