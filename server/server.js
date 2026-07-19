@@ -890,7 +890,7 @@ app.post('/api/generate-concept-image', async (req, res) => {
   const fontText = fontDescriptors[fontStyle] || expansion.typographySnippet;
 
   // Premium typographic logo prompt with integrated icon elements on charcoal background
-  const promptText = `A creative typographic logo design for '${conceptName}' on a solid dark charcoal background. The design features a custom, imaginative branding logotype written in a ${fontText}. A simple, stylized vector icon of: ${expansion.visualSnippet} is woven into the letterforms. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist style, flat design, crisp vector outlines, no gradients, no 3D shading.`;
+  const promptText = `A centered flat 2D vector typography brand logo on a solid deep charcoal (#2B303A) background. The logo features the brand name '${conceptName}' written in a very large, bold, clean ${fontText}. A small, simple, stylized vector icon of ${expansion.visualSnippet} is integrated directly on top of the text. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no realistic phone screen bezels, no device frames, no drop shadows.`;
 
   try {
     // Standardize main logo concept image to a neat, square 1:1 format (1024x1024) for ultimate sharpness
