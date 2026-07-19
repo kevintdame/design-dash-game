@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { fontPool } from "./FinalConceptScreen";
 
-// Humorous score tier describer
+// Humorous score tier describer - shortened as requested
 export const getHumorousTier = (score) => {
-  if (score >= 85) return "Design demigod (The customer is weeping tears of joy)";
-  if (score >= 70) return "Certified Genius (Almost as smart as the designer)";
-  if (score >= 50) return "Adequate (It won't catch fire, probably)";
-  return "Back to the drawing board (Even their mom wouldn't buy this)";
+  if (score >= 85) return "Design demigod";
+  if (score >= 70) return "Certified Genius";
+  if (score >= 50) return "Adequate";
+  return "Back to the drawing board";
 };
 
 // Pure, responsive SVG Donut Chart showing score inside a radial progress track
@@ -18,17 +18,10 @@ function DonutChart({ label, score }) {
   const strokeOffset = circ - (score / 100) * circ;
   return (
     <div className="flex flex-col items-center flex-1">
-      <div className="relative h-24 w-24 flex items-center justify-center select-none">
+      <div className="relative h-20 w-20 flex items-center justify-center select-none">
         <svg className="h-full w-full transform -rotate-90" viewBox="0 0 40 40">
           {/* Base Background Track Donut - visible and thick */}
-          <circle
-            cx="20"
-            cy="20"
-            r={radius}
-            fill="transparent"
-            stroke="#334155"
-            strokeWidth="5"
-          />
+          <circle cx="20" cy="20" r={radius} fill="transparent" stroke="#334155" strokeWidth="4.5" />
           {/* Progress Indicator Donut - bright cyan and thick */}
           <circle
             cx="20"
@@ -36,7 +29,7 @@ function DonutChart({ label, score }) {
             r={radius}
             fill="transparent"
             stroke="#00d4ff"
-            strokeWidth="5"
+            strokeWidth="4.5"
             strokeDasharray={circ}
             strokeDashoffset={strokeOffset}
             strokeLinecap="round"
@@ -44,11 +37,11 @@ function DonutChart({ label, score }) {
           />
         </svg>
         {/* Score Value Text - centered, large, and bright white */}
-        <div className="absolute text-white font-black text-lg drop-shadow-sm">
+        <div className="absolute text-white font-black text-sm drop-shadow-sm">
           {score}
         </div>
       </div>
-      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 mt-2.5 text-center">{label}</span>
+      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-2 text-center">{label}</span>
     </div>
   );
 }
@@ -66,17 +59,14 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
   const [idx, setIdx] = useState(0);
   const go = (d) => setIdx((p) => Math.max(0, Math.min(total - 1, p + d)));
 
-  const overall = ratings ? Math.round((ratings.value + ratings.creativity + ratings.uniqueness) / 3) : null;
-  const tier = ratings ? getHumorousTier(overall) : "";
-
   function renderSlide() {
     if (idx === 0) {
       return (
         <div className="w-full h-full flex flex-col justify-stretch">
           {/* Dynamic Brand Logo & Solution Card (Split Charcoal & White layout) */}
-          <div className="rounded-2xl overflow-hidden w-full flex flex-col min-h-[440px] flex-1 shadow-inner border border-white/5">
+          <div className="rounded-2xl overflow-hidden w-full flex flex-col min-h-[440px] flex-1 border border-white/5 shadow-inner">
             {/* Top Half: Charcoal Logo */}
-            <div className="bg-[#2B303A] flex flex-col items-center justify-center p-8 flex-1 select-none min-h-[260px]">
+            <div className="bg-[#2B303A] flex flex-col items-center justify-center p-8 flex-1 select-none min-h-[240px]">
               <div className="text-center px-4 w-full">
                 <div 
                   style={{ fontFamily: fontStyle.family }}
@@ -88,7 +78,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
             </div>
             
             {/* Bottom Half: White Solution Summary */}
-            <div className="bg-white p-8 flex items-center justify-center min-h-[180px] border-t border-slate-100">
+            <div className="bg-white p-8 flex items-center justify-center min-h-[160px] border-t border-slate-100">
               <p className="text-slate-800 text-sm sm:text-base text-center max-w-sm leading-relaxed font-semibold">
                 {concept.solutionOverview}
               </p>
@@ -101,63 +91,62 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
     if (idx === 1) {
       return (
         <div className="w-full h-full flex flex-col justify-stretch">
-          {/* Features Card - styled identical in size and border alignment as the logo slide */}
-          <div className="w-full min-h-[440px] flex-1 bg-[#1C2028] p-8 flex flex-col justify-center select-none border border-white/5 rounded-2xl shadow-inner">
-            <div className="space-y-6">
+          {/* Features Card - Split Charcoal & White layout */}
+          <div className="rounded-2xl overflow-hidden w-full flex flex-col min-h-[440px] flex-1 border border-white/5 shadow-inner">
+            {/* Top Half: Charcoal Header */}
+            <div className="bg-[#2B303A] py-6 px-8 flex flex-col justify-center select-none min-h-[100px]">
               <h3 
                 style={{ fontFamily: fontStyle.family }}
-                className="text-cyan-400 text-base font-extrabold uppercase tracking-wider border-b border-white/10 pb-2"
+                className="text-cyan-400 text-base font-extrabold uppercase tracking-wider"
               >
                 Core Brand Features
               </h3>
-              <div className="space-y-5">
-                {features.map((f, i) => (
-                  <div key={i} className="border-l-2 border-cyan-400/40 pl-4 py-0.5">
-                    <h4 
-                      style={{ fontFamily: fontStyle.family }}
-                      className="text-white font-extrabold text-base sm:text-lg capitalize animate-fade-in"
-                    >
-                      {f.title}
-                    </h4>
-                    <p className="text-slate-300 text-xs sm:text-sm mt-1 leading-relaxed">
-                      {f.description}
-                    </p>
-                  </div>
-                ))}
-                {features.length === 0 && (
-                  <p className="text-slate-400 text-sm italic">No key features defined for this concept.</p>
-                )}
-              </div>
+            </div>
+            
+            {/* Bottom Half: White Features List */}
+            <div className="bg-white p-8 flex-1 flex flex-col justify-center space-y-5 border-t border-slate-100 min-h-[300px]">
+              {features.map((f, i) => (
+                <div key={i} className="border-l-2 border-slate-300 pl-4 py-0.5">
+                  <h4 
+                    style={{ fontFamily: fontStyle.family }}
+                    className="text-slate-800 font-extrabold text-sm sm:text-base capitalize"
+                  >
+                    {f.title}
+                  </h4>
+                  <p className="text-slate-600 text-xs sm:text-sm mt-0.5 leading-relaxed">
+                    {f.description}
+                  </p>
+                </div>
+              ))}
+              {features.length === 0 && (
+                <p className="text-slate-400 text-sm italic">No key features defined for this concept.</p>
+              )}
             </div>
           </div>
         </div>
       );
     }
 
-    // Slide 2: Ratings Scoreboard
+    // Slide 2: Ratings Scoreboard - Split Charcoal & White layout
     return (
-      <div className="w-full p-8 text-center select-none flex flex-col justify-between min-h-[440px] bg-[#1A1E24] border border-white/5 rounded-2xl shadow-lg">
-        {/* Header summary */}
-        <div className="text-left border-b border-slate-800 pb-4">
-          <div className="text-slate-400 text-xs uppercase tracking-wider font-extrabold mb-1">Customer Verdict</div>
-          <h3 className="text-white font-black text-2xl capitalize leading-none">{challenge.customer_name}</h3>
-          {/* Larger font size and white color (no cyan) */}
-          <p className="text-white text-base sm:text-lg font-bold mt-2.5 leading-snug">{tier}</p>
-        </div>
+      <div className="w-full h-full flex flex-col justify-stretch">
+        <div className="rounded-2xl overflow-hidden w-full flex flex-col min-h-[440px] flex-1 border border-white/5 shadow-inner">
+          {/* Top Half: Charcoal containing Donuts */}
+          <div className="bg-[#2B303A] p-8 flex items-center justify-around gap-4 flex-1 min-h-[220px]">
+            <DonutChart label="Value" score={ratings.value} />
+            <DonutChart label="Creativity" score={ratings.creativity} />
+            <DonutChart label="Uniqueness" score={ratings.uniqueness} />
+          </div>
 
-        {/* 3 Donut charts in a responsive horizontal grid */}
-        <div className="flex justify-around items-center gap-4 my-6">
-          <DonutChart label="Value" score={ratings.value} />
-          <DonutChart label="Creativity" score={ratings.creativity} />
-          <DonutChart label="Uniqueness" score={ratings.uniqueness} />
-        </div>
-
-        {/* Customer review quote */}
-        <div className="bg-[#1C2028] border border-white/5 rounded-2xl p-5 text-left shadow-inner">
-          <Quote className="h-4 w-4 text-cyan-400 mb-2" />
-          <p className="text-slate-200 text-sm sm:text-base leading-relaxed font-semibold">
-            {ratings.review}
-          </p>
+          {/* Bottom Half: White containing Quote & Customer review */}
+          <div className="bg-white p-8 flex flex-col justify-center border-t border-slate-100 min-h-[180px]">
+            <div className="relative pl-6">
+              <Quote className="absolute left-0 top-0.5 h-4.5 w-4.5 text-slate-300" />
+              <p className="text-slate-800 text-xs sm:text-sm leading-relaxed font-semibold">
+                {ratings.review}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     );
