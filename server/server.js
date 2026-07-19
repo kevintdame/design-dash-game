@@ -14,6 +14,7 @@ dotenv.config();
 // to prevent conflicting OAuth 2 access token header injections
 process.env.GCP_METADATA_HOST = '127.0.0.1';
 process.env.GCE_METADATA_HOST = '127.0.0.1';
+process.env.NO_GCE_CHECK = 'true';
 
 const app = express();
 app.use(cors());
