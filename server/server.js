@@ -633,7 +633,7 @@ async function fetchAsBase64(url) {
   return `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
 }
 
-// Unified multi-tier image generator cascade
+// Unified multi-tier image generator cascade (No Pollinations AI fallback, strictly shows errors if keys fail)
 async function generateImageBase64(prompt, width = 400, height = 300) {
   const hfApiKey = process.env.HF_API_KEY;
   const geminiApiKey = process.env.GEMINI_API_KEY;
@@ -678,7 +678,8 @@ async function generateImageBase64(prompt, width = 400, height = 300) {
         {
           headers: { 
             "Authorization": `Bearer ${hfApiKey}`,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
           },
           method: "POST",
           body: JSON.stringify({ inputs: prompt }),
@@ -691,27 +692,15 @@ async function generateImageBase64(prompt, width = 400, height = 300) {
         return `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
       } else {
         const errText = await response.text();
-        console.warn(`Hugging Face API failed with status ${response.status}: ${errText}`);
+        throw new Error(`Hugging Face API failed with status ${response.status}: ${errText}`);
       }
     } catch (err) {
-      console.warn("Hugging Face generation failed, trying next tier:", err.message);
+      console.warn("Hugging Face generation failed:", err.message);
+      throw err;
     }
   }
 
-  // Tier 3: Pollinations AI (FLUX community server)
-  try {
-    console.log("Attempting Pollinations AI generation...");
-    const seed = Math.floor(Math.random() * 100000);
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&nologo=true&seed=${seed}`;
-    const base64Data = await fetchAsBase64(imageUrl);
-    console.log("Pollinations AI generation successful!");
-    return base64Data;
-  } catch (err) {
-    console.error("Pollinations AI generation failed:", err.message);
-    // Tier 4: Programmatic SVG Fallback
-    const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}"><rect width="${width}" height="${height}" fill="#20262e" rx="16" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#00d4ff" font-family="sans-serif" font-size="12">Mock Concept</text></svg>`;
-    return `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`;
-  }
+  throw new Error("No image generation API keys available or all generators failed.");
 }
 
 // Helper to use Gemini to translate concept info into descriptive vector graphic prompts and classify if it is a mobile app
@@ -746,7 +735,7 @@ Do not include markdown tags, code blocks, or extra text.`;
       }
     });
 
-    const text = response?.text?.();
+    const text = response?.text;
     if (text) {
       const parsed = JSON.parse(text.trim());
       if (parsed && typeof parsed.isApp === 'boolean' && parsed.visualSnippet) {
