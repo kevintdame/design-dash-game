@@ -880,21 +880,14 @@ Respond ONLY with a JSON object in this exact format:
 
 // 6. Generate Concept Image using Google AI Studio Imagen 3
 app.post('/api/generate-concept-image', async (req, res) => {
-  const { solutionOverview, domain, conceptName, features, fontStyle } = req.body;
+  const { solutionOverview, domain, conceptName, features } = req.body;
 
   // Use Gemini to expand the prompt and classify isApp
   const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview, features);
   console.log("Concept Image visual expansion returned:", expansion);
 
-  // Setup typographic style definitions
-  const fontDescriptors = {
-    modern: "bold, clean, modern geometric sans-serif typeface",
-    elegant: "elegant, high-contrast serif display font with decorative swashes and ligatures",
-    playful: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes",
-    classic: "classic roman serif typeface with clean proportions"
-  };
-  const fontText = fontDescriptors[fontStyle] || expansion.typographySnippet;
-  const promptText = `A centered flat 2D vector typography brand logo on a solid deep charcoal (#2B303A) background. The logo features the brand name '${conceptName}' written in a very large, bold, clean ${fontText}. The brand name text is colored in bright electric cyan (#00d4ff). A small, simple, stylized vector icon of ${expansion.visualSnippet} is colored in solid white (#ffffff) and integrated directly on top of the text. Colors: bright electric cyan (#00d4ff) and solid white (#ffffff) on a solid deep charcoal (#2B303A) background. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no realistic phone screen bezels, no device frames, no drop shadows.`;
+  // Pure, text-free brand mark icon prompt
+  const promptText = `A centered, clean flat 2D vector brand mark icon on a solid deep charcoal (#2B303A) background. The icon features a simple, stylized geometric symbol of: ${expansion.visualSnippet}. Colors: bright electric cyan (#00d4ff) and solid white (#ffffff) accents. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no text, no letters, no words, no phone mockups, no device frames, no drop shadows.`;
 
   try {
     // Standardize main logo concept image to a neat, square 1:1 format (1024x1024) for ultimate sharpness

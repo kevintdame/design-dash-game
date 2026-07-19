@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { generateConceptImage, getConceptAspectRatioClass } from "@/lib/designGame";
 
 export const fonts = [
-  { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-cyan-400 font-black uppercase text-3xl sm:text-4.5xl leading-none" },
-  { name: "Elegant", family: "'Playfair Display', serif", className: "italic text-white font-bold capitalize text-3.5xl sm:text-5xl leading-none" },
-  { name: "Playful", family: "'Fredoka', sans-serif", className: "text-cyan-400 font-extrabold lowercase text-3.5xl sm:text-5xl leading-none" },
-  { name: "Classic", family: "'Cinzel', serif", className: "tracking-widest text-white font-extrabold uppercase text-2.5xl sm:text-4xl leading-none" }
+  { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase text-3xl sm:text-4.5xl leading-none" },
+  { name: "Elegant", family: "'Playfair Display', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-bold capitalize text-3.5xl sm:text-5xl leading-none" },
+  { name: "Playful", family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase text-3.5xl sm:text-5xl leading-none" },
+  { name: "Classic", family: "'Cinzel', serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-extrabold uppercase text-2.5xl sm:text-4xl leading-none" }
 ];
 
 export default function FinalConceptScreen({ challenge, domain, onSubmit, loading }) {
@@ -157,13 +157,26 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400 mt-4">
         <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block mb-2">Concept Visual Mockup</label>
         {image && !imageLoadError ? (
-          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 aspect-square bg-[#2B303A] flex items-center justify-center select-none">
-            <img 
-              src={image} 
-              alt="Concept visual logo" 
-              className="w-full h-full object-cover animate-fade-in" 
-              onError={() => setImageLoadError(true)}
-            />
+          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 aspect-square bg-[#2B303A] flex flex-col items-center justify-center p-8 select-none">
+            {/* Dynamic AI Icon (Text-Free) */}
+            <div className="w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center mb-6">
+              <img 
+                src={image} 
+                alt="Concept visual icon" 
+                className="w-full h-full object-contain animate-fade-in" 
+                onError={() => setImageLoadError(true)}
+              />
+            </div>
+
+            {/* Dynamic Premium CSS Typography */}
+            <div className="w-full text-center px-4">
+              <div 
+                style={{ fontFamily: fonts[fontIdx].family }}
+                className={`${fonts[fontIdx].className} drop-shadow-md`}
+              >
+                {conceptName || "Concept Name"}
+              </div>
+            </div>
 
             {generatingImage && (
               <div className="absolute inset-0 bg-black/55 flex items-center justify-center backdrop-blur-[1px] rounded-xl">

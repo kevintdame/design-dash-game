@@ -38,8 +38,21 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
       return (
         <div className="w-full text-left overflow-y-auto max-h-[480px] [-webkit-overflow-scrolling:touch]">
           {concept.image && (
-            <div className="relative w-full aspect-square bg-[#2B303A] flex items-center justify-center select-none">
-              <img src={concept.image} alt={concept.name || "Concept"} className="w-full h-full object-cover" />
+            <div className="relative w-full aspect-square bg-[#2B303A] flex flex-col items-center justify-center p-8 select-none">
+              {/* Centered pure icon */}
+              <div className="w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center mb-6">
+                <img src={concept.image} alt={concept.name || "Concept"} className="w-full h-full object-contain" />
+              </div>
+              
+              {/* Premium CSS Typography */}
+              <div className="w-full text-center px-4">
+                <div 
+                  style={{ fontFamily: fonts[fontIdx].family }}
+                  className={`${fonts[fontIdx].className} drop-shadow-md`}
+                >
+                  {concept.name || "Concept Name"}
+                </div>
+              </div>
             </div>
           )}
           <div className="p-5">
