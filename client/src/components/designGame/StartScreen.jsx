@@ -55,7 +55,7 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
       </motion.div>
 
       <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 font-display text-white">
-        Design Sprint
+        Design Dash
       </h1>
       <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-8 max-w-sm mx-auto">
         Pick a domain, then meet a real-world challenge to solve for a customer.

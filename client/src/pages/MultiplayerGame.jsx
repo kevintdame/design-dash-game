@@ -278,7 +278,7 @@ export default function MultiplayerGame() {
             >
               <div className="text-center space-y-2 mb-4">
                 <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 font-display text-white">Multiplayer Battle</h1>
-                <p className="text-slate-400 text-sm font-medium">Compete head-to-head in a design thinking sprint!</p>
+                <p className="text-slate-400 text-sm font-medium">Compete head-to-head in a design thinking dash!</p>
               </div>
 
               <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5">

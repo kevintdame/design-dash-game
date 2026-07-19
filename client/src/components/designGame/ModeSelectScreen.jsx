@@ -41,11 +41,11 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
             </div>
             <div className="flex-1 space-y-1 text-left">
               <div className="font-extrabold text-base flex items-center justify-between text-card-foreground">
-                <span>Single Player Sprint</span>
+                <span>Single Player Dash</span>
                 <ArrowRight className="h-5 w-5 text-slate-400" />
               </div>
               <p className="text-slate-500 text-xs font-semibold leading-relaxed">
-                Take on a design sprint solo and pitch your final solution to a virtual customer.
+                Take on a design dash solo and pitch your final solution to a virtual customer.
               </p>
             </div>
           </CardContent>
