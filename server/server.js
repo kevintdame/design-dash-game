@@ -828,13 +828,20 @@ async function expandFeatureVisualPrompt(title, description, domain) {
   if (isOfflineMode) {
     return "a simple geometric symbol";
   }
-  try {
-    const prompt = `You are a design assistant. Translate the following product feature into a 1-sentence description of a single, simple vector icon (e.g., a speech bubble symbol, a delivery scooter, a calendar grid, a gear, a clock symbol).
+  const prompt = `You are a design assistant. Translate the following product feature into a 1-sentence description of a creative, simple vector icon.
 RULES:
-1. Describe a single, literal icon object.
+1. Describe a single, literal icon object or creative symbol combination.
 2. DO NOT include the feature title, description, or any text/letters in the description. The description must specify visual shapes ONLY.
 3. DO NOT use abstract terms (orbs, pulses, glows, magic).
 4. The icon description must be strictly for a flat 2D vector graphic. Do not use words like "glowing", "3D", "embossed", "gradient", "realistic", "shaded", "highlights", or "shadows".
+5. Be highly creative. Instead of a single boring literal object, suggest combining two simple outline shapes to create a unique visual metaphor.
+
+FEW-SHOT EXAMPLES:
+- Feature: "Low Cost" (A cheap price or deal) -> Output: "a simple outline of a price tag combined with a coin slot"
+- Feature: "Fun Music" (Plays music or sounds) -> Output: "a musical note symbol integrated with a clean heart shape outline"
+- Feature: "Aesthetic" (Beautiful layout) -> Output: "a clean four-pointed sparkle outline star"
+- Feature: "Free Plan" (Costs zero dollars) -> Output: "a simple coin outline with a slash mark through the center"
+- Feature: "Conversational" (Chat or sound) -> Output: "a speech bubble outline with a small soundwave line inside"
 
 Feature Title: "${title}"
 Feature Description: "${description}"
@@ -842,11 +849,10 @@ App Domain: "${domain}"
 
 Respond ONLY with a JSON object in this exact format:
 {
-  "iconSnippet": "1-sentence description of a single simple vector icon"
-}
+  "iconSnippet": "1-sentence description of a single simple vector icon combining 1-2 shapes"
+}`;
 
-Do not include markdown tags, code blocks, or extra text.`;
-
+  try {
     const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
@@ -888,9 +894,7 @@ app.post('/api/generate-concept-image', async (req, res) => {
     classic: "classic roman serif typeface with clean proportions"
   };
   const fontText = fontDescriptors[fontStyle] || expansion.typographySnippet;
-
-  // Premium typographic logo prompt with integrated icon elements on charcoal background
-  const promptText = `A centered flat 2D vector typography brand logo on a solid deep charcoal (#2B303A) background. The logo features the brand name '${conceptName}' written in a very large, bold, clean ${fontText}. A small, simple, stylized vector icon of ${expansion.visualSnippet} is integrated directly on top of the text. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no realistic phone screen bezels, no device frames, no drop shadows.`;
+  const promptText = `A centered flat 2D vector typography brand logo on a solid deep charcoal (#2B303A) background. The logo features the brand name '${conceptName}' written in a very large, bold, clean ${fontText}. The brand name text is colored in bright electric cyan (#00d4ff). A small, simple, stylized vector icon of ${expansion.visualSnippet} is colored in solid white (#ffffff) and integrated directly on top of the text. Colors: bright electric cyan (#00d4ff) and solid white (#ffffff) on a solid deep charcoal (#2B303A) background. Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no realistic phone screen bezels, no device frames, no drop shadows.`;
 
   try {
     // Standardize main logo concept image to a neat, square 1:1 format (1024x1024) for ultimate sharpness
@@ -911,15 +915,7 @@ app.post('/api/generate-feature-images', async (req, res) => {
         const iconSnippet = await expandFeatureVisualPrompt(f.title, f.description, domain);
         console.log(`Feature icon translation for "${f.title}":`, iconSnippet);
         
-        const prompt = `A centered, simple, flat 2D vector graphic icon on a solid black (#000000) background.
-STYLE GUIDE:
-- Style: Minimalist 2D Swiss vector icon.
-- Line/Fill Style: Clean, thin white vector outlines with a single bright electric cyan (#00d4ff) accent detail. No fills, no gradients, no 3D effects, no shadows, no colors other than pure white and electric cyan.
-- Example 1 (Conversational): A simple white outline of a speech bubble with a tiny electric cyan soundwave line inside it.
-- Example 2 (Low Cost): A simple white outline of a coin with an electric cyan slash mark through the center.
-- Example 3 (Aesthetic): A simple white outline of a star with an electric cyan sparkle highlight in the corner.
-
-SUBJECT TO DRAW: A simple white outline of: ${iconSnippet}, with a single electric cyan (#00d4ff) accent detail.`;
+        const prompt = `A centered, clean flat 2D vector graphic icon on a solid deep charcoal (#2B303A) background. The icon shows a simple, stylized outline of: ${iconSnippet}. The outline is drawn in solid white (#ffffff) and features a small accent detail drawn in bright electric cyan (#00d4ff). Swiss minimalist flat design style, crisp clean outlines, solid shapes, absolutely no text, no letters, no words, no phone mockups, no drop shadows.`;
         const image_url = await generateImageBase64(prompt, 512, 512);
         return { ...f, image_url };
       })
