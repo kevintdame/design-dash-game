@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote, ImageIcon } from "lucide-react";
 import { getConceptAspectRatioClass } from "@/lib/designGame";
-import { fonts } from "./FinalConceptScreen";
 
 function ScoreBar({ label, score }) {
   return (
@@ -34,22 +33,11 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
 
   function renderSlide() {
     if (idx === 0) {
-      const fontIdx = concept.fontIdx !== undefined ? concept.fontIdx : 0;
       return (
         <div className="w-full text-left overflow-y-auto max-h-[480px] [-webkit-overflow-scrolling:touch]">
           {concept.image && (
-            <div className="relative w-full aspect-square bg-[#2B303A] flex flex-col items-center justify-center p-8 select-none">
-              <div className="w-1/2 aspect-square flex items-center justify-center mb-6">
-                <img src={concept.image} alt={concept.name || "Concept"} className="w-full h-full object-contain" />
-              </div>
-              <div className="w-full text-center">
-                <div 
-                  style={{ fontFamily: fonts[fontIdx].family }}
-                  className={fonts[fontIdx].className}
-                >
-                  {concept.name}
-                </div>
-              </div>
+            <div className="relative w-full aspect-square bg-[#2B303A] overflow-hidden">
+              <img src={concept.image} alt={concept.name || "Concept"} className="w-full h-full object-cover" />
             </div>
           )}
           <div className="p-5">
