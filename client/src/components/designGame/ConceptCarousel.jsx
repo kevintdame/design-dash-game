@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Quote, ImageIcon } from "lucide-react";
-import { getConceptAspectRatioClass } from "@/lib/designGame";
-import { fonts } from "./FinalConceptScreen";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { getFontsForVibe } from "./FinalConceptScreen";
 
 function ScoreBar({ label, score }) {
   return (
@@ -25,7 +24,12 @@ function ScoreBar({ label, score }) {
 
 export default function ConceptCarousel({ challenge, concept, ratings }) {
   const features = concept?.features || [];
-  const total = 1 + features.length + (ratings ? 1 : 0);
+  const vibe = concept?.vibe || "organic";
+  const activeFonts = getFontsForVibe(vibe);
+  const fontIdx = concept.fontIdx !== undefined ? concept.fontIdx : 0;
+  
+  // Slide 0: Brand Logo, Slide 1: Features Summary, Slide 2: Ratings (if present)
+  const total = 2 + (ratings ? 1 : 0);
   const [idx, setIdx] = useState(0);
   const go = (d) => setIdx((p) => Math.max(0, Math.min(total - 1, p + d)));
 
@@ -34,62 +38,80 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
 
   function renderSlide() {
     if (idx === 0) {
-      const fontIdx = concept.fontIdx !== undefined ? concept.fontIdx : 0;
       return (
         <div className="w-full text-left overflow-y-auto max-h-[480px] [-webkit-overflow-scrolling:touch]">
-          {concept.image && (
-            <div className="relative w-full aspect-square bg-[#2B303A] flex flex-col items-center justify-center p-8 select-none">
-              {/* Centered pure icon */}
-              <div className="w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center mb-6">
-                <img src={concept.image} alt={concept.name || "Concept"} className="w-full h-full object-contain" />
-              </div>
-              
-              {/* Premium CSS Typography */}
-              <div className="w-full text-center px-4">
-                <div 
-                  style={{ fontFamily: fonts[fontIdx].family }}
-                  className={`${fonts[fontIdx].className} drop-shadow-md`}
-                >
-                  {concept.name || "Concept Name"}
-                </div>
+          {/* Dynamic Brand Logo Card */}
+          <div className="relative w-full aspect-square bg-[#2B303A] flex flex-col items-center justify-center p-8 select-none">
+            <div className="text-center px-4 w-full">
+              <div 
+                style={{ fontFamily: activeFonts[fontIdx].family }}
+                className={`${activeFonts[fontIdx].className} drop-shadow-md`}
+              >
+                {concept.name || "Concept Name"}
               </div>
             </div>
-          )}
+            <span className="text-[9px] uppercase font-bold text-slate-500 mt-6 tracking-widest bg-[#20262e] px-2.5 py-1 rounded-full">
+              Style: {activeFonts[fontIdx].name} ({vibe})
+            </span>
+          </div>
+
           <div className="p-5">
             <p className="text-card-foreground text-sm leading-relaxed">{concept.solutionOverview}</p>
           </div>
         </div>
       );
     }
-    if (idx <= features.length) {
-      const f = features[idx - 1];
+
+    if (idx === 1) {
       return (
-        <div className="w-full text-left">
-          <div className="aspect-square bg-black/5 flex items-center justify-center">
-            {f.image_url ? (
-              <img src={f.image_url} alt={f.title} className="w-full h-full object-cover" />
-            ) : (
-              <ImageIcon className="h-10 w-10 text-black/20" />
-            )}
-          </div>
-          <div className="p-5">
-            <div className="text-slate-400 text-[10px] uppercase tracking-wider font-bold mb-1">Feature {idx}</div>
-            <h3 className="text-card-foreground font-bold text-base mb-1.5">{f.title}</h3>
-            <p className="text-slate-600 text-sm leading-relaxed">{f.description}</p>
+        <div className="w-full text-left p-5 overflow-y-auto max-h-[480px] [-webkit-overflow-scrolling:touch]">
+          <div className="bg-[#1C2028] rounded-2xl p-6 shadow-inner border border-white/5 space-y-5">
+            <h3 
+              style={{ fontFamily: activeFonts[fontIdx].family }}
+              className="text-cyan-400 text-sm font-bold uppercase tracking-wider mb-2"
+            >
+              Core Brand Features
+            </h3>
+            <div className="space-y-4">
+              {features.map((f, i) => (
+                <div key={i} className="border-l border-cyan-400/30 pl-4 py-0.5">
+                  <h4 
+                    style={{ fontFamily: activeFonts[fontIdx].family }}
+                    className="text-white font-semibold text-sm capitalize animate-fade-in"
+                  >
+                    {f.title}
+                  </h4>
+                  <p className="text-slate-400 text-xs mt-0.5 leading-relaxed">
+                    {f.description}
+                  </p>
+                </div>
+              ))}
+              {features.length === 0 && (
+                <p className="text-slate-400 text-xs italic">No key features defined for this concept.</p>
+              )}
+            </div>
           </div>
         </div>
       );
     }
+
+    // Slide 2: Customer Rating feedback
     return (
       <div className="w-full p-5 text-center overflow-y-auto max-h-[480px] [-webkit-overflow-scrolling:touch]">
+        <div className="text-left mb-6 border-b border-slate-800 pb-4">
+          <div className="text-slate-400 text-[10px] uppercase tracking-wider font-bold mb-1">Customer Verdict</div>
+          <h3 className="text-white font-extrabold text-xl capitalize">{challenge.customer_name}</h3>
+          <p className="text-cyan-400 text-xs font-semibold mt-0.5">{tier} ({overall}/100)</p>
+        </div>
+
         <div className="space-y-2.5 text-left mb-4">
-          <ScoreBar label="Value" score={ratings.value} />
+          <ScoreBar label="Value Fit" score={ratings.value} />
           <ScoreBar label="Creativity" score={ratings.creativity} />
           <ScoreBar label="Uniqueness" score={ratings.uniqueness} />
         </div>
-        <div className="bg-black/5 rounded-2xl p-3 text-left">
-          <Quote className="h-4 w-4 text-cyan-400 mb-1" />
-          <p className="text-slate-900 text-sm leading-relaxed font-medium">{ratings.review}</p>
+        <div className="bg-[#1C2028] border border-white/5 rounded-2xl p-4 text-left">
+          <Quote className="h-4 w-4 text-cyan-400 mb-2" />
+          <p className="text-slate-300 text-sm leading-relaxed font-medium">{ratings.review}</p>
         </div>
       </div>
     );

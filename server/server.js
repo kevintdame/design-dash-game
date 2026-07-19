@@ -760,7 +760,8 @@ async function expandConceptVisualPrompt(conceptName, solutionOverview, features
     return {
       isApp,
       visualSnippet: isApp ? "a clean food cover plate symbol next to a stopwatch icon" : "a modern functional design logo",
-      typographySnippet: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes"
+      typographySnippet: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes",
+      vibe: isApp ? "tech" : "organic"
     };
   }
 
@@ -775,7 +776,8 @@ RULES:
 2. DO NOT use abstract metaphors, sci-fi, or fantasy concepts (e.g., NO 'orbs', 'pulses', 'magic glows', 'hologram', 'nebula', 'energy waves', 'magical effects').
 3. DO NOT include any text, labels, numbers, letters, or layout words inside the visualSnippet description. It must specify visual objects and shapes ONLY.
 4. DO NOT describe any physical phones, device frames, bezels, notches, app screens, layouts, dashboards, user interfaces, or realistic backgrounds. Keep the visualSnippet purely as a brief 3-5 word label of the symbol itself.
-5. Select a highly creative, custom typographic style (font style and layout description) for the typographySnippet that matches the product's name and personality. E.g., for a natural/mindful app: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes"; for a clean/modern app: "bold, clean, modern geometric sans-serif typeface"; for an elegant app: "elegant, high-contrast serif display font with decorative swashes and ligatures".
+5. Select a highly creative, custom typographic style (font style and layout description) for the typographySnippet that matches the product's name and personality.
+6. Classify the concept's personality vibe into one of four values: "tech" (for software, tools, productivity, speed, engineering), "organic" (for wellness, natural, food, community, warmth), "luxury" (for premium, high-end, elegant, calm, classical), or "playful" (for fun, children, games, casual, energetic).
 
 Product Concept Title: "${conceptName}"
 Product Concept Overview: "${solutionOverview}"
@@ -785,7 +787,8 @@ Respond ONLY with a JSON object in this exact format:
 {
   "isApp": true or false,
   "visualSnippet": "brief 3-5 word name of the symbol",
-  "typographySnippet": "1-sentence description of the custom typography design style"
+  "typographySnippet": "1-sentence description of the custom typography design style",
+  "vibe": "tech" or "organic" or "luxury" or "playful"
 }
 
 Do not include markdown tags, code blocks, or extra text.`;
@@ -805,7 +808,7 @@ Do not include markdown tags, code blocks, or extra text.`;
         cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
       }
       const parsed = JSON.parse(cleanText);
-      if (parsed && typeof parsed.isApp === 'boolean' && parsed.visualSnippet && parsed.typographySnippet) {
+      if (parsed && typeof parsed.isApp === 'boolean' && parsed.visualSnippet && parsed.typographySnippet && parsed.vibe) {
         return parsed;
       }
     }
@@ -819,7 +822,8 @@ Do not include markdown tags, code blocks, or extra text.`;
   return {
     isApp,
     visualSnippet: isApp ? "a clean food plate symbol next to a delivery vehicle outline" : "a modern geometric design structure with indicators",
-    typographySnippet: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes"
+    typographySnippet: "flowing, modern artistic script font with clean, elegant hand-lettered flourishes",
+    vibe: isApp ? "tech" : "organic"
   };
 }
 
@@ -917,6 +921,18 @@ app.post('/api/generate-feature-images', async (req, res) => {
   } catch (err) {
     console.error("Feature image generation failed:", err);
     res.status(500).json({ error: "Failed to generate feature images" });
+  }
+});
+
+// 6c. Get Concept Personality Vibe dynamically using Gemini
+app.post('/api/concept-vibe', async (req, res) => {
+  const { conceptName, solutionOverview } = req.body;
+  try {
+    const expansion = await expandConceptVisualPrompt(conceptName, solutionOverview, []);
+    res.json({ vibe: expansion.vibe });
+  } catch (err) {
+    console.warn("Concept vibe classification failed:", err);
+    res.json({ vibe: "organic" });
   }
 });
 

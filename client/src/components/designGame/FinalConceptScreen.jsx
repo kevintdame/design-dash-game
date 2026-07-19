@@ -1,24 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Rocket, ArrowRight, Loader2, ImageIcon, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { Rocket, ArrowRight, Loader2, Sparkles, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { generateConceptImage, getConceptAspectRatioClass } from "@/lib/designGame";
 
-export const fonts = [
-  { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase text-3xl sm:text-4.5xl leading-none" },
-  { name: "Elegant", family: "'Playfair Display', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-bold capitalize text-3.5xl sm:text-5xl leading-none" },
-  { name: "Playful", family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase text-3.5xl sm:text-5xl leading-none" },
-  { name: "Classic", family: "'Cinzel', serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-extrabold uppercase text-2.5xl sm:text-4xl leading-none" }
-];
+// Dynamic Google Fonts configuration mapping concept vibes to cohesive type styles
+export const getFontsForVibe = (vibe) => {
+  switch (vibe) {
+    case "tech":
+      return [
+        { name: "Modern", family: "'Space Grotesk', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-bold uppercase text-3xl sm:text-4.5xl leading-none" },
+        { name: "Elegant", family: "'Outfit', sans-serif", className: "tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-extrabold uppercase text-3xl sm:text-4.5xl leading-none" },
+        { name: "Playful", family: "'Orbitron', sans-serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-black uppercase text-2.5xl sm:text-3.5xl leading-none" },
+        { name: "Classic", family: "'Outfit', sans-serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-medium uppercase text-2.5xl sm:text-3.5xl leading-none" }
+      ];
+    case "luxury":
+      return [
+        { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase text-3xl sm:text-4.5xl leading-none" },
+        { name: "Elegant", family: "'Prata', serif", className: "text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal capitalize text-3.5xl sm:text-5xl leading-none" },
+        { name: "Playful", family: "'Cormorant Garamond', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-bold capitalize text-4xl sm:text-5xl leading-none" },
+        { name: "Classic", family: "'Cinzel', serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-extrabold uppercase text-2.5xl sm:text-4xl leading-none" }
+      ];
+    case "playful":
+      return [
+        { name: "Modern", family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase text-3.5xl sm:text-5xl leading-none" },
+        { name: "Elegant", family: "'Lilita One', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal uppercase text-3.5xl sm:text-5xl leading-none" },
+        { name: "Playful", family: "'Rubik Bubbles', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-normal text-3.5xl sm:text-5xl leading-none" },
+        { name: "Classic", family: "'Nunito', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-black capitalize text-3.5xl sm:text-5xl leading-none" }
+      ];
+    case "organic":
+    default:
+      return [
+        { name: "Modern", family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase text-3xl sm:text-4.5xl leading-none" },
+        { name: "Elegant", family: "'Playfair Display', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-bold capitalize text-3.5xl sm:text-5xl leading-none" },
+        { name: "Playful", family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase text-3.5xl sm:text-5xl leading-none" },
+        { name: "Classic", family: "'Lora', serif", className: "italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-semibold capitalize text-3.5xl sm:text-5xl leading-none" }
+      ];
+  }
+};
 
 export default function FinalConceptScreen({ challenge, domain, onSubmit, loading }) {
   const [conceptName, setConceptName] = useState("");
   const [problem, setProblem] = useState("");
   const [solutionOverview, setSolutionOverview] = useState("");
-  const [image, setImage] = useState(null);
-  const [generatingImage, setGeneratingImage] = useState(false);
-  const [imageLoadError, setImageLoadError] = useState(false);
   const [fontIdx, setFontIdx] = useState(0);
+  const [vibe, setVibe] = useState("organic");
   const [features, setFeatures] = useState([
     { title: "", description: "" },
     { title: "", description: "" },
@@ -27,7 +52,31 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
 
   const completeFeatures = features.filter((f) => f.title.trim().length > 0);
   const ready = conceptName.trim().length > 0 && solutionOverview.trim().length > 0;
-  const canGenerateImage = solutionOverview.trim().length >= 10;
+
+  // Debounced vibe classification endpoint fetcher
+  useEffect(() => {
+    if (conceptName.trim().length >= 3 && solutionOverview.trim().length >= 10) {
+      const delayDebounceFn = setTimeout(async () => {
+        try {
+          const res = await fetch("/api/concept-vibe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ conceptName, solutionOverview })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.vibe) {
+              setVibe(data.vibe);
+            }
+          }
+        } catch (err) {
+          console.warn("Vibe classification fetch error:", err);
+        }
+      }, 800);
+
+      return () => clearTimeout(delayDebounceFn);
+    }
+  }, [conceptName, solutionOverview]);
 
   function updateFeature(i, field, val) {
     const next = [...features];
@@ -35,36 +84,10 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
     setFeatures(next);
   }
 
-  const fontStyles = ["modern", "elegant", "playful", "classic"];
-
-  async function handleGenerateImage(customFontIdx = null) {
-    if (!canGenerateImage || generatingImage) return;
-    setImageLoadError(false);
-    setGeneratingImage(true);
-    const targetFontIdx = customFontIdx !== null ? customFontIdx : fontIdx;
-    try {
-      const url = await generateConceptImage(
-        solutionOverview,
-        domain,
-        conceptName,
-        completeFeatures,
-        fontStyles[targetFontIdx]
-      );
-      setImage(url);
-    } catch (err) {
-      console.error("Concept image generation failed:", err);
-      setImage(null);
-    } finally {
-      setGeneratingImage(false);
-    }
-  }
+  const activeFonts = getFontsForVibe(vibe);
 
   const handleFontCycle = () => {
-    const nextIdx = (fontIdx + 1) % fonts.length;
-    setFontIdx(nextIdx);
-    if (image) {
-      handleGenerateImage(nextIdx);
-    }
+    setFontIdx((prev) => (prev + 1) % activeFonts.length);
   };
 
   function submit() {
@@ -73,8 +96,9 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       name: conceptName.trim(),
       problem: problem.trim(),
       solutionOverview: solutionOverview.trim(),
-      image,
+      image: null,
       fontIdx,
+      vibe,
       features: completeFeatures.map((f) => ({ title: f.title.trim(), description: f.description.trim() }))
     });
   }
@@ -154,91 +178,56 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
         ))}
       </div>
 
-      <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400 mt-4">
-        <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block mb-2">Concept Visual Mockup</label>
-        {image && !imageLoadError ? (
-          <div className="relative rounded-xl overflow-hidden ring-1 ring-black/5 aspect-square bg-[#2B303A] flex flex-col items-center justify-center p-8 select-none">
-            {/* Dynamic AI Icon (Text-Free) */}
-            <div className="w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center mb-6">
-              <img 
-                src={image} 
-                alt="Concept visual icon" 
-                className="w-full h-full object-contain animate-fade-in" 
-                onError={() => setImageLoadError(true)}
-              />
-            </div>
-
-            {/* Dynamic Premium CSS Typography */}
-            <div className="w-full text-center px-4">
-              <div 
-                style={{ fontFamily: fonts[fontIdx].family }}
-                className={`${fonts[fontIdx].className} drop-shadow-md`}
-              >
-                {conceptName || "Concept Name"}
-              </div>
-            </div>
-
-            {generatingImage && (
-              <div className="absolute inset-0 bg-black/55 flex items-center justify-center backdrop-blur-[1px] rounded-xl">
-                <Loader2 className="h-7 w-7 text-cyan-400 animate-spin" />
-              </div>
-            )}
-
-            {/* Cycle Font Button */}
-            <button
-              type="button"
-              onClick={handleFontCycle}
-              className="absolute bottom-2 left-2 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider"
-              title="Change Font Style"
+      <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400 mt-4 space-y-4">
+        <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block">Brand Showcase Card</label>
+        
+        {/* Dynamic CSS Brand Logo Card */}
+        <div className="bg-[#2B303A] rounded-2xl p-8 flex flex-col items-center justify-center min-h-[180px] shadow-xl border border-white/5 relative select-none">
+          <div className="text-center px-4 w-full">
+            <div 
+              style={{ fontFamily: activeFonts[fontIdx].family }}
+              className={`${activeFonts[fontIdx].className} drop-shadow-lg`}
             >
-              Font: {fonts[fontIdx].name}
-            </button>
-
-            {/* Regenerate Button */}
-            <button
-              type="button"
-              onClick={handleGenerateImage}
-              disabled={generatingImage}
-              className="absolute top-2 right-2 h-8 w-8 rounded-full bg-[#20262e]/80 text-cyan-400 flex items-center justify-center hover:bg-[#20262e] transition-colors z-10"
-              title="Regenerate image"
-            >
-              {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            </button>
+              {conceptName || "Concept Name"}
+            </div>
           </div>
-        ) : image && imageLoadError ? (
-          <div className={`relative rounded-xl overflow-hidden ring-1 ring-black/5 ${getConceptAspectRatioClass(solutionOverview, conceptName)} bg-card border border-cyan-400/20 flex flex-col items-center justify-center p-6 text-center`}>
-            <AlertCircle className="h-8 w-8 text-cyan-400 mb-2" />
-            <div className="text-white font-bold text-xs">Image Generation Overloaded</div>
-            <div className="text-slate-400 text-[10px] mt-1 max-w-[240px] leading-relaxed">
-              The free image generation server is currently busy. Please wait a moment and click retry.
-            </div>
-            <Button
-              type="button"
-              onClick={handleGenerateImage}
-              disabled={generatingImage}
-              className="mt-3 bg-cyan-400 text-[#20262e] hover:bg-cyan-300 text-xs font-bold px-4 py-1.5 h-8 rounded-lg"
-            >
-              {generatingImage ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
-              Retry generation
-            </Button>
-          </div>
-        ) : (
-          <Button
+
+          {/* Cycle Font Button */}
+          <button
             type="button"
-            onClick={handleGenerateImage}
-            disabled={!canGenerateImage || generatingImage}
-            variant="outline"
-            className="w-full border-cyan-400/40 text-cyan-500 hover:bg-cyan-400/10 hover:text-cyan-600 font-semibold rounded-lg h-11 disabled:opacity-40"
+            onClick={handleFontCycle}
+            className="absolute bottom-2 left-2 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider"
+            title="Cycle Font Style"
           >
-            {generatingImage ? (
-              <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Generating image...</span>
-            ) : (
-              <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Generate concept image</span>
-            )}
-          </Button>
-        )}
-        {!canGenerateImage && !image && (
-          <p className="text-slate-400 text-[10px] mt-1.5 text-center">Write at least a sentence of your solution to enable image generation.</p>
+            Font: {activeFonts[fontIdx].name}
+          </button>
+        </div>
+
+        {/* Cohesive Features Summary Board inside the Brand System */}
+        {completeFeatures.length > 0 && (
+          <div className="bg-[#1C2028] rounded-xl p-5 shadow-inner border border-white/5 space-y-4">
+            <h3 
+              style={{ fontFamily: activeFonts[fontIdx].family }}
+              className="text-cyan-400 text-xs font-bold uppercase tracking-wider mb-2"
+            >
+              Core Brand Features
+            </h3>
+            <div className="space-y-4">
+              {completeFeatures.map((f, i) => (
+                <div key={i} className="border-l border-cyan-400/30 pl-4 py-0.5">
+                  <h4 
+                    style={{ fontFamily: activeFonts[fontIdx].family }}
+                    className="text-white font-semibold text-sm capitalize"
+                  >
+                    {f.title}
+                  </h4>
+                  <p className="text-slate-400 text-xs mt-0.5 leading-relaxed">
+                    {f.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
@@ -248,7 +237,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
         className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-bold rounded-lg h-14 mt-5 shadow-lg disabled:opacity-40"
       >
         {loading ? (
-          <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Generating your concept...</span>
+          <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Synthesizing final concept...</span>
         ) : (
           <span className="flex items-center gap-2">Present final concept <ArrowRight className="h-5 w-5" /></span>
         )}

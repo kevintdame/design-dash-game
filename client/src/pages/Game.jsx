@@ -92,10 +92,8 @@ export default function Game() {
     setRatingLoading(true);
     setError(null);
     try {
-      const featuresWithImages = await generateFeatureImages(c.features, domain);
-      const fullConcept = { ...c, features: featuresWithImages };
-      const r = await rateFinalConcept(challenge, fullConcept);
-      setConcept(fullConcept);
+      const r = await rateFinalConcept(challenge, c);
+      setConcept(c);
       setRatings(r);
       setStage("results");
     } catch (e) {

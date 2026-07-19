@@ -217,17 +217,12 @@ export default function MultiplayerGame() {
   async function submitConcept(conceptToSubmit) {
     setError(null);
     try {
-      const featuresWithImages = await generateFeatureImages(
-        conceptToSubmit.features || [],
-        room.domain
-      );
-      
       const res = await fetch(`/api/rooms/${room.id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           playerName: playerName.trim(),
-          concept: { ...conceptToSubmit, features: featuresWithImages }
+          concept: conceptToSubmit
         })
       });
       if (!res.ok) throw new Error("Failed to submit concept");
