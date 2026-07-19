@@ -236,9 +236,35 @@ const offlineDialogues = {
 };
 
 function assignCustomerImage(challenge) {
-  const name = challenge.customer_name || "Alex Taylor";
-  // DiceBear open-peeps style provides billions of distinct, modern hand-drawn character avatars
-  return `https://api.dicebear.com/7.x/open-peeps/svg?seed=${encodeURIComponent(name)}`;
+  const name = challenge.customer_name || "";
+  const role = challenge.customer_role || "";
+  const isFemale = /woman|female|lady|girl|mother|architect|teacher|coordinator/i.test(role) || /evelyn|sarah|elena|lisa|sophia|mia|olivia/i.test(name);
+  const isSenior = /retired|senior|elderly|grandfather|grandmother|70|74/i.test(role + " " + challenge.customer_persona);
+  const isYoung = /student|kid|teen|child|young|20/i.test(role + " " + challenge.customer_persona);
+
+  const ageGroup = isSenior ? "senior" : isYoung ? "young" : "middle";
+
+  if (isFemale) {
+    if (ageGroup === "young") {
+      return Math.random() > 0.5
+        ? "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/8d87fecbd_generated_image.png"
+        : "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/b7f321485_generated_image.png";
+    } else if (ageGroup === "senior") {
+      return "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/9cb914b32_generated_image.png";
+    } else {
+      return "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/e5020d6de_generated_image.png";
+    }
+  } else {
+    if (ageGroup === "young") {
+      return Math.random() > 0.5
+        ? "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/c52c6f05f_generated_image.png"
+        : "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/ba3ccd9e9_generated_image.png";
+    } else if (ageGroup === "senior") {
+      return "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/a36c1d7cd_generated_image.png";
+    } else {
+      return "https://media.base44.com/images/public/6a5962edf3c7c68b316e8e83/f150d8909_generated_image.png";
+    }
+  }
 }
 
 // ----------------------------------------------------

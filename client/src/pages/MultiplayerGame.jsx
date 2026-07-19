@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CustomerAvatar from "@/components/designGame/CustomerAvatar";
+// No CustomerAvatar
 
 function TimerBanner({ deadline, onTimeout }) {
   const [timeLeft, setTimeLeft] = useState("");
@@ -559,7 +559,11 @@ export default function MultiplayerGame() {
                           <span className="text-2xl font-black text-amber-500 w-6">
                             {rankIdx === 0 ? "🥇" : rankIdx === 1 ? "🥈" : rankIdx === 2 ? "🥉" : `${rankIdx + 1}`}
                           </span>
-                          <CustomerAvatar name={p.name} className="h-11 w-11 border border-slate-200" />
+                          <div className="h-11 w-11 rounded-xl bg-[#20262e] border border-slate-200 flex items-center justify-center shrink-0 shadow-md">
+                            <span className="text-sm font-extrabold text-cyan-400 font-display">
+                              {p.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
                           <div>
                             <h3 className="font-extrabold text-base text-slate-800">{p.name}</h3>
                             <p className="text-xs text-slate-500 font-semibold truncate max-w-[180px]">
@@ -581,7 +585,19 @@ export default function MultiplayerGame() {
               <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden">
                 <CardHeader>
                   <div className="flex items-center gap-3">
-                    <CustomerAvatar name={room.challenge.customer_name} className="h-10 w-10 border border-slate-200" />
+                    {room.challenge.customer_image ? (
+                      <img
+                        src={room.challenge.customer_image}
+                        alt={room.challenge.customer_name}
+                        className="h-10 w-10 rounded-xl object-cover shadow-sm border border-slate-200"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded-xl bg-[#20262e] flex items-center justify-center border border-slate-200">
+                        <span className="text-sm font-extrabold text-cyan-400">
+                          {room.challenge.customer_name.charAt(0)}
+                        </span>
+                      </div>
+                    )}
                     <CardTitle className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
                       💬 Customer Feedback ({room.challenge.customer_name})
                     </CardTitle>
