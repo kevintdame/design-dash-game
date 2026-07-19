@@ -20,7 +20,7 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
         </motion.div>
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 font-display text-white">
-            Design Dash
+            Concept Jam
           </h1>
           <p className="text-slate-400 text-sm leading-relaxed max-w-xs mx-auto">
             Solve real-world design challenges and pitch your ideas to virtual customers.
@@ -41,11 +41,11 @@ export default function ModeSelectScreen({ onSelectSingle, onSelectMulti, onPort
             </div>
             <div className="flex-1 space-y-1 text-left">
               <div className="font-extrabold text-base flex items-center justify-between text-card-foreground">
-                <span>Single Player Dash</span>
+                <span>Single Player Jam</span>
                 <ArrowRight className="h-5 w-5 text-slate-400" />
               </div>
               <p className="text-slate-500 text-xs font-semibold leading-relaxed">
-                Take on a design dash solo and pitch your final solution to a virtual customer.
+                Take on a concept jam solo and pitch your final solution to a virtual customer.
               </p>
             </div>
           </CardContent>

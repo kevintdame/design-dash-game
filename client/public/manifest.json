@@ -1,7 +1,7 @@
 {
-  "name": "Design Dash Game",
-  "short_name": "DesignDash",
-  "description": "A fun, fast-paced design thinking sprint game.",
+  "name": "Concept Jam Game",
+  "short_name": "ConceptJam",
+  "description": "A fun, fast-paced concept jam game.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
