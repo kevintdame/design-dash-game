@@ -898,8 +898,15 @@ app.post('/api/generate-feature-images', async (req, res) => {
         const iconSnippet = await expandFeatureVisualPrompt(f.title, f.description, domain);
         console.log(`Feature icon translation for "${f.title}":`, iconSnippet);
         
-        // Exact copy of the clean, high-contrast flat vector icon structure with pure black background
-        const prompt = `A centered flat 2D vector graphic icon on a solid black (#000000) background. The icon shows a simple, stylized vector outline of: ${iconSnippet}. Colors: bright electric cyan (#00d4ff) and solid white accents. Swiss minimalist flat design style, simple geometric shapes, clean sharp bold vector outlines, solid flat fills, absolutely no soft gradients, no airbrushing, no glow effects, no 3D shading, no highlights, no drop shadows, absolutely no text, no letters, no words.`;
+        const prompt = `A centered, simple, flat 2D vector graphic icon on a solid black (#000000) background.
+STYLE GUIDE:
+- Style: Minimalist 2D Swiss vector icon.
+- Line/Fill Style: Clean, thin white vector outlines with a single bright electric cyan (#00d4ff) accent detail. No fills, no gradients, no 3D effects, no shadows, no colors other than pure white and electric cyan.
+- Example 1 (Conversational): A simple white outline of a speech bubble with a tiny electric cyan soundwave line inside it.
+- Example 2 (Low Cost): A simple white outline of a coin with an electric cyan slash mark through the center.
+- Example 3 (Aesthetic): A simple white outline of a star with an electric cyan sparkle highlight in the corner.
+
+SUBJECT TO DRAW: A simple white outline of: ${iconSnippet}, with a single electric cyan (#00d4ff) accent detail.`;
         const image_url = await generateImageBase64(prompt, 512, 512);
         return { ...f, image_url };
       })
