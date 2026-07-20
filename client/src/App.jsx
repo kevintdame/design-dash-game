@@ -10,6 +10,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Game from './pages/Game';
 import Portfolio from './pages/Portfolio';
 import PortfolioDetail from './pages/PortfolioDetail';
+import MultiplayerGame from './pages/MultiplayerGame';
 
 
 const AuthenticatedApp = () => {
@@ -42,6 +43,7 @@ const AuthenticatedApp = () => {
     <Route path="/" element={<Game />} />
     <Route path="/portfolio" element={<Portfolio />} />
     <Route path="/portfolio/:id" element={<PortfolioDetail />} />
+    <Route path="/multiplayer" element={<MultiplayerGame />} />
 <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

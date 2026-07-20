@@ -188,7 +188,14 @@ export default function Game() {
                   <SplashScreen key="splash" onEnter={() => setStage("mode")} />
                 )}
                 {stage === "mode" && (
-                  <ModeSelectScreen key="mode" onSelect={(m) => { setMode(m); setStage("start"); }} />
+                  <ModeSelectScreen key="mode" onSelect={(m) => {
+                    if (m === "multi") {
+                      navigate("/multiplayer");
+                    } else {
+                      setMode(m);
+                      setStage("start");
+                    }
+                  }} />
                 )}
                 {stage === "start" && (
                   <StartScreen key="start" onStart={handleStart} loading={loadingChallenge} onPortfolio={() => navigate("/portfolio")} />
