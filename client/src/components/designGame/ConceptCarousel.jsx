@@ -32,8 +32,8 @@ function DonutChart({ label, score }) {
           {score}
         </div>
       </div>
-      {/* Label - bright cyan for readability */}
-      <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 mt-2.5 text-center">{label}</span>
+      {/* Label - bright accent pink for readability */}
+      <span className="text-[10px] font-black uppercase tracking-widest text-accent mt-2.5 text-center">{label}</span>
     </div>
   );
 }
@@ -58,7 +58,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
             {/* Top Half: Dark Header */}
             <div className="bg-[#1b143c] flex flex-col items-center justify-center p-8 flex-1 select-none min-h-[220px]">
               <div className="text-center px-4 w-full">
-                <div className="text-white font-display font-extrabold drop-shadow-md text-4xl sm:text-5xl break-words leading-tight uppercase tracking-tight">
+                <div className="text-white font-display font-extrabold drop-shadow-md text-5xl sm:text-6xl md:text-7xl break-words leading-none uppercase tracking-tight">
                   {concept.name || "Concept Name"}
                 </div>
               </div>
@@ -82,7 +82,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
           <div className="rounded-2xl overflow-hidden w-full flex flex-col min-h-[440px] flex-1 border border-white/5 shadow-inner">
             {/* Top Half: Dark Header */}
             <div className="bg-[#1b143c] py-6 px-8 flex flex-col justify-center select-none min-h-[100px]">
-              <h3 className="text-cyan-400 text-lg font-display font-extrabold uppercase tracking-wider">
+              <h3 className="text-accent text-center text-xl font-display font-extrabold uppercase tracking-wider w-full">
                 Features
               </h3>
             </div>
@@ -151,12 +151,12 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
 
         {/* Navigation toggles */}
         {idx > 0 && (
-          <button onClick={() => go(-1)} className="absolute left-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-[#20262e]/90 text-cyan-400 flex items-center justify-center shadow-md hover:bg-[#2c343d] transition-colors z-20">
+          <button onClick={() => go(-1)} className="absolute left-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-[#20262e]/90 text-accent flex items-center justify-center shadow-md hover:bg-[#2c343d] transition-colors z-20">
             <ChevronLeft className="h-5 w-5" />
           </button>
         )}
         {idx < total - 1 && (
-          <button onClick={() => go(1)} className="absolute right-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-[#20262e]/90 text-cyan-400 flex items-center justify-center shadow-md hover:bg-[#2c343d] transition-colors z-20">
+          <button onClick={() => go(1)} className="absolute right-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-[#20262e]/90 text-accent flex items-center justify-center shadow-md hover:bg-[#2c343d] transition-colors z-20">
             <ChevronRight className="h-5 w-5" />
           </button>
         )}
@@ -167,7 +167,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
           <button
             key={i}
             onClick={() => setIdx(i)}
-            className={`h-1.5 rounded-full transition-all ${i === idx ? "w-5 bg-cyan-400" : "w-1.5 bg-white/20"}`}
+            className={`h-1.5 rounded-full transition-all ${i === idx ? "w-5 bg-accent" : "w-1.5 bg-white/20"}`}
           />
         ))}
       </div>

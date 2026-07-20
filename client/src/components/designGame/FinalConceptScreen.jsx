@@ -16,7 +16,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
     { title: "", description: "" }
   ]);
 
-  const completeFeatures = features.filter((f) => f.title.trim().length > 2 && f.description.trim().length > 10);
+  const completeFeatures = features.filter((f) => f.title.trim().length > 0 && f.description.trim().length > 0);
   const ready = conceptName.trim().length > 0 && solutionOverview.trim().length > 0;
   const canGenerateImage = solutionOverview.trim().length >= 10;
 
@@ -82,8 +82,14 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
           <label className="text-[11px] font-extrabold uppercase tracking-wide text-primary-foreground">Concept Name <span className="text-primary-foreground/60 normal-case font-medium">(required)</span></label>
           <input
             value={conceptName}
-            onChange={(e) => setConceptName(e.target.value)}
-            placeholder="Give your concept a name..."
+            onChange={(e) => {
+              const val = e.target.value;
+              const words = val.trim().split(/\s+/).filter(Boolean);
+              if (words.length <= 4 || val.endsWith(" ")) {
+                setConceptName(val.slice(0, 30));
+              }
+            }}
+            placeholder="Give your concept a name (max 4 words)..."
             className="w-full mt-2 bg-transparent rounded-2xl px-3 py-2 text-base sm:text-sm font-bold text-primary-foreground placeholder:text-primary-foreground/50 outline-none focus:ring-2 focus:ring-white/60 transition-all"
           />
         </div>
