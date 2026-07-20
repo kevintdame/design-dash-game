@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import confetti from "canvas-confetti";
+import VibeBackground from "@/components/designGame/VibeBackground";
 // No CustomerAvatar
 
 function TimerBanner({ deadline, onTimeout }) {
@@ -66,10 +68,33 @@ export default function MultiplayerGame() {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
   const scrollRef = useRef(null);
+  const [expandedPlayer, setExpandedPlayer] = useState(null);
+  const firedConfetti = useRef(false);
+  const [savingPortfolio, setSavingPortfolio] = useState(false);
+  const [savedPortfolio, setSavedPortfolio] = useState(false);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [stage, mode]);
+
+  // Confetti trigger on results screen mount
+  useEffect(() => {
+    if (mode === "results" && room?.results) {
+      if (!firedConfetti.current) {
+        firedConfetti.current = true;
+        const colors = ["#a855f7", "#ff5c8a", "#fbbf24", "#ffffff", "#f472b6"];
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.5 },
+          colors,
+          scalar: 1.1
+        });
+      }
+    } else {
+      firedConfetti.current = false;
+    }
+  }, [mode, room]);
 
   // Setup form states
   const queryParams = new URLSearchParams(window.location.search);
@@ -241,9 +266,51 @@ export default function MultiplayerGame() {
     submitConcept(localConcept);
   }
 
+  // Save current player's concept to their portfolio
+  async function handleSavePortfolio() {
+    const myPlayerId = Object.keys(room.players).find(pid => room.players[pid].name === playerName);
+    if (!myPlayerId) return;
+    const me = room.players[myPlayerId];
+    if (!me || !me.concept || savedPortfolio) return;
+
+    const myScores = room.results.scores.find(s => s.player_id === myPlayerId) || { value: 70, creativity: 70, uniqueness: 70 };
+
+    setSavingPortfolio(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/portfolio/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          domain: room.domain,
+          challenge_title: room.challenge.title,
+          challenge_scenario: room.challenge.scenario,
+          customer_name: room.challenge.customer_name,
+          customer_role: room.challenge.customer_role,
+          concept_name: me.concept.name || "My Concept",
+          concept_image: me.concept.image || "",
+          problem: me.concept.problem || "",
+          solution_overview: me.concept.solutionOverview || "",
+          features: me.concept.features || [],
+          value_score: myScores.value,
+          creativity_score: myScores.creativity,
+          uniqueness_score: myScores.uniqueness,
+          review: room.results.review
+        })
+      });
+      if (!res.ok) throw new Error("Failed to save concept to portfolio");
+      setSavedPortfolio(true);
+    } catch (e) {
+      setError("Couldn't save to your portfolio. Please try again.");
+    } finally {
+      setSavingPortfolio(false);
+    }
+  }
+
   // Render components
   return (
     <div className="relative h-[100dvh] w-full bg-transparent overflow-hidden flex flex-col">
+      <VibeBackground />
       {mode !== "setup" && (
         <button
           type="button"
@@ -251,6 +318,8 @@ export default function MultiplayerGame() {
             if (window.confirm("Exit this room? Your current game session will be lost.")) {
               setMode("setup");
               setRoom(null);
+              setSavedPortfolio(false);
+              setSavingPortfolio(false);
             }
           }}
           className="absolute top-4 right-4 z-20 h-9 w-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 ring-1 ring-black/5 flex items-center justify-center transition-colors shadow-md"
@@ -532,136 +601,237 @@ export default function MultiplayerGame() {
           )}
 
           {/* BATTLE RESULTS / LEADERBOARD SCREEN */}
-          {mode === "results" && room && room.results && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              <div className="text-center space-y-2 mb-2">
-                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 font-display text-white">🏆 Pitch Battle Results</h1>
-                <p className="text-slate-400 text-sm font-medium">Evaluated by your customer, {room.challenge.customer_name}</p>
-              </div>
+          {mode === "results" && room && room.results && (() => {
+            const ranking = room.results.ranking;
+            const winnerPid = ranking[0];
+            const winner = room.players[winnerPid];
+            const winnerScores = room.results.scores.find(s => s.player_id === winnerPid) || { value: 0, creativity: 0, uniqueness: 0 };
+            const winnerAvgScore = Math.round((winnerScores.value + winnerScores.creativity + winnerScores.uniqueness) / 3);
 
-              {/* RATING LEADERS */}
-              <div className="space-y-3 font-sans">
-                {room.results.ranking.map((pid, rankIdx) => {
-                  const p = room.players[pid];
-                  const scores = room.results.scores.find(s => s.player_id === pid) || { value: 0, creativity: 0, uniqueness: 0 };
-                  const avgScore = Math.round((scores.value + scores.creativity + scores.uniqueness) / 3);
+            const myPlayerId = Object.keys(room.players).find(pid => room.players[pid].name === playerName);
+            const me = room.players[myPlayerId];
+            const hasConceptToSave = !!(me && me.concept);
 
-                  return (
-                    <Card key={pid} className={`bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden ${
-                      rankIdx === 0 ? "bg-gradient-to-tr from-accent/5 to-accent/15 border-accent/30" : ""
-                    }`}>
-                      <CardContent className="p-5 flex items-center justify-between">
-                        <div className="flex items-center space-x-3.5">
-                          <span className="text-2xl font-black text-amber-500 w-6">
-                            {rankIdx === 0 ? "🥇" : rankIdx === 1 ? "🥈" : rankIdx === 2 ? "🥉" : `${rankIdx + 1}`}
-                          </span>
-                          <div className="h-11 w-11 rounded-xl bg-[#20262e] border border-slate-200 flex items-center justify-center shrink-0 shadow-md">
-                            <span className="text-sm font-extrabold text-accent font-display">
-                              {p.name.charAt(0).toUpperCase()}
-                            </span>
+            return (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6 flex-1 flex flex-col justify-center py-4"
+              >
+                <div className="text-center space-y-2 mb-2">
+                  <motion.div
+                    initial={{ scale: 0.6, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 160, damping: 12 }}
+                    className="inline-flex items-center gap-1.5 text-yellow-300 mb-1"
+                  >
+                    <span className="text-xs font-extrabold uppercase tracking-widest">Showdown Completed</span>
+                  </motion.div>
+                  <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-1 font-display uppercase text-white">🏆 Game Results</h1>
+                  <p className="text-slate-400 text-xs font-semibold">Evaluated by {room.challenge.customer_name}</p>
+                </div>
+
+                {/* CHAMPION CARD */}
+                {winner && (
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1, type: "spring", stiffness: 140, damping: 12 }}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => setExpandedPlayer(expandedPlayer === winnerPid ? null : winnerPid)}
+                    className="relative cursor-pointer bg-gradient-to-br from-amber-400 to-pink-500 rounded-3xl p-6 ring-2 ring-amber-300 ring-offset-2 ring-offset-background shadow-2xl flex flex-col items-center text-center overflow-hidden"
+                    style={{ boxShadow: "0 10px 30px -8px rgba(251,191,36,0.6)" }}
+                  >
+                    <span className="text-5xl mb-2 drop-shadow">👑</span>
+                    <span className="text-xs font-black uppercase tracking-widest text-white/80">Squad Champion</span>
+                    <h2 className="text-3xl sm:text-4xl font-extrabold font-display text-white uppercase mt-1 tracking-wide drop-shadow">
+                      {winner.name}
+                    </h2>
+                    {winner.concept && (
+                      <p className="text-white/90 text-sm font-bold mt-1 max-w-xs line-clamp-1">
+                        {winner.concept.solutionOverview}
+                      </p>
+                    )}
+                    <div className="bg-white text-[#ff5c8a] font-extrabold text-sm px-4 py-1.5 rounded-full shadow-md mt-4 font-display">
+                      SCORE: {winnerAvgScore}
+                    </div>
+
+                    {/* Winner Detail Breakdown (expanded on tap) */}
+                    <AnimatePresence>
+                      {expandedPlayer === winnerPid && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="w-full border-t border-white/20 mt-4 pt-4 text-left space-y-3 overflow-hidden text-xs text-white"
+                        >
+                          {winner.concept ? (
+                            <>
+                              <p className="font-semibold leading-relaxed">
+                                <strong className="text-white/90 block text-[10px] uppercase tracking-wider">Problem Statement</strong> 
+                                {winner.concept.problem}
+                              </p>
+                              <p className="font-semibold leading-relaxed">
+                                <strong className="text-white/90 block text-[10px] uppercase tracking-wider">Solution Overview</strong> 
+                                {winner.concept.solutionOverview}
+                              </p>
+                              <div className="grid grid-cols-3 gap-2 pt-2 text-center text-[10px] uppercase font-bold text-white/80">
+                                <div className="bg-white/10 p-2 rounded-xl border border-white/10">
+                                  <span className="block text-white font-black text-base leading-none mb-1">{winnerScores.value}</span> Value
+                                </div>
+                                <div className="bg-white/10 p-2 rounded-xl border border-white/10">
+                                  <span className="block text-white font-black text-base leading-none mb-1">{winnerScores.creativity}</span> Unique
+                                </div>
+                                <div className="bg-white/10 p-2 rounded-xl border border-white/10">
+                                  <span className="block text-white font-black text-base leading-none mb-1">{winnerScores.uniqueness}</span> Design
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <p className="italic text-white/80 font-bold">Failed to submit a concept.</p>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+
+                {/* OTHER LEADERS LIST */}
+                {ranking.length > 1 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block pl-1">Leaderboard</span>
+                    <div className="space-y-2">
+                      {ranking.slice(1).map((pid, rankIdx) => {
+                        const p = room.players[pid];
+                        const scores = room.results.scores.find(s => s.player_id === pid) || { value: 0, creativity: 0, uniqueness: 0 };
+                        const avgScore = Math.round((scores.value + scores.creativity + scores.uniqueness) / 3);
+                        const displayRank = rankIdx + 2;
+
+                        return (
+                          <div key={pid} className="space-y-1">
+                            <motion.div
+                              whileHover={{ scale: 1.01 }}
+                              onClick={() => setExpandedPlayer(expandedPlayer === pid ? null : pid)}
+                              className="cursor-pointer bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center justify-between transition-colors shadow-lg"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <span className="text-lg font-black text-slate-400 w-5">
+                                  {displayRank === 2 ? "🥈" : displayRank === 3 ? "🥉" : `${displayRank}`}
+                                </span>
+                                <div>
+                                  <h3 className="font-extrabold text-sm text-white">{p.name}</h3>
+                                  {p.concept && (
+                                    <p className="text-[11px] text-slate-400 font-semibold truncate max-w-[200px]">
+                                      {p.concept.solutionOverview}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-base font-extrabold text-accent">{avgScore}</span>
+                              </div>
+                            </motion.div>
+
+                            {/* Runner-up detail breakdown (expanded on tap) */}
+                            <AnimatePresence>
+                              {expandedPlayer === pid && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-xs text-slate-350 space-y-3 overflow-hidden"
+                                >
+                                  {p.concept ? (
+                                    <>
+                                      <p className="font-semibold leading-relaxed text-slate-300">
+                                        <strong className="text-slate-400 block text-[9px] uppercase tracking-wider">Problem Statement</strong> 
+                                        {p.concept.problem}
+                                      </p>
+                                      <p className="font-semibold leading-relaxed text-slate-300">
+                                        <strong className="text-slate-400 block text-[9px] uppercase tracking-wider">Solution Overview</strong> 
+                                        {p.concept.solutionOverview}
+                                      </p>
+                                      <div className="grid grid-cols-3 gap-2 pt-2 text-center text-[9px] uppercase font-bold text-slate-400">
+                                        <div className="bg-slate-900/40 p-2 rounded-xl border border-white/5 text-slate-300">
+                                          <span className="block text-white font-black text-sm leading-none mb-1">{scores.value}</span> Value
+                                        </div>
+                                        <div className="bg-slate-900/40 p-2 rounded-xl border border-white/5 text-slate-300">
+                                          <span className="block text-white font-black text-sm leading-none mb-1">{scores.creativity}</span> Unique
+                                        </div>
+                                        <div className="bg-slate-900/40 p-2 rounded-xl border border-white/5 text-slate-300">
+                                          <span className="block text-white font-black text-sm leading-none mb-1">{scores.uniqueness}</span> Design
+                                        </div>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <p className="italic text-slate-500 font-bold">Failed to submit a concept.</p>
+                                  )}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
-                          <div>
-                            <h3 className="font-extrabold text-base text-slate-800">{p.name}</h3>
-                            <p className="text-xs text-slate-500 font-semibold truncate max-w-[180px]">
-                              {p.concept ? p.concept.solutionOverview : "Failed to submit"}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-2xl font-extrabold text-accent">{avgScore}</span>
-                          <span className="text-[9px] block text-slate-400 font-bold">AVG Rating</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
-              {/* CUSTOMER JUDGEMENT */}
-              <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden">
-                <CardHeader>
+                {/* CUSTOMER JUDGEMENT */}
+                <div className="relative bg-white/5 border border-white/10 rounded-3xl p-5 shadow-xl flex flex-col gap-3">
                   <div className="flex items-center gap-3">
                     {room.challenge.customer_image ? (
                       <img
                         src={room.challenge.customer_image}
                         alt={room.challenge.customer_name}
-                        className="h-10 w-10 rounded-xl object-cover shadow-sm border border-slate-200"
+                        className="h-10 w-10 rounded-2xl object-cover shadow-md border border-white/10"
                       />
                     ) : (
-                      <div className="h-10 w-10 rounded-xl bg-[#20262e] flex items-center justify-center border border-slate-200">
+                      <div className="h-10 w-10 rounded-2xl bg-slate-800 flex items-center justify-center border border-white/10">
                         <span className="text-sm font-extrabold text-accent">
                           {room.challenge.customer_name.charAt(0)}
                         </span>
                       </div>
                     )}
-                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-accent">
-                      💬 Customer Feedback ({room.challenge.customer_name})
-                    </CardTitle>
+                    <div>
+                      <span className="text-[9px] block text-accent font-extrabold uppercase tracking-widest">Customer Verdict</span>
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">{room.challenge.customer_name}</h4>
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent className="text-xs font-semibold leading-relaxed text-slate-600 italic">
-                  "{room.results.review}"
-                </CardContent>
-              </Card>
+                  <p className="text-xs font-semibold leading-relaxed text-slate-300 italic pl-1">
+                    "{room.results.review}"
+                  </p>
+                </div>
 
-              {/* SIDE-BY-SIDE CONCEPTS COMPARE */}
-              <Card className="bg-card text-card-foreground border border-slate-200/5 shadow-lg rounded-2xl ring-1 ring-black/5 overflow-hidden">
-                <CardHeader>
-                  <CardTitle className="text-sm font-extrabold text-card-foreground">Compare Submissions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {Object.keys(room.players).map(pid => {
-                    const p = room.players[pid];
-                    const scores = room.results.scores.find(s => s.player_id === pid) || { value: 0, creativity: 0, uniqueness: 0 };
-                    
-                    return (
-                      <div key={pid} className="border-t border-slate-100 pt-4 first:border-0 first:pt-0">
-                        <h4 className="font-bold text-sm text-accent">{p.name}'s Concept</h4>
-                        {p.concept ? (
-                          <div className="mt-2 space-y-2.5 text-xs">
-                            <p className="text-slate-600 font-semibold"><strong>Problem:</strong> {p.concept.problem}</p>
-                            <p className="text-slate-600 font-semibold"><strong>Solution:</strong> {p.concept.solutionOverview}</p>
-                            <div className="grid grid-cols-3 gap-2 pt-2 text-center text-[9px] uppercase font-bold text-slate-400">
-                              <div className="bg-slate-50 p-1.5 rounded-lg border border-slate-100 text-slate-500">
-                                <span className="block text-slate-800 font-black text-sm">{scores.value}</span> Value
-                              </div>
-                              <div className="bg-slate-50 p-1.5 rounded-lg border border-slate-100 text-slate-500">
-                                <span className="block text-slate-800 font-black text-sm">{scores.creativity}</span> Unique
-                              </div>
-                              <div className="bg-slate-50 p-1.5 rounded-lg border border-slate-100 text-slate-500">
-                                <span className="block text-slate-800 font-black text-sm">{scores.uniqueness}</span> Design
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <p className="text-rose-500 text-xs italic mt-1 font-bold">Player did not finish in time.</p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-
-              <div className="flex gap-4 pt-2">
-                <Button 
-                  onClick={() => { setMode("setup"); setRoom(null); }}
-                  className="flex-1 bg-accent hover:bg-accent/90 text-white font-bold h-12 rounded-lg shadow-md transition-transform active:scale-[0.98]"
-                >
-                  🎮 Play Again
-                </Button>
-                <Button 
-                  onClick={() => navigate("/")}
-                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold h-12 rounded-lg shadow-md transition-transform active:scale-[0.98]"
-                >
-                  🏠 Single Player
-                </Button>
-              </div>
-            </motion.div>
-          )}
+                {/* NAVIGATION BUTTONS */}
+                <div className="space-y-2 pt-2">
+                  {hasConceptToSave && (
+                    <>
+                      {!savedPortfolio ? (
+                        <Button
+                          onClick={handleSavePortfolio}
+                          disabled={savingPortfolio}
+                          className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 font-bold rounded-2xl h-12 shadow-xl shadow-primary/30 disabled:opacity-40 text-sm"
+                        >
+                          {savingPortfolio ? "Saving..." : "💾 Save to portfolio"}
+                        </Button>
+                      ) : (
+                        <div className="text-center py-2 text-emerald-400 font-extrabold text-xs flex items-center justify-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
+                          ✅ Saved to your portfolio
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  <Button 
+                    onClick={() => navigate("/")}
+                    className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold h-12 rounded-2xl shadow-md transition-transform active:scale-[0.98] text-sm"
+                  >
+                    Play Again
+                  </Button>
+                </div>
+              </motion.div>
+            );
+          })()}
 
         </div>
       </div>

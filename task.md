@@ -15,3 +15,7 @@
 - [x] Create PWA configuration files (manifest.json, sw.js, icon.svg) in client/public (Step B1)
 - [x] Register PWA service worker in client main.jsx (Step B1)
 - [x] Document deployment and installation guide in DEPLOYMENT.md
+- [x] Implement VibeBackground, canvas-confetti, and celebratory layout in MultiplayerGame.jsx results screen
+- [x] Add interactive expand-on-tap functionality to leaderboard cards to view details
+- [x] Verify build and prepare for Render deploy
+
