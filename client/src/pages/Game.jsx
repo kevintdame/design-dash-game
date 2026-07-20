@@ -3,21 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import ProgressHeader, { STAGES } from "@/components/designGame/ProgressHeader";
 import StartScreen from "@/components/designGame/StartScreen";
+import SplashScreen from "@/components/designGame/SplashScreen";
+import ModeSelectScreen from "@/components/designGame/ModeSelectScreen";
 import ChallengeScreen from "@/components/designGame/ChallengeScreen";
 import InterviewScreen from "@/components/designGame/InterviewScreen";
 import BrainstormScreen from "@/components/designGame/BrainstormScreen";
 import FinalConceptScreen from "@/components/designGame/FinalConceptScreen";
 import ResultsScreen from "@/components/designGame/ResultsScreen";
+import { base44 } from "@/api/base44Client";
 import { generateChallenge, rateFinalConcept, synthesizeInsights, generateFeatureImages } from "@/lib/designGame";
-import InsightWall from "@/components/designGame/InsightWall";
+import VibeBackground from "@/components/designGame/VibeBackground";
 import { X } from "lucide-react";
-import ModeSelectScreen from "@/components/designGame/ModeSelectScreen";
 
 export default function Game() {
   const navigate = useNavigate();
-  const [stage, setStage] = useState("select");
+  const [stage, setStage] = useState("splash");
   const [challenge, setChallenge] = useState(null);
   const [domain, setDomain] = useState(null);
+  const [mode, setMode] = useState(null);
   const [qa, setQa] = useState([]);
   const [ideas, setIdeas] = useState(["", "", ""]);
   const [feedbacks, setFeedbacks] = useState([]);
@@ -37,7 +40,7 @@ export default function Game() {
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [stage]);
-  const showProgress = stage !== "select" && stage !== "start";
+  const showProgress = !["start", "splash", "mode"].includes(stage);
 
   async function handleStart(d) {
     setLoadingChallenge(true);
@@ -55,9 +58,10 @@ export default function Game() {
   }
 
   function handleRestart() {
-    setStage("select");
+    setStage("start");
     setChallenge(null);
     setDomain(null);
+    setMode(null);
     setQa([]);
     setIdeas(["", "", ""]);
     setFeedbacks([]);
@@ -92,8 +96,10 @@ export default function Game() {
     setRatingLoading(true);
     setError(null);
     try {
-      const r = await rateFinalConcept(challenge, c);
-      setConcept(c);
+      const featuresWithImages = await generateFeatureImages(c.features, domain);
+      const fullConcept = { ...c, features: featuresWithImages };
+      const r = await rateFinalConcept(challenge, fullConcept);
+      setConcept(fullConcept);
       setRatings(r);
       setStage("results");
     } catch (e) {
@@ -108,29 +114,22 @@ export default function Game() {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/portfolio/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          domain,
-          challenge_title: challenge.title,
-          challenge_scenario: challenge.scenario,
-          customer_name: challenge.customer_name,
-          customer_role: challenge.customer_role,
-          concept_name: concept.name,
-          concept_image: concept.image,
-          concept_font_idx: concept.fontIdx !== undefined ? concept.fontIdx : 0,
-          concept_font_pool: concept.fontPool,
-          problem: concept.problem,
-          solution_overview: concept.solutionOverview,
-          features: concept.features,
-          value_score: ratings.value,
-          creativity_score: ratings.creativity,
-          uniqueness_score: ratings.uniqueness,
-          review: ratings.review
-        })
+      await base44.entities.GameSession.create({
+        domain,
+        challenge_title: challenge.title,
+        challenge_scenario: challenge.scenario,
+        customer_name: challenge.customer_name,
+        customer_role: challenge.customer_role,
+        concept_name: concept.name,
+        concept_image: concept.image,
+        problem: concept.problem,
+        solution_overview: concept.solutionOverview,
+        features: concept.features,
+        value_score: ratings.value,
+        creativity_score: ratings.creativity,
+        uniqueness_score: ratings.uniqueness,
+        review: ratings.review
       });
-      if (!res.ok) throw new Error("Couldn't save to portfolio.");
       setSaved(true);
     } catch (e) {
       setError("Couldn't save to your portfolio. Please try again.");
@@ -141,26 +140,27 @@ export default function Game() {
 
   return (
     <div className="relative h-[100dvh] w-full bg-transparent overflow-hidden flex flex-col">
+      <VibeBackground />
+      {showProgress && (
+        <button
+          type="button"
+          onClick={() => {
+            if (window.confirm("Exit this game and start a new one? Your current progress will be lost.")) {
+              handleRestart();
+            }
+          }}
+          className="absolute top-4 right-4 z-20 h-9 w-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 ring-1 ring-black/5 flex items-center justify-center transition-colors shadow-md"
+          aria-label="Exit game"
+          title="Exit game"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
       <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
-        <div className="min-h-full flex flex-col px-4 pt-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto">
+        <div className="min-h-full flex flex-col px-4 pt-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] max-w-lg w-full mx-auto">
           {showProgress && (
-            <div className="flex items-center justify-between gap-4 mb-4 shrink-0">
-              <div className="flex-1">
-                <ProgressHeader currentIndex={currentIndex < 0 ? 0 : currentIndex} />
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  if (window.confirm("Exit this game and start a new one? Your current progress will be lost.")) {
-                    handleRestart();
-                  }
-                }}
-                className="h-9 w-9 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition-colors shadow-md border border-slate-700/60 shrink-0"
-                aria-label="Exit game"
-                title="Exit game"
-              >
-                <X className="h-4 w-4" />
-              </button>
+            <div className="mb-4 shrink-0">
+              <ProgressHeader currentIndex={currentIndex < 0 ? 0 : currentIndex} />
             </div>
           )}
 
@@ -170,7 +170,8 @@ export default function Game() {
             </div>
           )}
 
-          <div className="flex-1 flex flex-col justify-center">
+          <div className="flex-1 flex flex-col min-h-0">
+           <div className="my-auto w-full">
             {insightsLoading ? (
               <div className="flex flex-col items-center justify-center text-center py-10">
                 <div className="h-10 w-10 border-4 border-black/10 border-t-primary rounded-full animate-spin mb-4" />
@@ -179,24 +180,14 @@ export default function Game() {
               </div>
             ) : (
               <AnimatePresence mode="wait">
-                {stage === "select" && (
-                  <ModeSelectScreen 
-                    onSelectSingle={() => setStage("start")} 
-                    onSelectMulti={() => navigate("/multiplayer")} 
-                    onPortfolio={() => navigate("/portfolio")} 
-                  />
+                {stage === "splash" && (
+                  <SplashScreen key="splash" onEnter={() => setStage("mode")} />
+                )}
+                {stage === "mode" && (
+                  <ModeSelectScreen key="mode" onSelect={(m) => { setMode(m); setStage("start"); }} />
                 )}
                 {stage === "start" && (
-                  <div className="flex flex-col w-full">
-                    <StartScreen key="start" onStart={handleStart} loading={loadingChallenge} onPortfolio={() => navigate("/portfolio")} />
-                    <button
-                      type="button"
-                      onClick={() => setStage("select")}
-                      className="mt-4 text-slate-500 hover:text-white text-xs font-semibold transition-colors"
-                    >
-                      ← Back to Mode Selection
-                    </button>
-                  </div>
+                  <StartScreen key="start" onStart={handleStart} loading={loadingChallenge} onPortfolio={() => navigate("/portfolio")} />
                 )}
                 {stage === "challenge" && challenge && (
                   <ChallengeScreen key="challenge" challenge={challenge} onContinue={() => setStage("interview")} />
@@ -247,6 +238,7 @@ export default function Game() {
                 )}
               </AnimatePresence>
             )}
+           </div>
           </div>
         </div>
       </div>

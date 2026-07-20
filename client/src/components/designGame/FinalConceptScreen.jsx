@@ -1,67 +1,24 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Rocket, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, ImageIcon, Sparkles, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// Categorized pools to ensure 100% variety across different visual vibes
-export const techPool = [
-  { family: "'Orbitron', sans-serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-black uppercase" },
-  { family: "'Space Grotesk', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-bold uppercase" },
-  { family: "'Space Mono', monospace", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-bold uppercase" },
-  { family: "'Outfit', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-black uppercase" }
-];
-
-export const luxuryPool = [
-  { family: "'Cinzel', serif", className: "tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-extrabold uppercase" },
-  { family: "'Prata', serif", className: "text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal capitalize" },
-  { family: "'Lora', serif", className: "italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-semibold capitalize" },
-  { family: "'Cormorant Garamond', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-bold capitalize" }
-];
-
-export const playfulPool = [
-  { family: "'Fredoka', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-extrabold lowercase" },
-  { family: "'Lilita One', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-normal uppercase" },
-  { family: "'Rubik Bubbles', sans-serif", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-400 font-normal" },
-  { family: "'Nunito', sans-serif", className: "tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-black capitalize" }
-];
-
-export const creativePool = [
-  { family: "'Pacifico', cursive", className: "text-transparent bg-clip-text bg-gradient-to-tr from-white to-cyan-300 font-normal capitalize" },
-  { family: "'Sacramento', cursive", className: "text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-400 font-normal" },
-  { family: "'Righteous', sans-serif", className: "tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-400 font-normal uppercase" },
-  { family: "'Playfair Display', serif", className: "italic text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-300 font-bold capitalize" }
-];
-
-export const fontPool = [...techPool, ...luxuryPool, ...playfulPool, ...creativePool];
+import { generateConceptImage } from "@/lib/designGame";
 
 export default function FinalConceptScreen({ challenge, domain, onSubmit, loading }) {
   const [conceptName, setConceptName] = useState("");
   const [problem, setProblem] = useState("");
   const [solutionOverview, setSolutionOverview] = useState("");
-  const [fontIdx, setFontIdx] = useState(0);
-
-  // Allow cycling through all 16 interesting fonts available in the pool
-  const [activeFonts] = useState(() => {
-    // Shuffle the full font pool so the cycle order is different every session
-    const pool = [...fontPool].sort(() => Math.random() - 0.5);
-    return pool.map((f) => {
-      // Extract clean font name from the family string (e.g. "'Lilita One', sans-serif" -> "Lilita One")
-      const nameMatch = f.family.match(/'([^']+)'/);
-      return {
-        ...f,
-        name: nameMatch ? nameMatch[1] : "Custom"
-      };
-    });
-  });
-
+  const [image, setImage] = useState(null);
+  const [generatingImage, setGeneratingImage] = useState(false);
   const [features, setFeatures] = useState([
     { title: "", description: "" },
     { title: "", description: "" },
     { title: "", description: "" }
   ]);
 
-  const completeFeatures = features.filter((f) => f.title.trim().length > 0);
+  const completeFeatures = features.filter((f) => f.title.trim().length > 2 && f.description.trim().length > 10);
   const ready = conceptName.trim().length > 0 && solutionOverview.trim().length > 0;
+  const canGenerateImage = solutionOverview.trim().length >= 10;
 
   function updateFeature(i, field, val) {
     const next = [...features];
@@ -69,9 +26,18 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
     setFeatures(next);
   }
 
-  const handleFontCycle = () => {
-    setFontIdx((prev) => (prev + 1) % activeFonts.length);
-  };
+  async function handleGenerateImage() {
+    if (!canGenerateImage || generatingImage) return;
+    setGeneratingImage(true);
+    try {
+      const url = await generateConceptImage(solutionOverview, domain);
+      setImage(url);
+    } catch {
+      setImage(null);
+    } finally {
+      setGeneratingImage(false);
+    }
+  }
 
   function submit() {
     if (!ready || loading) return;
@@ -79,9 +45,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       name: conceptName.trim(),
       problem: problem.trim(),
       solutionOverview: solutionOverview.trim(),
-      image: null,
-      fontIdx,
-      fontPool: activeFonts, // Save the selected 4 font list to the database
+      image,
       features: completeFeatures.map((f) => ({ title: f.title.trim(), description: f.description.trim() }))
     });
   }
@@ -93,146 +57,127 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       exit={{ opacity: 0, x: -30 }}
       className="max-w-md mx-auto"
     >
-      <motion.div animate={{ y: [0, -3, 0] }} transition={{ duration: 1.8, repeat: Infinity, repeatDelay: 1.5 }} className="flex items-center gap-2 text-cyan-400 mb-2">
-        <Rocket className="h-4 w-4" />
-        <span className="text-xs font-semibold uppercase tracking-widest">Final Concept</span>
-      </motion.div>
-      <p className="text-white text-sm mb-4">
-        Shape your best idea into a structured concept to present to {challenge.customer_name.split(" ")[0]}.
+      <div className="text-center mb-3">
+        <motion.div
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 160, damping: 12 }}
+          className="inline-flex items-center gap-1.5 text-yellow-300"
+        >
+          <Sparkles className="h-4 w-4" />
+          <span className="text-xs font-extrabold uppercase tracking-widest">Final Concept</span>
+          <Sparkles className="h-4 w-4" />
+        </motion.div>
+      </div>
+      <h2 className="text-4xl sm:text-5xl font-extrabold font-display uppercase leading-none mb-2 text-center">
+        <span className="text-foreground">Shape your</span>{" "}
+        <span className="text-accent">concept</span>
+      </h2>
+      <p className="text-foreground/70 text-sm mb-5 text-center">
+        Turn your best idea into a structured concept to present to {challenge.customer_name.split(" ")[0]}.
       </p>
 
       <div className="space-y-4">
-        <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400">
-          <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500">Concept Name <span className="text-slate-400 normal-case font-medium">(required)</span></label>
+        <div className="bg-gradient-to-br from-primary to-accent rounded-3xl p-4 shadow-lg shadow-primary/30">
+          <label className="text-[11px] font-extrabold uppercase tracking-wide text-primary-foreground">Concept Name <span className="text-primary-foreground/60 normal-case font-medium">(required)</span></label>
           <input
             value={conceptName}
             onChange={(e) => setConceptName(e.target.value)}
             placeholder="Give your concept a name..."
-            className="w-full mt-1 text-base sm:text-sm font-semibold text-card-foreground placeholder:text-slate-300 outline-none"
+            className="w-full mt-2 bg-transparent rounded-2xl px-3 py-2 text-base sm:text-sm font-bold text-primary-foreground placeholder:text-primary-foreground/50 outline-none focus:ring-2 focus:ring-white/60 transition-all"
           />
         </div>
 
-        <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5">
-          <label className="text-[11px] font-bold uppercase tracking-wide text-slate-500">User Problem <span className="text-slate-400 normal-case font-medium">(optional)</span></label>
+        <div className="bg-gradient-to-br from-accent to-primary rounded-3xl p-4 shadow-lg shadow-accent/30">
+          <label className="text-[11px] font-extrabold uppercase tracking-wide text-primary-foreground">User Problem <span className="text-primary-foreground/60 normal-case font-medium">(optional)</span></label>
           <textarea
             value={problem}
             onChange={(e) => setProblem(e.target.value)}
             placeholder="The core problem your customer is facing..."
-            rows={3}
-            className="w-full mt-1 text-base sm:text-sm text-card-foreground placeholder:text-slate-300 outline-none resize-none leading-relaxed"
+            rows={2}
+            className="w-full mt-2 bg-transparent rounded-2xl px-3 py-2 text-base sm:text-sm text-primary-foreground placeholder:text-primary-foreground/50 outline-none focus:ring-2 focus:ring-white/60 transition-all resize-none leading-relaxed"
           />
         </div>
 
-        <div className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5 ring-2 ring-cyan-400">
-          <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500">Solution Overview <span className="text-slate-400 normal-case font-medium">(required)</span></label>
+        <div className="bg-gradient-to-br from-primary to-accent rounded-3xl p-4 shadow-lg shadow-primary/30">
+          <label className="text-[11px] font-extrabold uppercase tracking-wide text-primary-foreground">Solution Overview <span className="text-primary-foreground/60 normal-case font-medium">(required)</span></label>
           <textarea
             value={solutionOverview}
             onChange={(e) => setSolutionOverview(e.target.value)}
-            placeholder="A description of your solution..."
-            rows={5}
-            className="w-full mt-1 text-base sm:text-sm text-card-foreground placeholder:text-slate-300 outline-none resize-none leading-relaxed"
+            placeholder="A high-level description of your solution..."
+            rows={3}
+            className="w-full mt-2 bg-transparent rounded-2xl px-3 py-2 text-base sm:text-sm text-primary-foreground placeholder:text-primary-foreground/50 outline-none focus:ring-2 focus:ring-white/60 transition-all resize-none leading-relaxed"
           />
+          <div className="mt-3">
+            {image ? (
+              <div className="relative rounded-2xl overflow-hidden ring-1 ring-border">
+                <img src={image} alt="Concept visual" className="w-full aspect-[4/3] object-cover" />
+                <button
+                  type="button"
+                  onClick={handleGenerateImage}
+                  disabled={generatingImage}
+                  className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/80 text-primary flex items-center justify-center hover:bg-white transition-colors"
+                  title="Regenerate image"
+                >
+                  {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                </button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleGenerateImage}
+                disabled={!canGenerateImage || generatingImage}
+                className="w-full bg-white/15 text-primary-foreground hover:bg-white/25 font-bold rounded-2xl h-11 ring-1 ring-white/30 disabled:opacity-40"
+              >
+                {generatingImage ? (
+                  <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Generating image...</span>
+                ) : (
+                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Generate concept image</span>
+                )}
+              </Button>
+            )}
+            {!canGenerateImage && !image && (
+              <p className="text-primary-foreground/70 text-[10px] mt-1.5 text-center font-medium">Write at least a sentence of your solution to enable image generation.</p>
+            )}
+          </div>
         </div>
 
-        <div className="text-cyan-400 text-xs font-semibold uppercase tracking-widest pt-1">Key Features <span className="text-slate-400 normal-case font-medium">(optional)</span></div>
+        <div className="text-accent text-xs font-extrabold uppercase tracking-widest pt-1 text-center">Key Features <span className="text-foreground/60 normal-case font-medium">(optional)</span></div>
 
         {features.map((f, i) => (
-          <div key={i} className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5">
+          <div key={i} className={`bg-gradient-to-br rounded-3xl p-4 shadow-lg shadow-primary/30 ${i % 2 ? "from-accent to-primary" : "from-primary to-accent"}`}>
             <div className="flex items-center gap-2 mb-2">
-              <div className="h-6 w-6 rounded-full bg-cyan-400 text-[#20262e] text-xs font-bold flex items-center justify-center">
+              <div className="h-7 w-7 rounded-full bg-white/25 text-primary-foreground text-xs font-extrabold flex items-center justify-center shadow-sm">
                 {i + 1}
               </div>
-              <span className="text-xs font-semibold text-slate-400 uppercase">Feature {i + 1}</span>
+              <span className="text-xs font-bold text-primary-foreground/80 uppercase">Feature {i + 1}</span>
             </div>
             <input
               value={f.title}
               onChange={(e) => updateFeature(i, "title", e.target.value)}
               placeholder={`Feature ${i + 1} name`}
-              className="w-full text-base sm:text-sm font-semibold text-card-foreground placeholder:text-slate-300 outline-none"
+              className="w-full bg-transparent rounded-2xl px-3 py-2 text-base sm:text-sm font-bold text-primary-foreground placeholder:text-primary-foreground/50 outline-none focus:ring-2 focus:ring-white/60 transition-all"
             />
             <textarea
               value={f.description}
               onChange={(e) => updateFeature(i, "description", e.target.value)}
               placeholder="Describe how this feature works..."
               rows={2}
-              className="w-full mt-2 text-base sm:text-sm text-card-foreground placeholder:text-slate-300 outline-none resize-none leading-relaxed"
+              className="w-full mt-2 bg-transparent rounded-2xl px-3 py-2 text-base sm:text-sm text-primary-foreground placeholder:text-primary-foreground/50 outline-none focus:ring-2 focus:ring-white/60 transition-all resize-none leading-relaxed"
             />
           </div>
         ))}
       </div>
 
-      <div className="mt-6 space-y-4">
-        <label className="text-[11px] font-bold uppercase tracking-wide text-cyan-500 block -mb-2">Brand Showcase Preview</label>
-        
-        {/* Dynamic CSS Brand Logo Card - Split Layout */}
-        <div className="rounded-2xl shadow-xl border border-white/5 overflow-hidden w-full flex flex-col min-h-[300px]">
-          {/* Top Half: Charcoal Logo */}
-          <div className="bg-[#2B303A] p-8 flex flex-col items-center justify-center flex-1 relative select-none min-h-[180px]">
-            <div className="text-center px-4 w-full">
-              <div 
-                style={{ fontFamily: activeFonts[fontIdx].family }}
-                className={`${activeFonts[fontIdx].className} drop-shadow-lg text-4xl sm:text-5xl md:text-6xl break-words leading-tight`}
-              >
-                {conceptName || "Concept Name"}
-              </div>
-            </div>
-
-            {/* Cycle Font Button */}
-            <button
-              type="button"
-              onClick={handleFontCycle}
-              className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-[#20262e]/80 text-[10px] font-bold text-cyan-400 flex items-center gap-1 hover:bg-[#20262e] transition-colors z-10 uppercase tracking-wider"
-              title="Cycle Font Style"
-            >
-              Font: {activeFonts[fontIdx].name}
-            </button>
-          </div>
-
-          {/* Bottom Half: White Solution Summary */}
-          <div className="bg-white p-6 flex items-center justify-center min-h-[120px] border-t border-slate-100">
-            <p className="text-slate-800 text-sm text-center max-w-sm leading-relaxed font-semibold">
-              {solutionOverview || "Your solution summary will appear here..."}
-            </p>
-          </div>
-        </div>
-
-        {/* Cohesive Features Summary Board (identical size to logo card) */}
-        {completeFeatures.length > 0 && (
-          <div className="bg-[#1C2028] rounded-2xl p-8 shadow-inner border border-white/5 space-y-5 w-full">
-            <h3 
-              style={{ fontFamily: activeFonts[fontIdx].family }}
-              className="text-cyan-400 text-base font-extrabold uppercase tracking-wider mb-2 border-b border-white/10 pb-2"
-            >
-              Core Brand Features
-            </h3>
-            <div className="space-y-5">
-              {completeFeatures.map((f, i) => (
-                <div key={i} className="border-l-2 border-cyan-400/40 pl-4 py-0.5">
-                  <h4 
-                    style={{ fontFamily: activeFonts[fontIdx].family }}
-                    className="text-white font-extrabold text-base sm:text-lg capitalize animate-fade-in"
-                  >
-                    {f.title}
-                  </h4>
-                  <p className="text-slate-300 text-xs sm:text-sm mt-1 leading-relaxed animate-fade-in">
-                    {f.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
       <Button
         onClick={submit}
         disabled={!ready || loading}
-        className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-bold rounded-lg h-14 mt-6 shadow-lg disabled:opacity-40"
+        className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 font-bold rounded-2xl h-14 mt-5 shadow-xl shadow-primary/30 disabled:opacity-40"
       >
         {loading ? (
-          <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Synthesizing final concept...</span>
+          <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Generating your concept...</span>
         ) : (
-          <span className="flex items-center gap-2">Present final concept <ArrowRight className="h-5 w-5" /></span>
+          <span className="flex items-center gap-2">🚀 Present final concept <ArrowRight className="h-5 w-5" /></span>
         )}
       </Button>
     </motion.div>

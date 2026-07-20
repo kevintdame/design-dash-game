@@ -1,88 +1,88 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@700;900&family=Cormorant+Garamond:ital,wght@1,700&family=Fredoka:wght@600;800&family=Lilita+One&family=Lora:ital,wght@0,600;1,600&family=Nunito:wght@800&family=Orbitron:wght@800;900&family=Outfit:wght@800;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Prata&family=Rubik+Bubbles&family=Space+Grotesk:wght@700&family=Pacifico&family=Righteous&family=Sacramento&family=Space+Mono:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 215 16% 12%;
+    --background: 254 59% 26%;
     --foreground: 0 0% 100%;
     --card: 0 0% 100%;
-    --card-foreground: 215 16% 12%;
+    --card-foreground: 254 59% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 215 16% 12%;
-    --primary: 190 100% 44%;
-    --primary-foreground: 215 16% 12%;
-    --secondary: 215 16% 18%;
+    --popover-foreground: 254 59% 0%;
+    --primary: 271 91% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 254 59% 32%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 215 16% 18%;
-    --muted-foreground: 215 12% 62%;
-    --accent: 190 100% 44%;
-    --accent-foreground: 215 16% 12%;
+    --muted: 254 59% 32%;
+    --muted-foreground: 254 59% 40%;
+    --accent: 337 100% 68%;
+    --accent-foreground: 254 59% 0%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 215 14% 24%;
-    --input: 215 14% 24%;
-    --ring: 190 100% 44%;
-    --chart-1: 190 100% 44%;
-    --chart-2: 200 80% 60%;
-    --chart-3: 180 60% 50%;
-    --chart-4: 210 80% 60%;
-    --chart-5: 220 70% 65%;
+    --border: 254 59% 34%;
+    --input: 254 59% 34%;
+    --ring: 271 91% 65%;
+    --chart-1: 271 91% 65%;
+    --chart-2: 337 100% 68%;
+    --chart-3: 271 91% 50%;
+    --chart-4: 337 100% 53%;
+    --chart-5: 254 59% 46%;
     --radius: 0.5rem;
-    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Lilita One', sans-serif;
+    --font-heading: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Lilita One', 'Nunito', ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --sidebar-background: 215 16% 12%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 190 100% 44%;
-    --sidebar-primary-foreground: 215 16% 12%;
-    --sidebar-accent: 215 16% 18%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 215 14% 24%;
-    --sidebar-ring: 190 100% 44%;
+    --sidebar-background: 254 59% 26%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 271 91% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 254 59% 32%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 254 59% 34%;
+    --sidebar-ring: 271 91% 65%;
   }
 
   .dark {
-    --background: 215 16% 12%;
+    --background: 254 59% 26%;
     --foreground: 0 0% 100%;
     --card: 0 0% 100%;
-    --card-foreground: 215 16% 12%;
+    --card-foreground: 254 59% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 215 16% 12%;
-    --primary: 190 100% 44%;
-    --primary-foreground: 215 16% 12%;
-    --secondary: 215 16% 18%;
+    --popover-foreground: 254 59% 0%;
+    --primary: 271 91% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 254 59% 32%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 215 16% 18%;
-    --muted-foreground: 215 12% 62%;
-    --accent: 190 100% 44%;
-    --accent-foreground: 215 16% 12%;
+    --muted: 254 59% 32%;
+    --muted-foreground: 254 59% 40%;
+    --accent: 337 100% 68%;
+    --accent-foreground: 254 59% 0%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 215 14% 24%;
-    --input: 215 14% 24%;
-    --ring: 190 100% 44%;
-    --chart-1: 190 100% 44%;
-    --chart-2: 200 80% 60%;
-    --chart-3: 180 60% 50%;
-    --chart-4: 210 80% 60%;
-    --chart-5: 220 70% 65%;
-    --sidebar-background: 215 16% 12%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 190 100% 44%;
-    --sidebar-primary-foreground: 215 16% 12%;
-    --sidebar-accent: 215 16% 18%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 215 14% 24%;
-    --sidebar-ring: 190 100% 44%;
+    --border: 254 59% 34%;
+    --input: 254 59% 34%;
+    --ring: 271 91% 65%;
+    --chart-1: 271 91% 65%;
+    --chart-2: 337 100% 68%;
+    --chart-3: 271 91% 50%;
+    --chart-4: 337 100% 53%;
+    --chart-5: 254 59% 46%;
+    --sidebar-background: 254 59% 26%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 271 91% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 254 59% 32%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 254 59% 34%;
+    --sidebar-ring: 271 91% 65%;
   }
 }
 
 @layer components {
   .text-gradient {
-    background-image: linear-gradient(90deg, #00d4ff, #66e8ff);
+    background-image: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -96,7 +96,7 @@
 
   body {
     @apply text-foreground font-body;
-    background-color: #1a1f26;
+    background-color: hsl(var(--background));
     min-height: 100dvh;
   }
 }

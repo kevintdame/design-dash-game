@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, RotateCcw } from "lucide-react";
-import ConceptCarousel, { getHumorousTier } from "@/components/designGame/ConceptCarousel";
+import { base44 } from "@/api/base44Client";
+import ConceptCarousel from "@/components/designGame/ConceptCarousel";
 import { Button } from "@/components/ui/button";
 
 export default function PortfolioDetail() {
@@ -14,9 +15,7 @@ export default function PortfolioDetail() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`/api/portfolio/${id}`);
-        if (!res.ok) throw new Error("API error");
-        const s = await res.json();
+        const s = await base44.entities.GameSession.get(id);
         setSession(s);
       } catch {
         setNotFound(true);
@@ -63,7 +62,7 @@ export default function PortfolioDetail() {
     customer_name: session.customer_name
   };
   const overall = Math.round((ratings.value + ratings.creativity + ratings.uniqueness) / 3);
-  const tier = getHumorousTier(overall);
+  const tier = overall >= 85 ? "Design Mastermind" : overall >= 70 ? "Design Thinker" : overall >= 50 ? "Rising Designer" : "Keep Iterating";
 
   return (
     <div className="min-h-[100dvh] bg-transparent">

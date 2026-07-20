@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Send, ArrowRight, Loader2 } from "lucide-react";
+import { MessageCircle, Send, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
@@ -38,20 +38,32 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
       exit={{ opacity: 0, x: -30 }}
       className="max-w-md mx-auto flex flex-col h-full"
     >
-      <motion.div animate={{ rotate: [0, -8, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }} className="flex items-center gap-2 text-cyan-400 mb-2">
-        <MessageCircle className="h-4 w-4" />
-        <span className="text-xs font-semibold uppercase tracking-widest">
-          Interview · {questionsLeft} {questionsLeft === 1 ? "question" : "questions"} left
-        </span>
-      </motion.div>
-      <p className="text-white text-sm mb-3">
-        Ask {challenge.customer_name.split(" ")[0]} anything to understand their needs.
+      <div className="text-center mb-3">
+        <motion.div
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 160, damping: 12 }}
+          className="inline-flex items-center gap-1.5 text-yellow-300"
+        >
+          <Sparkles className="h-4 w-4" />
+          <span className="text-xs font-extrabold uppercase tracking-widest">
+            Interview · {questionsLeft} {questionsLeft === 1 ? "question" : "questions"} left
+          </span>
+        </motion.div>
+      </div>
+      <h2 className="text-4xl sm:text-5xl font-extrabold font-display uppercase leading-none mb-2 text-center">
+        <span className="text-foreground">Ask</span>{" "}
+        <span className="text-accent">{challenge.customer_name.split(" ")[0]}</span>
+      </h2>
+      <p className="text-foreground/70 text-sm mb-4 text-center">
+        Ask anything to understand their needs, frustrations, and daily life.
       </p>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-1 -mr-1 mb-3 min-h-[200px] sm:min-h-[280px]">
         {qa.length === 0 && !loading && (
-          <div className="h-full flex items-center justify-center text-center py-10">
-            <p className="text-slate-400 text-sm max-w-[15rem]">
+          <div className="h-full flex flex-col items-center justify-center text-center py-10 gap-2">
+            <span className="text-4xl">🎤</span>
+            <p className="text-foreground/60 text-sm max-w-[15rem] font-medium">
               Start the conversation — ask about their frustrations, daily routine, or what they wish existed.
             </p>
           </div>
@@ -60,22 +72,20 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
           {qa.map((item, i) => (
             <div key={i}>
               <motion.div
-                initial={{ scale: 0.9, opacity: 0, y: 12 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 450, damping: 26 }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
                 className="flex justify-end"
               >
-                <div className="bg-cyan-400 text-[#20262e] rounded-2xl rounded-br-md px-4 py-2.5 max-w-[85%] shadow-md">
+                <div className="bg-gradient-to-br from-primary to-accent text-primary-foreground rounded-2xl rounded-br-md px-4 py-2.5 max-w-[85%] shadow-md shadow-primary/20">
                   <p className="text-sm font-medium">{item.question}</p>
                 </div>
               </motion.div>
               <motion.div
-                initial={{ scale: 0.9, opacity: 0, y: 12 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 450, damping: 26, delay: 0.05 }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
                 className="flex justify-start mt-2"
               >
-                <div className="bg-card text-card-foreground rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[85%] ring-1 ring-black/5 shadow-sm">
+                <div className="bg-card/90 backdrop-blur text-card-foreground rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[85%] ring-1 ring-border shadow-sm">
                   <p className="text-sm leading-relaxed">{item.answer}</p>
                 </div>
               </motion.div>
@@ -84,8 +94,8 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
         </AnimatePresence>
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-card text-card-foreground rounded-2xl rounded-bl-md px-4 py-3 ring-1 ring-black/5 shadow-sm">
-              <Loader2 className="h-4 w-4 animate-spin" />
+            <div className="bg-card/90 backdrop-blur text-card-foreground rounded-2xl rounded-bl-md px-4 py-3 ring-1 ring-border shadow-sm">
+              <Loader2 className="h-4 w-4 animate-spin text-accent" />
             </div>
           </div>
         )}
@@ -99,12 +109,12 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAsk()}
               placeholder="Type your question..."
-              className="flex-1 bg-card text-card-foreground rounded-2xl px-4 py-3 text-base sm:text-sm placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-cyan-400 shadow-sm ring-1 ring-black/5"
+              className="flex-1 bg-card/90 backdrop-blur text-card-foreground rounded-2xl px-4 py-3 text-base sm:text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-accent shadow-sm ring-1 ring-border"
             />
             <Button
               onClick={handleAsk}
               disabled={!canAsk}
-              className="bg-cyan-400 text-[#20262e] hover:bg-cyan-300 rounded-2xl h-12 w-12 p-0 shadow-md"
+              className="bg-gradient-to-br from-primary to-accent text-primary-foreground hover:opacity-90 rounded-2xl h-12 w-12 p-0 shadow-md shadow-primary/20"
             >
               <Send className="h-4 w-4" />
             </Button>
@@ -114,7 +124,7 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
         <Button
           onClick={onContinue}
           disabled={loading}
-          className="w-full bg-card text-card-foreground hover:bg-white ring-1 ring-black/10 font-bold rounded-lg h-12"
+          className="w-full bg-card/90 backdrop-blur text-card-foreground hover:bg-gradient-to-r hover:from-primary hover:to-accent hover:text-primary-foreground hover:ring-accent ring-1 ring-border font-bold rounded-2xl h-12 transition-all"
         >
           {qa.length === 0 ? (
             "Skip to brainstorm →"

@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, FolderOpen } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { getConceptAspectRatioClass } from "@/lib/designGame";
-import { fontPool } from "../components/designGame/FinalConceptScreen";
 
 function overallOf(s) {
   return Math.round((s.value_score + s.creativity_score + s.uniqueness_score) / 3);
@@ -17,12 +16,10 @@ export default function Portfolio() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/portfolio");
-        if (!res.ok) throw new Error("API error");
-        const list = await res.json();
-        setSessions(list.sort((a, b) => Number(b.id) - Number(a.id)));
-      } catch (err) {
-        console.error(err);
+        const me = await base44.auth.me();
+        const list = await base44.entities.GameSession.filter({ created_by_id: me.id }, "-created_date", 100);
+        setSessions(list);
+      } catch {
         setSessions([]);
       }
     })();
@@ -30,19 +27,16 @@ export default function Portfolio() {
 
   return (
     <div className="min-h-[100dvh] bg-transparent">
-      <div className="max-w-md mx-auto px-4 py-6">
+      <div className="max-w-lg mx-auto px-4 py-6">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => navigate("/")} className="h-9 w-9 rounded-lg bg-cyan-400 text-[#20262e] flex items-center justify-center hover:bg-cyan-300 shadow-sm">
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <div>
-            <h1 className="text-white font-bold text-base leading-none">Saved Portfolio</h1>
-            <p className="text-slate-400 text-[10px] mt-1">Review your best design concepts.</p>
-          </div>
+          <h1 className="text-2xl font-extrabold font-display text-white">My Portfolio</h1>
         </div>
 
         {sessions === null ? (
-          <div className="min-h-[50vh] flex items-center justify-center">
+          <div className="flex justify-center py-10">
             <div className="h-8 w-8 border-4 border-white/10 border-t-cyan-400 rounded-full animate-spin" />
           </div>
         ) : sessions.length === 0 ? (
@@ -59,40 +53,25 @@ export default function Portfolio() {
               <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                 <Link
                   to={`/portfolio/${s.id}`}
-                  className="block rounded-2xl shadow-md hover:shadow-lg transition-all overflow-hidden border border-slate-200 flex flex-col"
+                  className="block bg-card rounded-2xl p-4 ring-1 ring-black/5 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  {/* Top Half: Charcoal Logo container */}
-                  {(() => {
-                    const fontPoolActive = s.concept_font_pool || fontPool;
-                    const fontIdx = s.concept_font_idx !== undefined ? s.concept_font_idx : 0;
-                    const fontStyle = fontPoolActive[fontIdx] || fontPoolActive[0];
-                    return (
-                      <div className="w-full min-h-[120px] flex items-center justify-center bg-[#2B303A] p-6 select-none">
-                        <div 
-                          style={{ fontFamily: fontStyle.family }}
-                          className={`${fontStyle.className} text-2xl sm:text-3xl tracking-wide text-center leading-tight drop-shadow-md break-words`}
-                        >
-                          {s.concept_name || "Concept Name"}
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {/* Bottom Half: White Info details */}
-                  <div className="bg-white p-5 flex-1 flex flex-col justify-between border-t border-slate-100 min-h-[160px]">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="text-cyan-600 text-[10px] font-extrabold uppercase tracking-wider mb-1">{s.domain}</div>
-                      <h3 className="text-slate-800 font-extrabold text-sm truncate leading-snug">{s.concept_name || s.challenge_title}</h3>
-                      <p className="text-slate-500 text-xs mt-1 truncate">{s.solution_overview}</p>
-                      <p className="text-slate-400 text-[10px] mt-2">Challenge: {s.challenge_title} for {s.customer_name}</p>
+                      <div className="text-cyan-500 text-[10px] uppercase tracking-wider font-bold mb-0.5">{s.domain}</div>
+                      <h3 className="text-card-foreground font-bold text-sm leading-snug truncate">{s.challenge_title}</h3>
+                      <p className="text-slate-500 text-xs mt-1">for {s.customer_name}</p>
                     </div>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-                      <div className="text-slate-400 text-[9px] uppercase tracking-wider font-bold">Concept Rating</div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="text-lg font-black text-slate-800">{overallOf(s)}</div>
-                        <div className="text-slate-400 text-[9px] uppercase tracking-widest font-bold">score</div>
+                    <div className="text-center shrink-0">
+                      <div className="text-2xl font-extrabold font-display text-gradient">{overallOf(s)}</div>
+                      <div className="text-slate-400 text-[10px]">score</div>
+                    </div>
+                  </div>
+                  <div className="flex gap-1.5 mt-3">
+                    {(s.features || []).slice(0, 3).map((f, i) => (
+                      <div key={i} className="h-10 w-10 rounded-lg bg-black/5 overflow-hidden">
+                        {f.image_url && <img src={f.image_url} alt="" className="w-full h-full object-cover" />}
                       </div>
-                    </div>
+                    ))}
                   </div>
                 </Link>
               </motion.div>

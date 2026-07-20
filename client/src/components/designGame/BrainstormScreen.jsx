@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lightbulb, ArrowRight, Loader2, ThumbsUp, ThumbsDown, Meh } from "lucide-react";
+import { ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import InsightWall from "@/components/designGame/InsightWall";
 
 const ENTHU = {
-  excited: { icon: ThumbsUp, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  interested: { icon: ThumbsUp, color: "text-sky-400", bg: "bg-sky-500/10" },
-  neutral: { icon: Meh, color: "text-amber-400", bg: "bg-amber-500/10" },
-  skeptical: { icon: ThumbsDown, color: "text-rose-400", bg: "bg-rose-500/10" }
+  excited: { color: "text-emerald-300", label: "Excited", grad: "from-emerald-400 to-teal-500", ring: "ring-emerald-300", glow: "rgba(16,185,129,0.55)", emoji: "🤩" },
+  interested: { color: "text-sky-300", label: "Interested", grad: "from-sky-400 to-blue-500", ring: "ring-sky-300", glow: "rgba(56,189,248,0.55)", emoji: "🙂" },
+  neutral: { color: "text-amber-300", label: "Neutral", grad: "from-amber-400 to-orange-500", ring: "ring-amber-300", glow: "rgba(251,191,36,0.55)", emoji: "😐" },
+  skeptical: { color: "text-rose-300", label: "Skeptical", grad: "from-rose-400 to-pink-500", ring: "ring-rose-300", glow: "rgba(244,63,94,0.55)", emoji: "😒" }
 };
 
 export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedbacks, setFeedbacks, insights, onContinue }) {
@@ -46,12 +46,24 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
       exit={{ opacity: 0, x: -30 }}
       className="max-w-md mx-auto"
     >
-      <motion.div animate={{ rotate: [0, -12, 12, 0] }} transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.5 }} className="flex items-center gap-2 text-cyan-400 mb-2">
-        <Lightbulb className="h-4 w-4" />
-        <span className="text-xs font-semibold uppercase tracking-widest">Brainstorm</span>
-      </motion.div>
-      <p className="text-white text-sm mb-4">
-        Based on your research, write your <strong>3 best ideas</strong> for {challenge.customer_name.split(" ")[0]}.
+      <div className="text-center mb-3">
+        <motion.div
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 160, damping: 12 }}
+          className="inline-flex items-center gap-1.5 text-yellow-300"
+        >
+          <Sparkles className="h-4 w-4" />
+          <span className="text-xs font-extrabold uppercase tracking-widest">Brainstorm</span>
+          <Sparkles className="h-4 w-4" />
+        </motion.div>
+      </div>
+      <h2 className="text-4xl sm:text-5xl font-extrabold font-display uppercase leading-none mb-2 text-center">
+        <span className="text-foreground">Got any</span>{" "}
+        <span className="text-accent">bright ideas?</span>
+      </h2>
+      <p className="text-foreground/70 text-sm mb-5 text-center">
+        Based on your research, write your <strong className="text-accent">3 best ideas</strong> for {challenge.customer_name.split(" ")[0]}.
       </p>
 
       <InsightWall insights={insights} />
@@ -60,18 +72,29 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
         {ideas.map((idea, i) => {
           const fb = feedbacks[i];
           const enthu = fb ? ENTHU[fb.enthusiasm] || ENTHU.neutral : null;
-          const Icon = enthu?.icon;
           return (
-            <div key={i} className="bg-card rounded-2xl p-4 shadow-md ring-1 ring-black/5">
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 10, rotate: i % 2 ? 1 : -1 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ delay: i * 0.06, type: "spring", stiffness: 200, damping: 16 }}
+              className={`bg-card/90 backdrop-blur rounded-3xl p-4 shadow-lg ring-1 ${fb ? `ring-2 ${enthu.ring}` : "ring-border"}`}
+              style={fb ? { boxShadow: `0 12px 30px -10px ${enthu.glow}` } : undefined}
+            >
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-6 w-6 rounded-full bg-cyan-400 text-[#20262e] text-xs font-bold flex items-center justify-center">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm font-extrabold flex items-center justify-center shadow-md ring-2 ring-background">
                   {i + 1}
                 </div>
-                <span className="text-xs font-semibold text-slate-400 uppercase">Idea {i + 1}</span>
-                {Icon && (
-                  <span className={`ml-auto flex items-center gap-1 text-[10px] font-bold uppercase ${enthu.color}`}>
-                    <Icon className="h-3.5 w-3.5" /> {fb.enthusiasm}
-                  </span>
+                <span className="text-xs font-extrabold text-muted-foreground uppercase tracking-wide">Idea {i + 1}</span>
+                {enthu && (
+                  <motion.span
+                    initial={{ scale: 0, rotate: -20 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 12 }}
+                    className={`ml-auto flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r ${enthu.grad} text-white text-xs font-extrabold uppercase tracking-wider shadow-lg`}
+                  >
+                    <span className="text-3xl leading-none">{enthu.emoji}</span> {enthu.label}
+                  </motion.span>
                 )}
               </div>
               <textarea
@@ -85,7 +108,7 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
                 placeholder={`Describe idea ${i + 1}...`}
                 rows={2}
                 disabled={hasFeedback}
-                className="w-full text-base sm:text-sm text-card-foreground placeholder:text-slate-300 outline-none resize-none bg-transparent"
+                className="w-full text-base sm:text-sm text-card-foreground placeholder:text-muted-foreground outline-none resize-none bg-transparent font-medium"
               />
               <AnimatePresence>
                 {fb && (
@@ -93,13 +116,15 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
-                    className={`mt-2 pt-2 border-t border-black/5 ${enthu.bg} rounded-xl px-3 py-2`}
+                    className="mt-3 pt-3 border-t border-border/60"
                   >
-                    <p className="text-sm text-slate-900 leading-relaxed font-medium">"{challenge.customer_name.split(" ")[0]}: {fb.feedback}"</p>
+                    <p className="text-sm text-zinc-900 leading-relaxed font-semibold">
+                      <span className="text-primary font-extrabold">{challenge.customer_name.split(" ")[0]}:</span> {fb.feedback}
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -108,26 +133,28 @@ export default function BrainstormScreen({ challenge, qa, ideas, setIdeas, feedb
         <Button
           onClick={handleGetFeedback}
           disabled={!atLeastOne || loading}
-          className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-bold rounded-lg h-12 shadow-md disabled:opacity-40"
+          size="lg"
+          className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 font-bold rounded-2xl shadow-xl shadow-primary/30 h-14 text-base disabled:opacity-40"
         >
           {loading ? (
-            <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Getting feedback...</span>
+            <span className="flex items-center gap-2"><Loader2 className="h-5 w-5 animate-spin" /> Getting feedback...</span>
           ) : (
-            "Share ideas with customer"
+            <span className="flex items-center gap-2">💡 Share ideas with {challenge.customer_name.split(" ")[0]}</span>
           )}
         </Button>
       ) : (
         <div className="space-y-2">
           <Button
             onClick={onContinue}
-            className="w-full bg-cyan-400 text-[#20262e] hover:bg-cyan-300 font-bold rounded-lg h-12 shadow-md"
+            size="lg"
+            className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 font-bold rounded-2xl shadow-xl shadow-primary/30 h-14 text-base"
           >
             <span className="flex items-center justify-center gap-2">Iterate into final concept <ArrowRight className="h-5 w-5" /></span>
           </Button>
           <Button
             onClick={() => setFeedbacks([])}
             variant="ghost"
-            className="w-full text-slate-400 hover:text-white hover:bg-white/5 font-medium rounded-lg h-10"
+            className="w-full text-foreground/60 hover:text-foreground hover:bg-muted font-bold rounded-2xl h-10"
           >
             Revise ideas & get new feedback
           </Button>
