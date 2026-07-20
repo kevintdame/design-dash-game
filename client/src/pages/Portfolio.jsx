@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getDomainGradient } from "@/components/designGame/ConceptCarousel";
+import { useAuth } from "@/lib/AuthContext";
 
 function overallOf(s) {
   return Math.round((s.value_score + s.creativity_score + s.uniqueness_score) / 3);
@@ -11,12 +12,13 @@ function overallOf(s) {
 
 export default function Portfolio() {
   const [sessions, setSessions] = useState(null);
+  const { userId } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/portfolio");
+        const res = await fetch(`/api/portfolio?userId=${userId}`);
         if (!res.ok) throw new Error("API error");
         const list = await res.json();
         setSessions(list.sort((a, b) => Number(b.id) - Number(a.id)));
@@ -25,7 +27,7 @@ export default function Portfolio() {
         setSessions([]);
       }
     })();
-  }, []);
+  }, [userId]);
 
   return (
     <div className="min-h-[100dvh] bg-transparent">
@@ -55,7 +57,7 @@ export default function Portfolio() {
               <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                 <Link
                   to={`/portfolio/${s.id}`}
-                  className="block rounded-3xl overflow-hidden border border-white/5 shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]"
+                  className="block rounded-3xl overflow-hidden border border-white/10 bg-slate-900/60 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all hover:scale-[1.01] hover:border-white/20"
                 >
                   {/* Top Half: Themed Gradient Header displaying concept name */}
                   <div className={`relative bg-gradient-to-br ${getDomainGradient(s.domain)} p-5 select-none text-center flex flex-col justify-center min-h-[110px] overflow-hidden`}>
@@ -71,10 +73,10 @@ export default function Portfolio() {
                       {s.domain}
                     </p>
                   </div>
-                  {/* Bottom Half: White Summary and Score */}
-                  <div className="bg-white p-5 flex flex-col justify-between min-h-[120px] border-t border-slate-100">
+                  {/* Bottom Half: Dark Glassmorphic Summary and Score */}
+                  <div className="p-5 flex flex-col justify-between min-h-[120px] border-t border-white/5 bg-slate-950/20">
                     <div>
-                      <p className="text-slate-800 text-xs sm:text-sm font-semibold leading-relaxed line-clamp-2">
+                      <p className="text-slate-200 text-xs sm:text-sm font-semibold leading-relaxed line-clamp-2">
                         {s.solution_overview}
                       </p>
                       <p className="text-slate-400 text-[10px] mt-2 font-bold uppercase tracking-wider">
@@ -82,9 +84,9 @@ export default function Portfolio() {
                       </p>
                     </div>
                     {/* Concept overall score display */}
-                    <div className="flex items-center justify-between border-t border-slate-100 pt-3 mt-3">
+                    <div className="flex items-center justify-between border-t border-white/5 pt-3 mt-3">
                       <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">Overall Score</span>
-                      <span className="text-accent font-display font-extrabold text-base bg-accent/10 px-3 py-0.5 rounded-full">
+                      <span className="text-white font-display font-black text-sm bg-gradient-to-r from-primary to-accent px-3 py-1 rounded-full shadow-md shadow-accent/10">
                         {overallOf(s)} pts
                       </span>
                     </div>

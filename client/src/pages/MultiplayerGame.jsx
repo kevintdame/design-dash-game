@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import confetti from "canvas-confetti";
 import VibeBackground from "@/components/designGame/VibeBackground";
+import { useAuth } from "@/lib/AuthContext";
 // No CustomerAvatar
 
 function TimerBanner({ deadline, onTimeout }) {
@@ -48,8 +49,50 @@ function TimerBanner({ deadline, onTimeout }) {
   );
 }
 
+function getRankCardStyles(rank) {
+  if (rank === 1) {
+    return {
+      grad: "from-amber-400 to-pink-500",
+      ring: "ring-amber-300",
+      emoji: "👑",
+      label: "Squad Champion",
+      shadow: "rgba(251,191,36,0.6)",
+      textAccent: "text-[#ff5c8a]"
+    };
+  }
+  if (rank === 2) {
+    return {
+      grad: "from-slate-400 to-slate-600",
+      ring: "ring-slate-350",
+      emoji: "🥈",
+      label: "Second Place",
+      shadow: "rgba(148,163,184,0.4)",
+      textAccent: "text-slate-600"
+    };
+  }
+  if (rank === 3) {
+    return {
+      grad: "from-amber-600 to-amber-800",
+      ring: "ring-amber-500",
+      emoji: "🥉",
+      label: "Third Place",
+      shadow: "rgba(217,119,6,0.4)",
+      textAccent: "text-amber-700"
+    };
+  }
+  return {
+    grad: "from-purple-500 to-indigo-650",
+    ring: "ring-purple-400",
+    emoji: "🎯",
+    label: `Rank ${rank}`,
+    shadow: "rgba(168,85,247,0.4)",
+    textAccent: "text-purple-600"
+  };
+}
+
 export default function MultiplayerGame() {
   const navigate = useNavigate();
+  const { userId } = useAuth();
   
   // Game state controllers
   const [mode, setMode] = useState("setup"); // setup | lobby | playing | waiting | results
@@ -274,6 +317,8 @@ export default function MultiplayerGame() {
     if (!me || !me.concept || savedPortfolio) return;
 
     const myScores = room.results.scores.find(s => s.player_id === myPlayerId) || { value: 70, creativity: 70, uniqueness: 70 };
+    const myFeedbackObj = room.results.feedbacks?.find(f => f.player_id === myPlayerId);
+    const myFeedbackText = myFeedbackObj?.feedback || room.results.review;
 
     setSavingPortfolio(true);
     setError(null);
@@ -282,6 +327,7 @@ export default function MultiplayerGame() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          user_id: userId,
           domain: room.domain,
           challenge_title: room.challenge.title,
           challenge_scenario: room.challenge.scenario,
@@ -295,7 +341,7 @@ export default function MultiplayerGame() {
           value_score: myScores.value,
           creativity_score: myScores.creativity,
           uniqueness_score: myScores.uniqueness,
-          review: room.results.review
+          review: myFeedbackText
         })
       });
       if (!res.ok) throw new Error("Failed to save concept to portfolio");
@@ -603,11 +649,6 @@ export default function MultiplayerGame() {
           {/* BATTLE RESULTS / LEADERBOARD SCREEN */}
           {mode === "results" && room && room.results && (() => {
             const ranking = room.results.ranking;
-            const winnerPid = ranking[0];
-            const winner = room.players[winnerPid];
-            const winnerScores = room.results.scores.find(s => s.player_id === winnerPid) || { value: 0, creativity: 0, uniqueness: 0 };
-            const winnerAvgScore = Math.round((winnerScores.value + winnerScores.creativity + winnerScores.uniqueness) / 3);
-
             const myPlayerId = Object.keys(room.players).find(pid => room.players[pid].name === playerName);
             const me = room.players[myPlayerId];
             const hasConceptToSave = !!(me && me.concept);
@@ -631,150 +672,102 @@ export default function MultiplayerGame() {
                   <p className="text-slate-400 text-xs font-semibold">Evaluated by {room.challenge.customer_name}</p>
                 </div>
 
-                {/* CHAMPION CARD */}
-                {winner && (
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.1, type: "spring", stiffness: 140, damping: 12 }}
-                    whileHover={{ scale: 1.02 }}
-                    onClick={() => setExpandedPlayer(expandedPlayer === winnerPid ? null : winnerPid)}
-                    className="relative cursor-pointer bg-gradient-to-br from-amber-400 to-pink-500 rounded-3xl p-6 ring-2 ring-amber-300 ring-offset-2 ring-offset-background shadow-2xl flex flex-col items-center text-center overflow-hidden"
-                    style={{ boxShadow: "0 10px 30px -8px rgba(251,191,36,0.6)" }}
-                  >
-                    <span className="text-5xl mb-2 drop-shadow">👑</span>
-                    <span className="text-xs font-black uppercase tracking-widest text-white/80">Squad Champion</span>
-                    <h2 className="text-3xl sm:text-4xl font-extrabold font-display text-white uppercase mt-1 tracking-wide drop-shadow">
-                      {winner.name}
-                    </h2>
-                    {winner.concept && (
-                      <p className="text-white/90 text-sm font-bold mt-1 max-w-xs line-clamp-1">
-                        {winner.concept.solutionOverview}
-                      </p>
-                    )}
-                    <div className="bg-white text-[#ff5c8a] font-extrabold text-sm px-4 py-1.5 rounded-full shadow-md mt-4 font-display">
-                      SCORE: {winnerAvgScore}
-                    </div>
+                {/* LEADERBOARD CARDS */}
+                <div className="space-y-3.5">
+                  {ranking.map((pid, rankIdx) => {
+                    const p = room.players[pid];
+                    if (!p) return null;
+                    const scores = room.results.scores.find(s => s.player_id === pid) || { value: 0, creativity: 0, uniqueness: 0 };
+                    const avgScore = Math.round((scores.value + scores.creativity + scores.uniqueness) / 3);
+                    const displayRank = rankIdx + 1;
+                    const isWinner = displayRank === 1;
+                    
+                    const styles = getRankCardStyles(displayRank);
+                    const isExpanded = expandedPlayer === pid;
+                    
+                    // Find customer feedback for this specific player
+                    const playerFeedbackObj = room.results.feedbacks?.find(f => f.player_id === pid);
+                    const playerFeedback = playerFeedbackObj?.feedback || "Great effort! A solid response to the challenge.";
 
-                    {/* Winner Detail Breakdown (expanded on tap) */}
-                    <AnimatePresence>
-                      {expandedPlayer === winnerPid && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="w-full border-t border-white/20 mt-4 pt-4 text-left space-y-3 overflow-hidden text-xs text-white"
-                        >
-                          {winner.concept ? (
-                            <>
-                              <p className="font-semibold leading-relaxed">
-                                <strong className="text-white/90 block text-[10px] uppercase tracking-wider">Problem Statement</strong> 
-                                {winner.concept.problem}
-                              </p>
-                              <p className="font-semibold leading-relaxed">
-                                <strong className="text-white/90 block text-[10px] uppercase tracking-wider">Solution Overview</strong> 
-                                {winner.concept.solutionOverview}
-                              </p>
-                              <div className="grid grid-cols-3 gap-2 pt-2 text-center text-[10px] uppercase font-bold text-white/80">
-                                <div className="bg-white/10 p-2 rounded-xl border border-white/10">
-                                  <span className="block text-white font-black text-base leading-none mb-1">{winnerScores.value}</span> Value
-                                </div>
-                                <div className="bg-white/10 p-2 rounded-xl border border-white/10">
-                                  <span className="block text-white font-black text-base leading-none mb-1">{winnerScores.creativity}</span> Unique
-                                </div>
-                                <div className="bg-white/10 p-2 rounded-xl border border-white/10">
-                                  <span className="block text-white font-black text-base leading-none mb-1">{winnerScores.uniqueness}</span> Design
-                                </div>
-                              </div>
-                            </>
-                          ) : (
-                            <p className="italic text-white/80 font-bold">Failed to submit a concept.</p>
+                    return (
+                      <motion.div
+                        key={pid}
+                        initial={isWinner ? { scale: 0.95, opacity: 0 } : { opacity: 0, y: 10 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        transition={{ delay: isWinner ? 0.1 : (rankIdx * 0.05), type: "spring", stiffness: 140, damping: 12 }}
+                        whileHover={{ scale: 1.01 }}
+                        onClick={() => setExpandedPlayer(isExpanded ? null : pid)}
+                        className={`relative cursor-pointer bg-gradient-to-br ${styles.grad} rounded-3xl p-5 ring-2 ${
+                          isWinner || isExpanded ? `${styles.ring} ring-offset-2 ring-offset-background` : "ring-white/5"
+                        } shadow-xl flex flex-col items-center text-center overflow-hidden transition-all`}
+                        style={{ boxShadow: isWinner || isExpanded ? `0 8px 24px -6px ${styles.shadow}` : undefined }}
+                      >
+                        <div className="flex flex-col items-center">
+                          <span className="text-4xl mb-1.5 drop-shadow">{styles.emoji}</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-white/80">{styles.label}</span>
+                          <h2 className="text-2xl sm:text-3xl font-extrabold font-display text-white uppercase mt-0.5 tracking-wide drop-shadow leading-tight">
+                            {p.name}
+                          </h2>
+                          {p.concept && (
+                            <p className="text-white/90 text-xs font-bold mt-1 max-w-xs line-clamp-1">
+                              {p.concept.solutionOverview}
+                            </p>
                           )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                )}
-
-                {/* OTHER LEADERS LIST */}
-                {ranking.length > 1 && (
-                  <div className="space-y-2">
-                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block pl-1">Leaderboard</span>
-                    <div className="space-y-2">
-                      {ranking.slice(1).map((pid, rankIdx) => {
-                        const p = room.players[pid];
-                        const scores = room.results.scores.find(s => s.player_id === pid) || { value: 0, creativity: 0, uniqueness: 0 };
-                        const avgScore = Math.round((scores.value + scores.creativity + scores.uniqueness) / 3);
-                        const displayRank = rankIdx + 2;
-
-                        return (
-                          <div key={pid} className="space-y-1">
-                            <motion.div
-                              whileHover={{ scale: 1.01 }}
-                              onClick={() => setExpandedPlayer(expandedPlayer === pid ? null : pid)}
-                              className="cursor-pointer bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center justify-between transition-colors shadow-lg"
-                            >
-                              <div className="flex items-center space-x-3">
-                                <span className="text-lg font-black text-slate-400 w-5">
-                                  {displayRank === 2 ? "🥈" : displayRank === 3 ? "🥉" : `${displayRank}`}
-                                </span>
-                                <div>
-                                  <h3 className="font-extrabold text-sm text-white">{p.name}</h3>
-                                  {p.concept && (
-                                    <p className="text-[11px] text-slate-400 font-semibold truncate max-w-[200px]">
-                                      {p.concept.solutionOverview}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <span className="text-base font-extrabold text-accent">{avgScore}</span>
-                              </div>
-                            </motion.div>
-
-                            {/* Runner-up detail breakdown (expanded on tap) */}
-                            <AnimatePresence>
-                              {expandedPlayer === pid && (
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: "auto", opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
-                                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-xs text-slate-350 space-y-3 overflow-hidden"
-                                >
-                                  {p.concept ? (
-                                    <>
-                                      <p className="font-semibold leading-relaxed text-slate-300">
-                                        <strong className="text-slate-400 block text-[9px] uppercase tracking-wider">Problem Statement</strong> 
-                                        {p.concept.problem}
-                                      </p>
-                                      <p className="font-semibold leading-relaxed text-slate-300">
-                                        <strong className="text-slate-400 block text-[9px] uppercase tracking-wider">Solution Overview</strong> 
-                                        {p.concept.solutionOverview}
-                                      </p>
-                                      <div className="grid grid-cols-3 gap-2 pt-2 text-center text-[9px] uppercase font-bold text-slate-400">
-                                        <div className="bg-slate-900/40 p-2 rounded-xl border border-white/5 text-slate-300">
-                                          <span className="block text-white font-black text-sm leading-none mb-1">{scores.value}</span> Value
-                                        </div>
-                                        <div className="bg-slate-900/40 p-2 rounded-xl border border-white/5 text-slate-300">
-                                          <span className="block text-white font-black text-sm leading-none mb-1">{scores.creativity}</span> Unique
-                                        </div>
-                                        <div className="bg-slate-900/40 p-2 rounded-xl border border-white/5 text-slate-300">
-                                          <span className="block text-white font-black text-sm leading-none mb-1">{scores.uniqueness}</span> Design
-                                        </div>
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <p className="italic text-slate-500 font-bold">Failed to submit a concept.</p>
-                                  )}
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
+                          <div className={`bg-white ${styles.textAccent} font-extrabold text-xs px-3.5 py-1 rounded-full shadow-md mt-3 font-display`}>
+                            SCORE: {avgScore}
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                        </div>
+
+                        {/* Expanded Details Breakdown */}
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="w-full border-t border-white/20 mt-4 pt-4 text-left space-y-3.5 overflow-hidden text-xs text-white"
+                            >
+                              {p.concept ? (
+                                <>
+                                  <p className="font-semibold leading-relaxed">
+                                    <strong className="text-white/90 block text-[10px] uppercase tracking-wider mb-0.5">Problem Statement</strong> 
+                                    {p.concept.problem}
+                                  </p>
+                                  <p className="font-semibold leading-relaxed">
+                                    <strong className="text-white/90 block text-[10px] uppercase tracking-wider mb-0.5">Solution Overview</strong> 
+                                    {p.concept.solutionOverview}
+                                  </p>
+                                  
+                                  {/* Specific Customer Feedback for this Player */}
+                                  <div className="bg-black/15 border border-white/10 rounded-2xl p-3.5 space-y-1">
+                                    <strong className="text-white/90 block text-[9px] uppercase tracking-wider">💭 Customer Feedback</strong>
+                                    <p className="italic font-semibold text-white/95 leading-relaxed">
+                                      "{playerFeedback}"
+                                    </p>
+                                  </div>
+
+                                  <div className="grid grid-cols-3 gap-2 pt-2 text-center text-[10px] uppercase font-bold text-white/80">
+                                    <div className="bg-white/10 p-2.5 rounded-xl border border-white/10">
+                                      <span className="block text-white font-black text-base leading-none mb-1">{scores.value}</span> Value
+                                    </div>
+                                    <div className="bg-white/10 p-2.5 rounded-xl border border-white/10">
+                                      <span className="block text-white font-black text-base leading-none mb-1">{scores.creativity}</span> Unique
+                                    </div>
+                                    <div className="bg-white/10 p-2.5 rounded-xl border border-white/10">
+                                      <span className="block text-white font-black text-base leading-none mb-1">{scores.uniqueness}</span> Design
+                                    </div>
+                                  </div>
+                                </>
+                              ) : (
+                                <p className="italic text-white/80 font-bold text-center">Failed to submit a concept.</p>
+                              )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    );
+                  })}
+                </div>
 
                 {/* CUSTOMER JUDGEMENT */}
                 <div className="relative bg-white/5 border border-white/10 rounded-3xl p-5 shadow-xl flex flex-col gap-3">

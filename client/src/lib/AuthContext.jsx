@@ -14,6 +14,14 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState(null);
   const [authChecked, setAuthChecked] = useState(true);
   const [appPublicSettings, setAppPublicSettings] = useState({ id: 'game', public_settings: {} });
+  const [userId, setUserId] = useState(() => {
+    let id = localStorage.getItem("designdash_user_id");
+    if (!id) {
+      id = "usr_" + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+      localStorage.setItem("designdash_user_id", id);
+    }
+    return id;
+  });
 
   const logout = () => {
     setUser(null);
@@ -30,6 +38,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ 
       user, 
+      userId,
       isAuthenticated, 
       isLoadingAuth,
       isLoadingPublicSettings,

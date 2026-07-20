@@ -18,4 +18,13 @@
 - [x] Implement VibeBackground, canvas-confetti, and celebratory layout in MultiplayerGame.jsx results screen
 - [x] Add interactive expand-on-tap functionality to leaderboard cards to view details
 - [x] Verify build and prepare for Render deploy
+- [x] Initialize userId in AuthContext.jsx and generate if missing
+- [x] Update multiplayer evaluation route in server.js to return feedbacks array
+- [x] Update /api/portfolio/save and /api/portfolio routes in server.js to filter by userId
+- [x] Implement rank-themed expanded cards in MultiplayerGame.jsx results screen
+- [x] Pass individual feedback and userId during portfolio saving in MultiplayerGame.jsx
+- [x] Redesign portfolio card layout to glassmorphic dark design in Portfolio.jsx
+- [x] Fix PWA caching strategy in sw.js (Network-First for HTML and manifest)
+- [x] Fix customer avatar gender and age assignment by adding customer_gender and customer_age to Gemini challenge schemas
+
 

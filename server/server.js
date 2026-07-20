@@ -126,7 +126,9 @@ const offlineScenarios = {
       customer_name: "Evelyn Vance",
       customer_role: "Retired Architect",
       customer_persona: "Evelyn is a 74-year-old retired architect living alone in a modernist home she designed herself. She values architectural elegance, proud independence, and hates clinical assistance aids.",
-      customer_context: "Evelyn fears losing her independence and being forced into sterile assisted living. She refuses to use standard clinical modifications (like industrial grab bars) because they ruin her home's aesthetic identity. She desires solutions that support safe movement seamlessly without looking clinical."
+      customer_context: "Evelyn fears losing her independence and being forced into sterile assisted living. She refuses to use standard clinical modifications (like industrial grab bars) because they ruin her home's aesthetic identity. She desires solutions that support safe movement seamlessly without looking clinical.",
+      customer_gender: "female",
+      customer_age: "senior"
     }
   },
   "Sustainability": {
@@ -136,7 +138,9 @@ const offlineScenarios = {
       customer_name: "Leo Jenkins",
       customer_role: "Community Garden Coordinator",
       customer_persona: "Leo Jenkins, 35, coordinates the community garden. He is community-focused, energetic, and wants to scale composting.",
-      customer_context: "Leo is tired of washing moldy bins and sorting neighbor waste. Most neighbors want to do the right thing, but find composting too messy, smelly, and inconvenient for their busy routines. He needs a clean, effortless way to get families participating without smell or chores."
+      customer_context: "Leo is tired of washing moldy bins and sorting neighbor waste. Most neighbors want to do the right thing, but find composting too messy, smelly, and inconvenient for their busy routines. He needs a clean, effortless way to get families participating without smell or chores.",
+      customer_gender: "male",
+      customer_age: "adult"
     }
   },
   "Education": {
@@ -146,7 +150,9 @@ const offlineScenarios = {
       customer_name: "Sarah Chen",
       customer_role: "Night-Shift Nurse",
       customer_persona: "Sarah Chen, 29, works exhausting 12-hour night shifts. She is highly motivated to switch to health-tech but has zero continuous free time.",
-      customer_context: "Sarah only has 5-10 minute coffee breaks during night shifts. Reading textbooks or watching long video lectures puts her to sleep instantly. She needs a way to make active learning progress in short windows without feeling like another tiring chore."
+      customer_context: "Sarah only has 5-10 minute coffee breaks during night shifts. Reading textbooks or watching long video lectures puts her to sleep instantly. She needs a way to make active learning progress in short windows without feeling like another tiring chore.",
+      customer_gender: "female",
+      customer_age: "adult"
     }
   }
 };
@@ -286,7 +292,9 @@ app.post('/api/challenge', async (req, res) => {
       customer_name: "Alex Taylor",
       customer_role: "End User",
       customer_persona: "Alex is a busy user seeking simplified experiences.",
-      customer_context: "Alex is easily overwhelmed by complexity and values clean, elegant workflows."
+      customer_context: "Alex is easily overwhelmed by complexity and values clean, elegant workflows.",
+      customer_gender: "male",
+      customer_age: "adult"
     };
     fallback.customer_image = assignCustomerImage(fallback);
     return res.json(fallback);
@@ -309,6 +317,8 @@ Requirements:
 - "customer_context" is internal context the LLM uses to answer interview questions and rate ideas consistently as this customer. Put ALL the rich detail here: their hidden frustrations, specific needs, deal-breakers, budget concerns, daily life details, emotional drivers, and what they secretly wish existed. The player NEVER sees this field.
 - NO SOLUTIONS IN INTERVIEW: The customer's context and behavior must only focus on their daily life, feelings, and frustrations. Never mention, suggest, or discuss specific solutions, technology formats, or product features.
 - DIVERSITY: Ensure the customer name, age, specific profession, and background vary widely. Choose from a rich set of unique names and distinct roles (e.g. students, retail managers, elderly gardeners, night security guards, etc.) to keep the game fresh. Never generate the same name or profile twice.
+- customer_gender: Strictly set to 'male' or 'female' to match their name.
+- customer_age: Strictly set to 'young', 'adult', or 'senior' to match their age and profession.
 `;
 
   try {
@@ -326,9 +336,11 @@ Requirements:
             customer_name: { type: "STRING" },
             customer_role: { type: "STRING" },
             customer_persona: { type: "STRING" },
-            customer_context: { type: "STRING" }
+            customer_context: { type: "STRING" },
+            customer_gender: { type: "STRING", enum: ["male", "female"] },
+            customer_age: { type: "STRING", enum: ["young", "adult", "senior"] }
           },
-          required: ["title", "scenario", "customer_name", "customer_role", "customer_persona", "customer_context"]
+          required: ["title", "scenario", "customer_name", "customer_role", "customer_persona", "customer_context", "customer_gender", "customer_age"]
         }
       }
     });
@@ -916,6 +928,7 @@ app.post('/api/concept-vibe', async (req, res) => {
 app.post('/api/portfolio/save', async (req, res) => {
   const sessionData = {
     ...req.body,
+    user_id: req.body.user_id || req.body.userId || 'anonymous',
     id: String(Date.now()),
     created_date: new Date().toISOString()
   };
@@ -939,14 +952,26 @@ app.post('/api/portfolio/save', async (req, res) => {
 
 // 8. Database / Portfolio listing
 app.get('/api/portfolio', async (req, res) => {
+  const { userId } = req.query;
   try {
     if (firestoreDb) {
-      const snapshot = await firestoreDb.collection('game_sessions').orderBy('created_date', 'desc').limit(100).get();
+      let query = firestoreDb.collection('game_sessions');
+      if (userId) {
+        query = query.where('user_id', '==', userId);
+      }
+      // Note: order by created_date might require a composite index in Firestore if combined with where, 
+      // but if Firestore isn't indexed, it can fail. To be safe, we order on the client side 
+      // or retrieve first and sort to prevent Firestore index errors from blocking the user.
+      const snapshot = await query.get();
       const list = [];
       snapshot.forEach(doc => list.push(doc.data()));
-      res.json(list);
+      list.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      res.json(list.slice(0, 100));
     } else {
-      const list = readLocalDB();
+      let list = readLocalDB();
+      if (userId) {
+        list = list.filter(s => s.user_id === userId || s.userId === userId);
+      }
       list.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
       res.json(list);
     }
@@ -1053,9 +1078,14 @@ async function evaluateRoomBattle(room) {
       creativity: 85,
       uniqueness: 78
     }));
+    const feedbacks = playersList.map(p => ({
+      player_id: p.id,
+      feedback: `Offline Demo Mode: ${p.name}'s concept is solid and aligns well with the customer's desires.`
+    }));
     return {
       ranking: ranking,
       scores: scores,
+      feedbacks: feedbacks,
       review: "Offline Demo Mode: All submitted concepts show a strong understanding of the customer's needs and lifestyle."
     };
   }
@@ -1082,7 +1112,8 @@ Task:
 Compare all concepts side-by-side. 
 Rate each concept 1-100 on value, creativity, and uniqueness.
 Rank the designers from 1st to last.
-Write a 3-5 sentence review explaining your rankings and why you selected the 1st place concept as the winner.`;
+Write a 3-5 sentence review explaining your rankings and why you selected the 1st place concept as the winner.
+Write a 2-3 sentence direct customer feedback commentary for EACH player individually (explaining how well their specific solution addresses your needs).`;
 
   try {
     const response = await generateContentWithRetry({
@@ -1110,9 +1141,20 @@ Write a 3-5 sentence review explaining your rankings and why you selected the 1s
                 required: ["player_id", "value", "creativity", "uniqueness"]
               }
             },
+            feedbacks: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  player_id: { type: "STRING" },
+                  feedback: { type: "STRING" }
+                },
+                required: ["player_id", "feedback"]
+              }
+            },
             review: { type: "STRING" }
           },
-          required: ["ranking", "scores", "review"]
+          required: ["ranking", "scores", "feedbacks", "review"]
         }
       }
     });
@@ -1127,6 +1169,10 @@ Write a 3-5 sentence review explaining your rankings and why you selected the 1s
         value: 70,
         creativity: 70,
         uniqueness: 70
+      })),
+      feedbacks: playersList.map(p => ({
+        player_id: p.id,
+        feedback: "An error occurred during evaluation. Here is the fallback feedback for your concept."
       })),
       review: "An error occurred during evaluation. All designs have been graded equally."
     };
@@ -1159,14 +1205,22 @@ app.post('/api/rooms/create', async (req, res) => {
         customer_name: "Alex Taylor",
         customer_role: "End User",
         customer_persona: "Alex is a busy user seeking simplified experiences.",
-        customer_context: "Alex is easily overwhelmed by complexity."
+        customer_context: "Alex is easily overwhelmed by complexity.",
+        customer_gender: "male",
+        customer_age: "adult"
       };
     }
   } else {
     const prompt = `You are a design thinking game master. Generate ONE compelling, realistic design challenge for a player to solve.
 PLAYER-CHOSEN PARAMETERS:
 - Domain: ${domain}
-Requirements same as normal challenges.`;
+Requirements same as normal challenges:
+- A real-world design problem in the "${domain}" domain. Broad and intuitive.
+- Punchy and simple language under 2 sentences.
+- customer_persona is neutral (no struggles/needs).
+- customer_context holds hidden details (frustrations, specific needs).
+- customer_gender: Strictly set to 'male' or 'female' to match their name.
+- customer_age: Strictly set to 'young', 'adult', or 'senior' to match their age.`;
 
     try {
       const response = await generateContentWithRetry({
@@ -1183,9 +1237,11 @@ Requirements same as normal challenges.`;
               customer_name: { type: "STRING" },
               customer_role: { type: "STRING" },
               customer_persona: { type: "STRING" },
-              customer_context: { type: "STRING" }
+              customer_context: { type: "STRING" },
+              customer_gender: { type: "STRING", enum: ["male", "female"] },
+              customer_age: { type: "STRING", enum: ["young", "adult", "senior"] }
             },
-            required: ["title", "scenario", "customer_name", "customer_role", "customer_persona", "customer_context"]
+            required: ["title", "scenario", "customer_name", "customer_role", "customer_persona", "customer_context", "customer_gender", "customer_age"]
           }
         }
       });
@@ -1200,7 +1256,9 @@ Requirements same as normal challenges.`;
         customer_name: "Alex Taylor",
         customer_role: "End User",
         customer_persona: "Alex is a busy user seeking simplified experiences.",
-        customer_context: "Alex is easily overwhelmed by complexity."
+        customer_context: "Alex is easily overwhelmed by complexity.",
+        customer_gender: "male",
+        customer_age: "adult"
       };
     }
   }
