@@ -199,6 +199,8 @@ export default function Game() {
                       navigate("/multiplayer");
                     } else if (m === "portfolio") {
                       navigate("/portfolio");
+                    } else if (m === "leaderboard") {
+                      navigate("/leaderboard");
                     } else {
                       setMode(m);
                       setStage("start");
