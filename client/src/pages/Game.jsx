@@ -13,9 +13,11 @@ import ResultsScreen from "@/components/designGame/ResultsScreen";
 import { generateChallenge, rateFinalConcept, synthesizeInsights, generateFeatureImages } from "@/lib/designGame";
 import VibeBackground from "@/components/designGame/VibeBackground";
 import { X } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function Game() {
   const navigate = useNavigate();
+  const { userId } = useAuth();
   const [stage, setStage] = useState("splash");
   const [challenge, setChallenge] = useState(null);
   const [domain, setDomain] = useState(null);
@@ -117,6 +119,7 @@ export default function Game() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          user_id: userId,
           domain,
           challenge_title: challenge.title,
           challenge_scenario: challenge.scenario,
