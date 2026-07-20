@@ -1296,8 +1296,16 @@ app.post('/api/rooms/join', async (req, res) => {
   if (!room) {
     return res.status(404).json({ error: "Room not found" });
   }
-  if (room.status !== 'lobby') {
-    return res.status(400).json({ error: "Game has already started in this room" });
+  if (room.status === 'finished') {
+    return res.status(400).json({ error: "Game has already finished in this room" });
+  }
+  if (room.status === 'playing') {
+    const now = new Date();
+    if (room.deadline && now > new Date(room.deadline)) {
+      return res.status(400).json({ error: "Game submission period has already ended" });
+    }
+  } else if (room.status !== 'lobby') {
+    return res.status(400).json({ error: "Cannot join this room" });
   }
 
   const currentPlayers = Object.keys(room.players);

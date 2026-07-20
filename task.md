@@ -25,6 +25,8 @@
 - [x] Pass individual feedback and userId during portfolio saving in MultiplayerGame.jsx
 - [x] Redesign portfolio card layout to glassmorphic dark design in Portfolio.jsx
 - [x] Fix PWA caching strategy in sw.js (Network-First for HTML and manifest)
-- [x] Fix customer avatar gender and age assignment by adding customer_gender and customer_age to Gemini challenge schemas
+- [x] Add View Portfolio button to ModeSelectScreen.jsx and wire navigation in Game.jsx
+- [x] Update /api/rooms/join in server.js to allow joining active games in playing status
+
 
 

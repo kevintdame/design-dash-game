@@ -191,6 +191,8 @@ export default function Game() {
                   <ModeSelectScreen key="mode" onSelect={(m) => {
                     if (m === "multi") {
                       navigate("/multiplayer");
+                    } else if (m === "portfolio") {
+                      navigate("/portfolio");
                     } else {
                       setMode(m);
                       setStage("start");
