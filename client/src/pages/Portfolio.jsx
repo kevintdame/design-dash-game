@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getDomainGradient } from "@/components/designGame/ConceptCarousel";
 
 function overallOf(s) {
   return Math.round((s.value_score + s.creativity_score + s.uniqueness_score) / 3);
@@ -56,12 +57,17 @@ export default function Portfolio() {
                   to={`/portfolio/${s.id}`}
                   className="block rounded-3xl overflow-hidden border border-white/5 shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]"
                 >
-                  {/* Top Half: Dark Header displaying concept name */}
-                  <div className="bg-[#1b143c] p-5 select-none text-center flex flex-col justify-center min-h-[110px]">
-                    <h2 className="text-white font-display font-extrabold text-lg sm:text-xl uppercase tracking-wider leading-tight truncate">
+                  {/* Top Half: Themed Gradient Header displaying concept name */}
+                  <div className={`relative bg-gradient-to-br ${getDomainGradient(s.domain)} p-5 select-none text-center flex flex-col justify-center min-h-[110px] overflow-hidden`}>
+                    {/* Floating blurs for depth */}
+                    <div className="absolute inset-0 overflow-hidden opacity-25 pointer-events-none">
+                      <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-white/30 blur-md" />
+                      <div className="absolute -bottom-6 -left-6 w-16 h-16 rounded-full bg-white/20 blur-sm" />
+                    </div>
+                    <h2 className="text-white font-display font-extrabold text-lg sm:text-xl uppercase tracking-wider leading-tight truncate drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.3)] z-10">
                       {s.concept_name || "Concept Name"}
                     </h2>
-                    <p className="text-slate-400 text-[10px] uppercase tracking-widest mt-1">
+                    <p className="text-white/80 text-[10px] uppercase tracking-widest mt-1 font-bold z-10 drop-shadow-sm">
                       {s.domain}
                     </p>
                   </div>
