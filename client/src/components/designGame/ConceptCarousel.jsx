@@ -40,7 +40,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
   const go = (d) => setIdx((p) => Math.max(0, Math.min(total - 1, p + d)));
 
   const overall = ratings ? Math.round((ratings.value + ratings.creativity + ratings.uniqueness) / 3) : null;
-  const tier = overall >= 85 ? "Design Mastermind" : overall >= 70 ? "Design Thinker" : overall >= 50 ? "Rising Designer" : "Keep Iterating";
+  const tier = overall >= 85 ? "Design Mastermind" : overall >= 70 ? "Certified Genius" : overall >= 50 ? "Adequate" : "Back to the drawing board";
 
   function renderSlide() {
     if (idx === 0) {

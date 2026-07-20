@@ -45,7 +45,7 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
       name: conceptName.trim(),
       problem: problem.trim(),
       solutionOverview: solutionOverview.trim(),
-      image,
+      image: null,
       features: completeFeatures.map((f) => ({ title: f.title.trim(), description: f.description.trim() }))
     });
   }
@@ -108,38 +108,6 @@ export default function FinalConceptScreen({ challenge, domain, onSubmit, loadin
             rows={3}
             className="w-full mt-2 bg-transparent rounded-2xl px-3 py-2 text-base sm:text-sm text-primary-foreground placeholder:text-primary-foreground/50 outline-none focus:ring-2 focus:ring-white/60 transition-all resize-none leading-relaxed"
           />
-          <div className="mt-3">
-            {image ? (
-              <div className="relative rounded-2xl overflow-hidden ring-1 ring-border">
-                <img src={image} alt="Concept visual" className="w-full aspect-[4/3] object-cover" />
-                <button
-                  type="button"
-                  onClick={handleGenerateImage}
-                  disabled={generatingImage}
-                  className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/80 text-primary flex items-center justify-center hover:bg-white transition-colors"
-                  title="Regenerate image"
-                >
-                  {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                </button>
-              </div>
-            ) : (
-              <Button
-                type="button"
-                onClick={handleGenerateImage}
-                disabled={!canGenerateImage || generatingImage}
-                className="w-full bg-white/15 text-primary-foreground hover:bg-white/25 font-bold rounded-2xl h-11 ring-1 ring-white/30 disabled:opacity-40"
-              >
-                {generatingImage ? (
-                  <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Generating image...</span>
-                ) : (
-                  <span className="flex items-center gap-2"><Sparkles className="h-4 w-4" /> Generate concept image</span>
-                )}
-              </Button>
-            )}
-            {!canGenerateImage && !image && (
-              <p className="text-primary-foreground/70 text-[10px] mt-1.5 text-center font-medium">Write at least a sentence of your solution to enable image generation.</p>
-            )}
-          </div>
         </div>
 
         <div className="text-accent text-xs font-extrabold uppercase tracking-widest pt-1 text-center">Key Features <span className="text-foreground/60 normal-case font-medium">(optional)</span></div>

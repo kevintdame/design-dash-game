@@ -7,8 +7,8 @@ import ConceptCarousel from "@/components/designGame/ConceptCarousel";
 
 export default function ResultsScreen({ challenge, concept, ratings, onSave, saving, saved, onRestart, onGoPortfolio }) {
   const overall = Math.round((ratings.value + ratings.creativity + ratings.uniqueness) / 3);
-  const tier = overall >= 85 ? "Design Mastermind" : overall >= 70 ? "Design Thinker" : overall >= 50 ? "Rising Designer" : "Keep Iterating";
-  const tierEmoji = overall >= 85 ? "👑" : overall >= 70 ? "🌟" : overall >= 50 ? "✨" : "💪";
+  const tier = overall >= 85 ? "Design Mastermind" : overall >= 70 ? "Certified Genius" : overall >= 50 ? "Adequate" : "Back to the drawing board";
+  const tierEmoji = overall >= 85 ? "👑" : overall >= 70 ? "🧠" : overall >= 50 ? "👌" : "✍️";
   const fired = useRef(false);
 
   useEffect(() => {
