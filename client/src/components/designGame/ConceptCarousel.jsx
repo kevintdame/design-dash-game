@@ -2,21 +2,33 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote, ImageIcon } from "lucide-react";
 
-function ScoreBar({ label, score }) {
+function DonutChart({ label, score }) {
+  const radius = 18;
+  const circ = 2 * Math.PI * radius; // ~113.1
+  const strokeOffset = circ - (score / 100) * circ;
   return (
-    <div>
-      <div className="flex justify-between text-[11px] font-semibold text-muted-foreground mb-1">
-        <span className="uppercase tracking-wide">{label}</span>
-        <span>{score}/100</span>
+    <div className="flex flex-col items-center flex-1">
+      <div className="relative h-20 w-20 flex items-center justify-center select-none">
+        <svg className="h-full w-full transform -rotate-90" viewBox="0 0 40 40">
+          <circle cx="20" cy="20" r={radius} fill="transparent" stroke="rgba(255,255,255,0.06)" strokeWidth="4.5" />
+          <circle
+            cx="20"
+            cy="20"
+            r={radius}
+            fill="transparent"
+            stroke="hsl(var(--accent))"
+            strokeWidth="4.5"
+            strokeDasharray={circ}
+            strokeDashoffset={strokeOffset}
+            strokeLinecap="round"
+            className="transition-all duration-1000 ease-out"
+          />
+        </svg>
+        <div className="absolute text-card-foreground font-black text-sm drop-shadow-sm">
+          {score}
+        </div>
       </div>
-      <div className="h-2 rounded-full bg-black/5 overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${score}%` }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="h-full rounded-full bg-gradient-to-r from-accent to-primary"
-        />
-      </div>
+      <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mt-2.5 text-center">{label}</span>
     </div>
   );
 }
@@ -68,15 +80,16 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
       );
     }
     return (
-      <div className="w-full p-5 text-center overflow-y-auto max-h-[360px] [-webkit-overflow-scrolling:touch]">
-        <div className="space-y-2.5 text-left mb-4">
-          <ScoreBar label="Value" score={ratings.value} />
-          <ScoreBar label="Creativity" score={ratings.creativity} />
-          <ScoreBar label="Uniqueness" score={ratings.uniqueness} />
+      <div className="w-full p-5 text-center flex flex-col justify-between min-h-[320px]">
+        {/* 3 Donut charts in a responsive horizontal grid */}
+        <div className="flex justify-around items-center gap-4 my-2.5">
+          <DonutChart label="Value" score={ratings.value} />
+          <DonutChart label="Creativity" score={ratings.creativity} />
+          <DonutChart label="Uniqueness" score={ratings.uniqueness} />
         </div>
-        <div className="bg-black/5 rounded-2xl p-3 text-left">
-          <Quote className="h-4 w-4 text-primary mb-1" />
-          <p className="text-card-foreground text-sm leading-relaxed font-medium">{ratings.review}</p>
+        <div className="bg-black/5 rounded-2xl p-4 text-left border border-black/5 shadow-inner mt-4">
+          <Quote className="h-4 w-4 text-accent mb-2" />
+          <p className="text-card-foreground text-sm leading-relaxed font-medium italic">"{ratings.review}"</p>
         </div>
       </div>
     );
