@@ -968,7 +968,7 @@ app.get('/api/portfolio/:id', async (req, res) => {
       res.json(doc.data());
     } else {
       const list = readLocalDB();
-      const item = list.find(s => s.id === id);
+      const item = list.find(s => String(s.id) === String(id));
       if (!item) {
         return res.status(404).json({ error: "Portfolio session not found" });
       }
