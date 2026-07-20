@@ -122,12 +122,12 @@ export default function ModeSelectScreen({ onSelect }) {
         </Button>
       </motion.div>
 
-      {/* Portfolio Link */}
+      {/* Secondary Navigation Options */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.15 }}
-        className="mt-6"
+        className="mt-6 flex flex-col gap-2"
       >
         <button
           type="button"
@@ -135,6 +135,13 @@ export default function ModeSelectScreen({ onSelect }) {
           className="text-xs font-black tracking-wider uppercase text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5 mx-auto py-2 px-4 rounded-xl hover:bg-white/5"
         >
           📂 View My Saved Concepts
+        </button>
+        <button
+          type="button"
+          onClick={() => onSelect("leaderboard")}
+          className="text-xs font-black tracking-wider uppercase text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5 mx-auto py-2 px-4 rounded-xl hover:bg-white/5"
+        >
+          🏆 Global Leaderboard
         </button>
       </motion.div>
     </motion.div>

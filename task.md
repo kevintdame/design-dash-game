@@ -27,6 +27,12 @@
 - [x] Fix PWA caching strategy in sw.js (Network-First for HTML and manifest)
 - [x] Add View Portfolio button to ModeSelectScreen.jsx and wire navigation in Game.jsx
 - [x] Update /api/rooms/join in server.js to allow joining active games in playing status
+- [x] Add Designer Name input to StartScreen.jsx
+- [x] Save and validate player_name in Game.jsx single player mode
+- [x] Add Global Leaderboard button to ModeSelectScreen.jsx
+- [x] Implement Leaderboard.jsx page using rank-based themes and fetch GET /api/leaderboard
+- [x] Add /leaderboard route to App.jsx React Router
+- [x] Implement /api/leaderboard endpoint and update /api/portfolio/save with player_name and overall_score in server.js
 
 
 

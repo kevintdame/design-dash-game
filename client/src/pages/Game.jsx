@@ -18,6 +18,7 @@ import { useAuth } from "@/lib/AuthContext";
 export default function Game() {
   const navigate = useNavigate();
   const { userId } = useAuth();
+  const [playerName, setPlayerName] = useState(() => localStorage.getItem("designdash_player_name") || "");
   const [stage, setStage] = useState("splash");
   const [challenge, setChallenge] = useState(null);
   const [domain, setDomain] = useState(null);
@@ -43,7 +44,8 @@ export default function Game() {
   }, [stage]);
   const showProgress = !["start", "splash", "mode"].includes(stage);
 
-  async function handleStart(d) {
+  async function handleStart(d, nameInput) {
+    setPlayerName(nameInput);
     setLoadingChallenge(true);
     setError(null);
     try {
@@ -120,6 +122,7 @@ export default function Game() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: userId,
+          player_name: playerName || "Anonymous Designer",
           domain,
           challenge_title: challenge.title,
           challenge_scenario: challenge.scenario,

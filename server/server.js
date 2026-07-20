@@ -926,9 +926,16 @@ app.post('/api/concept-vibe', async (req, res) => {
 
 // 7. Database / Portfolio saving
 app.post('/api/portfolio/save', async (req, res) => {
+  const val = Number(req.body.value_score || 0);
+  const cr = Number(req.body.creativity_score || 0);
+  const un = Number(req.body.uniqueness_score || 0);
+  const overall = Math.round((val + cr + un) / 3);
+
   const sessionData = {
     ...req.body,
+    player_name: req.body.player_name || 'Anonymous Designer',
     user_id: req.body.user_id || req.body.userId || 'anonymous',
+    overall_score: overall,
     id: String(Date.now()),
     created_date: new Date().toISOString()
   };
@@ -1002,6 +1009,43 @@ app.get('/api/portfolio/:id', async (req, res) => {
   } catch (err) {
     console.error("Get Portfolio detail error:", err);
     res.status(500).json({ error: "Failed to retrieve portfolio detail" });
+  }
+});
+
+// 10. Database / Global Leaderboard
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    if (firestoreDb) {
+      const snapshot = await firestoreDb.collection('game_sessions').get();
+      const list = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.overall_score === undefined) {
+          const v = Number(data.value_score || 0);
+          const c = Number(data.creativity_score || 0);
+          const u = Number(data.uniqueness_score || 0);
+          data.overall_score = Math.round((v + c + u) / 3);
+        }
+        list.push(data);
+      });
+      list.sort((a, b) => b.overall_score - a.overall_score);
+      res.json(list.slice(0, 10));
+    } else {
+      const list = readLocalDB();
+      list.forEach(data => {
+        if (data.overall_score === undefined) {
+          const v = Number(data.value_score || 0);
+          const c = Number(data.creativity_score || 0);
+          const u = Number(data.uniqueness_score || 0);
+          data.overall_score = Math.round((v + c + u) / 3);
+        }
+      });
+      list.sort((a, b) => b.overall_score - a.overall_score);
+      res.json(list.slice(0, 10));
+    }
+  } catch (err) {
+    console.error("Leaderboard error:", err);
+    res.status(500).json({ error: "Failed to retrieve leaderboard" });
   }
 });
 

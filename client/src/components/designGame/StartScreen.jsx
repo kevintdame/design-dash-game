@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const DOMAINS = [
   { label: "Health & Wellness", grad: "from-emerald-400 to-teal-600", ring: "ring-emerald-300", glow: "rgba(16,185,129,0.5)" },
@@ -38,7 +39,8 @@ function Chip({ active, onClick, grad, ring, glow, children }) {
 
 export default function StartScreen({ onStart, loading, onPortfolio }) {
   const [domain, setDomain] = useState(null);
-  const ready = !!domain;
+  const [playerName, setPlayerName] = useState(() => localStorage.getItem("designdash_player_name") || "");
+  const ready = !!domain && playerName.trim().length > 0;
 
   return (
     <motion.div
@@ -63,7 +65,28 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
       </h2>
       <p className="text-foreground/70 text-sm sm:text-base mb-8">Choose a domain to tackle.</p>
 
+      {/* Designer Name Input */}
+      <div className="mb-6 text-left">
+        <label className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block pl-1 mb-1.5">
+          Designer Name
+        </label>
+        <Input
+          type="text"
+          placeholder="Enter your name..."
+          value={playerName}
+          onChange={(e) => {
+            const val = e.target.value;
+            setPlayerName(val);
+            localStorage.setItem("designdash_player_name", val);
+          }}
+          className="h-12 bg-white/5 border-white/10 rounded-2xl text-white placeholder-slate-500 font-bold focus:border-accent text-sm pl-4"
+        />
+      </div>
+
       <div className="mb-6">
+        <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block pl-1 text-left mb-2">
+          Select a Domain
+        </span>
         <div className="grid grid-cols-2 gap-3">
           {DOMAINS.map((d, i) => (
             <motion.div key={d.label} initial={{ opacity: 0, y: 12, rotate: i % 2 ? 2 : -2 }} animate={{ opacity: 1, y: 0, rotate: 0 }} transition={{ delay: i * 0.05, type: "spring", stiffness: 200, damping: 14 }}>
@@ -76,7 +99,7 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
       </div>
 
       <Button
-        onClick={() => ready && onStart(domain)}
+        onClick={() => ready && onStart(domain, playerName)}
         disabled={!ready || loading}
         size="lg"
         className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 font-bold rounded-2xl shadow-xl shadow-primary/30 text-base h-14 disabled:opacity-40"
