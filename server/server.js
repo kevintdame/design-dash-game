@@ -236,13 +236,32 @@ const offlineDialogues = {
 };
 
 function assignCustomerImage(challenge) {
+  const gender = (challenge.customer_gender || "female").toLowerCase();
+  const age = (challenge.customer_age || "adult").toLowerCase();
   const name = challenge.customer_name || "Customer";
+
+  const avatarMap = {
+    female: {
+      young: ["avatar_female_young_0.png", "avatar_female_young_8.png"],
+      adult: ["avatar_female_adult_4.png", "avatar_female_adult_6.png"],
+      senior: ["avatar_female_senior_2.png"]
+    },
+    male: {
+      young: ["avatar_male_young_3.png"],
+      adult: ["avatar_male_adult_1.png", "avatar_male_adult_5.png", "avatar_male_adult_7.png"],
+      senior: ["avatar_male_senior_9.png"]
+    }
+  };
+
+  const genderList = avatarMap[gender] || avatarMap.female;
+  const list = genderList[age] || genderList.adult;
+
   let sum = 0;
   for (let i = 0; i < name.length; i++) {
     sum += name.charCodeAt(i);
   }
-  const idx = (sum % 3) + 1;
-  return `/avatars/avatar_${idx}.jpg`;
+  const file = list[sum % list.length];
+  return `/avatars/${file}`;
 }
 
 // ----------------------------------------------------
