@@ -9,7 +9,7 @@ const DOMAINS = [
   { label: "Education", grad: "from-sky-400 to-indigo-600", ring: "ring-sky-300", glow: "rgba(56,189,248,0.5)" },
   { label: "Finance", grad: "from-lime-400 to-green-600", ring: "ring-lime-300", glow: "rgba(132,204,22,0.5)" },
   { label: "Food & Cooking", grad: "from-orange-400 to-rose-600", ring: "ring-orange-300", glow: "rgba(251,146,60,0.5)" },
-  { label: "Travel & Mobility", grad: "from-cyan-400 to-blue-600", ring: "ring-cyan-300", glow: "rgba(34,211,238,0.5)" },
+  { label: "Travel & Mobility", grad: "from-blue-400 to-indigo-600", ring: "ring-blue-300", glow: "rgba(59,130,246,0.5)" },
   { label: "Sustainability", grad: "from-green-400 to-emerald-600", ring: "ring-green-300", glow: "rgba(34,197,94,0.5)" },
   { label: "Work & Productivity", grad: "from-amber-400 to-pink-500", ring: "ring-amber-300", glow: "rgba(251,191,36,0.5)" }
 ];

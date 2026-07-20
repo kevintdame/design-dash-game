@@ -58,7 +58,7 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
             {/* Top Half: Dark Header */}
             <div className="bg-[#1b143c] flex flex-col items-center justify-center p-8 flex-1 select-none min-h-[220px]">
               <div className="text-center px-4 w-full">
-                <div className="text-white font-display font-extrabold drop-shadow-md text-5xl sm:text-6xl md:text-7xl break-words leading-none uppercase tracking-tight">
+                <div className="text-white font-display font-extrabold drop-shadow-md text-4xl sm:text-5xl md:text-6xl break-keep whitespace-normal leading-none uppercase tracking-tight text-center">
                   {concept.name || "Concept Name"}
                 </div>
               </div>
@@ -88,19 +88,24 @@ export default function ConceptCarousel({ challenge, concept, ratings }) {
             </div>
             
             {/* Bottom Half: White Features List */}
-            <div className="bg-white p-8 flex-1 flex flex-col justify-center space-y-5 border-t border-slate-100 min-h-[300px]">
+            <div className="bg-white p-6 flex-1 flex flex-col justify-center gap-3 border-t border-slate-100 min-h-[300px]">
               {features.map((f, i) => (
-                <div key={i} className="border-l-2 border-slate-300 pl-4 py-0.5">
-                  <h4 className="text-slate-800 font-extrabold text-sm sm:text-base capitalize">
-                    {f.title}
-                  </h4>
-                  <p className="text-slate-650 text-xs sm:text-sm mt-0.5 leading-relaxed">
-                    {f.description}
-                  </p>
+                <div key={i} className="flex items-start gap-3 bg-[#faf9fe] border border-[#f0ecfc] rounded-2xl p-4 shadow-sm hover:shadow-md transition-all">
+                  <div className="h-6 w-6 rounded-full bg-accent text-white font-display font-extrabold flex items-center justify-center text-xs shrink-0 shadow-sm">
+                    {i + 1}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-slate-800 font-extrabold text-sm sm:text-base capitalize leading-tight">
+                      {f.title}
+                    </h4>
+                    <p className="text-slate-500 text-xs sm:text-sm mt-1.5 leading-relaxed">
+                      {f.description}
+                    </p>
+                  </div>
                 </div>
               ))}
               {features.length === 0 && (
-                <p className="text-slate-400 text-sm italic">No key features defined for this concept.</p>
+                <p className="text-slate-450 text-sm italic text-center py-4">No key features defined for this concept.</p>
               )}
             </div>
           </div>
