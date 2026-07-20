@@ -10,7 +10,6 @@ import InterviewScreen from "@/components/designGame/InterviewScreen";
 import BrainstormScreen from "@/components/designGame/BrainstormScreen";
 import FinalConceptScreen from "@/components/designGame/FinalConceptScreen";
 import ResultsScreen from "@/components/designGame/ResultsScreen";
-import { base44 } from "@/api/base44Client";
 import { generateChallenge, rateFinalConcept, synthesizeInsights, generateFeatureImages } from "@/lib/designGame";
 import VibeBackground from "@/components/designGame/VibeBackground";
 import { X } from "lucide-react";
@@ -114,22 +113,27 @@ export default function Game() {
     setSaving(true);
     setError(null);
     try {
-      await base44.entities.GameSession.create({
-        domain,
-        challenge_title: challenge.title,
-        challenge_scenario: challenge.scenario,
-        customer_name: challenge.customer_name,
-        customer_role: challenge.customer_role,
-        concept_name: concept.name,
-        concept_image: concept.image,
-        problem: concept.problem,
-        solution_overview: concept.solutionOverview,
-        features: concept.features,
-        value_score: ratings.value,
-        creativity_score: ratings.creativity,
-        uniqueness_score: ratings.uniqueness,
-        review: ratings.review
+      const res = await fetch("/api/portfolio/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          domain,
+          challenge_title: challenge.title,
+          challenge_scenario: challenge.scenario,
+          customer_name: challenge.customer_name,
+          customer_role: challenge.customer_role,
+          concept_name: concept.name,
+          concept_image: concept.image,
+          problem: concept.problem,
+          solution_overview: concept.solutionOverview,
+          features: concept.features,
+          value_score: ratings.value,
+          creativity_score: ratings.creativity,
+          uniqueness_score: ratings.uniqueness,
+          review: ratings.review
+        })
       });
+      if (!res.ok) throw new Error("Couldn't save to portfolio.");
       setSaved(true);
     } catch (e) {
       setError("Couldn't save to your portfolio. Please try again.");
