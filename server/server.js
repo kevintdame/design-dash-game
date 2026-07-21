@@ -115,77 +115,115 @@ function writeLocalDB(data) {
   fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2));
 }
 
-const subTopics = {
-  "Health & Wellness": [
-    "Sleep quality for night workers",
-    "Posture and workplace ergonomics",
-    "Chronic pain management",
-    "Teenage mindfulness and stress relief",
-    "Hydration and water drinking habits",
-    "Digital eye strain prevention",
-    "Gut health tracking",
-    "Seasonal allergy management"
-  ],
-  "Entertainment": [
-    "Interactive collaborative storytelling",
-    "Local indie music discovery",
-    "Board game group matching",
-    "Virtual museum exploration",
-    "Crowd-sourced stand-up comedy",
-    "Creative writing prompts",
-    "Retro gaming communities"
-  ],
-  "Education": [
-    "Language learning through real conversation",
-    "Public speaking anxiety management",
-    "Visual math concepts learning",
-    "History virtual field trips",
-    "Peer-to-peer study groups matching",
-    "Micro-learning study cards",
-    "Coding logic and syntax games"
-  ],
-  "Finance": [
-    "Teen financial literacy and budgeting",
-    "Neighborhood group buying pools",
-    "Impulse spending prevention",
-    "Gig-worker tax prep and savings",
-    "Micro-investing for beginners",
-    "Subscription monitoring and auditing",
-    "Joint savings goals tracking"
-  ],
-  "Food & Cooking": [
-    "Zero-waste pantry recipe creation",
-    "Community spice and herb swaps",
-    "Baking fermentation and sourdough timers",
-    "Picky-eater family meal plans",
-    "Allergy-friendly local restaurant mapping",
-    "Heritage family recipe preservation"
-  ],
-  "Travel & Mobility": [
-    "Multi-modal city commuting planning",
-    "Solo traveler safety navigation",
-    "Weekend micro-road trip planning",
-    "Local transit wheelchair accessibility",
-    "Luggage sharing and pooling networks",
-    "Offline travel audio guides"
-  ],
-  "Sustainability": [
-    "Home appliance repair guides",
-    "Neighborhood tool and utility item sharing libraries",
-    "Backyard composting swaps",
-    "Household energy consumption monitoring",
-    "Plastic packaging reduction in groceries",
-    "Ethical brand scoring and reviews"
-  ],
-  "Work & Productivity": [
-    "Focus and deep work timers",
-    "Asynchronous team standups",
-    "Meeting agenda builders",
-    "Home office ergonomics setup",
-    "Career pivot mentorship connection",
-    "Freelancer invoice and payment tracking"
-  ]
-};
+const SUB_TOPICS_PATH = path.resolve('sub_topics.json');
+let subTopics = {};
+try {
+  subTopics = JSON.parse(fs.readFileSync(SUB_TOPICS_PATH, 'utf8'));
+  console.log("Successfully loaded 100 niches per domain from sub_topics.json");
+} catch (e) {
+  console.warn("Could not load sub_topics.json, using static fallback sub-topics:", e.message);
+  subTopics = {
+    "Health & Wellness": [
+      "Sleep quality for night workers",
+      "Posture and workplace ergonomics",
+      "Chronic pain management",
+      "Teenage mindfulness and stress relief",
+      "Hydration and water drinking habits",
+      "Digital eye strain prevention",
+      "Gut health tracking",
+      "Seasonal allergy management"
+    ],
+    "Entertainment": [
+      "Interactive collaborative storytelling",
+      "Local indie music discovery",
+      "Board game group matching",
+      "Virtual museum exploration",
+      "Crowd-sourced stand-up comedy",
+      "Creative writing prompts",
+      "Retro gaming communities"
+    ],
+    "Education": [
+      "Language learning through real conversation",
+      "Public speaking anxiety management",
+      "Visual math concepts learning",
+      "History virtual field trips",
+      "Peer-to-peer study groups matching",
+      "Micro-learning study cards",
+      "Coding logic and syntax games"
+    ],
+    "Finance": [
+      "Teen financial literacy and budgeting",
+      "Neighborhood group buying pools",
+      "Impulse spending prevention",
+      "Gig-worker tax prep and savings",
+      "Micro-investing for beginners",
+      "Subscription monitoring and auditing",
+      "Joint savings goals tracking"
+    ],
+    "Food & Cooking": [
+      "Zero-waste pantry recipe creation",
+      "Community spice and herb swaps",
+      "Baking fermentation and sourdough timers",
+      "Picky-eater family meal plans",
+      "Allergy-friendly local restaurant mapping",
+      "Heritage family recipe preservation"
+    ],
+    "Travel & Mobility": [
+      "Multi-modal city commuting planning",
+      "Solo traveler safety navigation",
+      "Weekend micro-road trip planning",
+      "Local transit wheelchair accessibility",
+      "Luggage sharing and pooling networks",
+      "Offline travel audio guides"
+    ],
+    "Sustainability": [
+      "Home appliance repair guides",
+      "Neighborhood tool and utility item sharing libraries",
+      "Backyard composting swaps",
+      "Household energy consumption monitoring",
+      "Plastic packaging reduction in groceries",
+      "Ethical brand scoring and reviews"
+    ],
+    "Work & Productivity": [
+      "Focus and deep work timers",
+      "Asynchronous team standups",
+      "Meeting agenda builders",
+      "Home office ergonomics setup",
+      "Career pivot mentorship connection",
+      "Freelancer invoice and payment tracking"
+    ]
+  };
+}
+
+const femaleFirstNames = [
+  "Aisha", "Amara", "Anika", "Anya", "Beatriz", "Camila", "Carmen", "Chloe", "Clara", "Daniela",
+  "Diana", "Elena", "Elisa", "Evelyn", "Fatima", "Fiona", "Gabriela", "Grace", "Hana", "Imani",
+  "Ingrid", "Julia", "Keisha", "Leila", "Lucia", "Mariam", "Maya", "Mei", "Miriam", "Nadia",
+  "Naomi", "Nina", "Olivia", "Priya", "Sasha", "Sofia", "Sonia", "Soraya", "Sylvia", "Valerie",
+  "Yuki", "Zara", "Zuri", "Astrid", "Freya", "Ines", "Kiara", "Lina", "Maeve", "Noor",
+  "Rosa", "Sana", "Talia", "Alina", "Dahlia", "Esther", "Giselle", "Iris", "Joy", "Kira",
+  "Lana", "Mira", "Nala", "Opal", "Pearl", "Ruby", "Selena", "Tara", "Una", "Vera",
+  "Willa", "Xena", "Yara", "Zelda", "Aria", "Bella", "Cora", "Della", "Eva", "Flora"
+];
+
+const maleFirstNames = [
+  "Kwame", "Hiroshi", "Mateo", "Liam", "Tariq", "Chen", "Ravi", "Dmitry", "Alejandro", "Omar",
+  "Ethan", "Marcus", "Kenji", "Santiago", "Jamal", "Hans", "Dev", "Arthur", "Kofi", "Yusuf",
+  "Gabriel", "Leo", "Ryan", "Zayn", "Andre", "Malik", "Dante", "Sven", "Arjun", "Bruno",
+  "Lucas", "Felix", "Victor", "Hugo", "Alan", "Ian", "Kyle", "Sean", "Ivan", "Eric",
+  "Milan", "Rajiv", "Amir", "Bilal", "Cesar", "Diego", "Enzo", "Farhan", "Gianni", "Hassan",
+  "Igor", "Javier", "Khalid", "Luis", "Mikhail", "Nikolai", "Oscar", "Pablo", "Quentin", "Ramon",
+  "Salim", "Tomas", "Ulrich", "Vlad", "Walter", "Xavier", "Youssef", "Zachary", "Aaron", "Blake",
+  "Caleb", "David", "Logan", "Mason", "Nico", "Owen", "Ryder", "Silas", "Toby", "Wyatt"
+];
+
+function generateRandomCustomerProfile() {
+  const gender = Math.random() < 0.5 ? "female" : "male";
+  const list = gender === "female" ? femaleFirstNames : maleFirstNames;
+  const name = list[Math.floor(Math.random() * list.length)];
+  const age = ["young", "adult", "senior"][Math.floor(Math.random() * 3)];
+  return { name, gender, age };
+}
 
 function getRandomSubTopic(domain) {
   const topics = subTopics[domain];
@@ -401,6 +439,8 @@ app.post('/api/challenge', async (req, res) => {
   const randomSeed = Math.random().toString(36).substring(7);
   const subTopic = getRandomSubTopic(domain);
   const subTopicConstraint = subTopic ? `- Sub-Topic Focus: ${subTopic}\n` : '';
+  const profile = generateRandomCustomerProfile();
+
   const prompt = `You are a design thinking game master. Generate ONE compelling, realistic design challenge for a player to solve.
 
 [RANDOM SEED: ${randomSeed}]
@@ -408,18 +448,23 @@ app.post('/api/challenge', async (req, res) => {
 PLAYER-CHOSEN PARAMETERS:
 - Domain: ${domain}
 ${subTopicConstraint}
+
+REQUIRED CUSTOMER ATTRIBUTES (YOU MUST USE THESE):
+- customer_name: ${profile.name} (This is a single first name only, do NOT add a last name)
+- customer_gender: ${profile.gender}
+- customer_age: ${profile.age}
+
 Requirements:
 - A real-world design problem in the "${domain}" domain${subTopic ? `, focusing specifically on the sub-topic focus area "${subTopic}"` : ''}. Keep the challenge title and scenario BROAD, intuitive, and extremely easy for anyone to understand at a glance.
 - PUNCHY & SIMPLE LANGUAGE: Write in plain, everyday English. Do NOT use academic, dry, corporate, or technical jargon (e.g., avoid terms like "closing the loop", "waste management practices", "municipal infrastructure", "decentralized networks", "optimization"). Keep the scenario description under 2 sentences.
 - Open-Ended Challenge: Do NOT force any solution format (like an app, product, or service). The challenge must be open-ended, allowing the player to design any solution that helps the customer.
 - Do NOT reveal the customer's specific frustrations, needs, or pain points in the scenario. Those must be discovered through the interview.
-- "customer_persona" is the ONLY thing the player sees about the customer up front. It MUST be a neutral, high-level introduction: their name, age, role/profession, and a sentence or two of general context (where they work, their lifestyle broadly). Do NOT mention any frustrations, problems, struggles, pain points, needs, desires, or what they wish were different. The player should learn those only by interviewing.
+- "customer_persona" is the ONLY thing the player sees about the customer up front. It MUST be a neutral, high-level introduction: their name (${profile.name}), age, role/profession, and a sentence or two of general context (where they work, their lifestyle broadly). Do NOT mention any frustrations, problems, struggles, pain points, needs, desires, or what they wish were different. The player should learn those only by interviewing.
 - "customer_context" is internal context the LLM uses to answer interview questions and rate ideas consistently as this customer. Put ALL the rich detail here: their hidden frustrations, specific needs, deal-breakers, budget concerns, daily life details, emotional drivers, and what they secretly wish existed. The player NEVER sees this field.
 - NO SOLUTIONS IN INTERVIEW: The customer's context and behavior must only focus on their daily life, feelings, and frustrations. Never mention, suggest, or discuss specific solutions, technology formats, or product features.
-- DIVERSITY: Ensure the customer name, age, specific profession, and background vary widely. Choose from a rich set of unique names and distinct roles (e.g. students, retail managers, elderly gardeners, night security guards, etc.) to keep the game fresh. Never generate the same name or profile twice.
-- customer_gender: Strictly set to 'male' or 'female' to match their name.
-- customer_age: Strictly set to 'young', 'adult', or 'senior' to match their age and profession.
-`;
+- customer_name: MUST be exactly "${profile.name}".
+- customer_gender: MUST be exactly "${profile.gender}".
+- customer_age: MUST be exactly "${profile.age}".`;
 
   try {
     const response = await generateContentWithRetry({
@@ -1364,17 +1409,26 @@ app.post('/api/rooms/create', async (req, res) => {
   } else {
     const subTopic = getRandomSubTopic(domain);
     const subTopicConstraint = subTopic ? `- Sub-Topic Focus: ${subTopic}\n` : '';
+    const profile = generateRandomCustomerProfile();
+
     const prompt = `You are a design thinking game master. Generate ONE compelling, realistic design challenge for a player to solve.
 PLAYER-CHOSEN PARAMETERS:
 - Domain: ${domain}
 ${subTopicConstraint}
+
+REQUIRED CUSTOMER ATTRIBUTES (YOU MUST USE THESE):
+- customer_name: ${profile.name} (This is a single first name only, do NOT add a last name)
+- customer_gender: ${profile.gender}
+- customer_age: ${profile.age}
+
 Requirements same as normal challenges:
 - A real-world design problem in the "${domain}" domain${subTopic ? `, focusing specifically on the sub-topic focus area "${subTopic}"` : ''}. Broad and intuitive.
 - Punchy and simple language under 2 sentences.
-- customer_persona is neutral (no struggles/needs).
-- customer_context holds hidden details (frustrations, specific needs).
-- customer_gender: Strictly set to 'male' or 'female' to match their name.
-- customer_age: Strictly set to 'young', 'adult', or 'senior' to match their age.`;
+- "customer_persona" is the ONLY thing the players see up front. It MUST be a neutral, high-level introduction: their name (${profile.name}), age, role/profession, and a sentence or two of general context. Do NOT mention struggles or needs.
+- "customer_context" is internal context the LLM uses. Put ALL the rich detail here: daily life details, frustrations, and specific needs.
+- customer_name: MUST be exactly "${profile.name}".
+- customer_gender: MUST be exactly "${profile.gender}".
+- customer_age: MUST be exactly "${profile.age}".`;
 
     try {
       const response = await generateContentWithRetry({

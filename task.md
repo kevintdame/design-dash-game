@@ -36,6 +36,11 @@
 - [x] Add sub-topic lists and inject random sub-topics into single and multiplayer challenge prompt generation in server.js
 - [x] Enforce first name only for solo player names, lobby creators, joiners, and portfolio saves
 - [x] Implement pronoun and age keyword heuristics in assignCustomerImage to guarantee correct avatar gender and age
+- [x] Create scratch script to generate 100 sub-topics per domain using Gemini and write to sub_topics.json
+- [x] Run sub-topics generation script
+- [x] Update server.js to load sub_topics.json and enforce random selections
+- [x] Update female and male first name lists in server.js to have 80 entries each and configure server-side pre-selected profiles
+
 
 
 
