@@ -38,26 +38,26 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
       exit={{ opacity: 0, x: -30 }}
       className="max-w-md mx-auto flex flex-col h-full"
     >
-      <div className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl p-5 mb-4 shadow-xl shadow-orange-500/20 border border-white/10 text-white">
+      <div className="bg-gradient-to-br from-primary/90 to-accent/90 text-primary-foreground rounded-3xl p-5 mb-4 shadow-xl shadow-primary/30">
         {/* Top line with category / questions counter */}
-        <div className="flex items-center justify-between mb-3 border-b border-white/20 pb-2">
-          <span className="text-[10px] font-black uppercase tracking-widest text-orange-100 flex items-center gap-1">
-            <Sparkles className="h-3.5 w-3.5 text-amber-200 animate-pulse" />
+        <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+          <span className="text-[10px] font-black uppercase tracking-widest text-primary-foreground/75 flex items-center gap-1">
+            <Sparkles className="h-3.5 w-3.5 text-yellow-300 animate-pulse" />
             Design Challenge
           </span>
-          <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full text-white">
+          <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2.5 py-0.5 rounded-full text-white">
             {questionsLeft} {questionsLeft === 1 ? "Q" : "Qs"} left
           </span>
         </div>
         
         {/* Main Header / Challenge Title */}
-        <h3 className="text-xl sm:text-2xl font-black uppercase tracking-wide mb-1 text-white leading-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold font-display leading-tight uppercase">
           {challenge.title}
-        </h3>
+        </h2>
         
         {/* Scenario description */}
-        <p className="text-orange-50 text-sm leading-relaxed">
-          "{challenge.scenario}"
+        <p className="text-primary-foreground/90 text-sm sm:text-base leading-relaxed mt-2">
+          {challenge.scenario}
         </p>
       </div>
 
