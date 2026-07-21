@@ -99,7 +99,7 @@ export default function StartScreen({ onStart, loading, onPortfolio }) {
       </div>
 
       <Button
-        onClick={() => ready && onStart(domain, playerName)}
+        onClick={() => ready && onStart(domain, playerName.trim().split(/\s+/)[0])}
         disabled={!ready || loading}
         size="lg"
         className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 font-bold rounded-2xl shadow-xl shadow-primary/30 text-base h-14 disabled:opacity-40"

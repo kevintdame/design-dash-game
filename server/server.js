@@ -321,9 +321,28 @@ const offlineDialogues = {
 };
 
 function assignCustomerImage(challenge) {
-  const gender = (challenge.customer_gender || "female").toLowerCase();
-  const age = (challenge.customer_age || "adult").toLowerCase();
+  let gender = (challenge.customer_gender || "female").toLowerCase();
+  let age = (challenge.customer_age || "adult").toLowerCase();
   const name = challenge.customer_name || "Customer";
+  const persona = (challenge.customer_persona || "").toLowerCase();
+  const context = (challenge.customer_context || "").toLowerCase();
+  const textToScan = `${name.toLowerCase()} ${persona} ${context}`;
+
+  // Pronoun heuristic for gender detection
+  const femaleCount = (textToScan.match(/\bshe\b|\bher\b|\bhers\b|\bfemale\b|\bwoman\b|\bgirl\b/g) || []).length;
+  const maleCount = (textToScan.match(/\bhe\b|\bhim\b|\bhis\b|\bmale\b|\bman\b|\bboy\b/g) || []).length;
+  if (femaleCount > maleCount) {
+    gender = "female";
+  } else if (maleCount > femaleCount) {
+    gender = "male";
+  }
+
+  // Age heuristic for age group detection
+  if (/\bretired\b|\belderly\b|\bsenior\b|\bgrandfather\b|\bgrandmother\b|\bpensioner\b|\b6[0-9]\b|\b7[0-9]\b|\b8[0-9]\b/.test(textToScan)) {
+    age = "senior";
+  } else if (/\bteen\b|\bteenage\b|\bteenager\b|\bstudent\b|\bschool\b|\bkid\b|\bchild\b|\b1[3-9]\b/.test(textToScan) && !/\buniversity\b|\bcollege\b|\bgraduate\b/.test(textToScan)) {
+    age = "young";
+  }
 
   const avatarMap = {
     female: {
@@ -1012,9 +1031,12 @@ app.post('/api/portfolio/save', async (req, res) => {
   const un = Number(req.body.uniqueness_score || 0);
   const overall = Math.round((val + cr + un) / 3);
 
+  const rawName = req.body.player_name || 'Anonymous Designer';
+  const cleanPlayerName = rawName.trim().split(/\s+/)[0] || 'Anonymous';
+
   const sessionData = {
     ...req.body,
-    player_name: req.body.player_name || 'Anonymous Designer',
+    player_name: cleanPlayerName,
     user_id: req.body.user_id || req.body.userId || 'anonymous',
     overall_score: overall,
     id: String(Date.now()),
@@ -1309,6 +1331,10 @@ Write a 2-3 sentence direct customer feedback commentary for EACH player individ
 // 1. Create Room
 app.post('/api/rooms/create', async (req, res) => {
   const { creatorName, domain, timerDuration } = req.body;
+  if (!creatorName) {
+    return res.status(400).json({ error: "Missing creatorName" });
+  }
+  const cleanCreatorName = creatorName.trim().split(/\s+/)[0] || "Host";
 
   let roomId = generateRoomCode();
   let existing = await getRoom(roomId);
@@ -1399,12 +1425,12 @@ Requirements same as normal challenges:
     constraint: "",
     challenge,
     status: 'lobby',
-    creator_name: creatorName,
+    creator_name: cleanCreatorName,
     timer_duration: timerDuration || 480,
     start_time: null,
     deadline: null,
     players: {
-      "player_1": { name: creatorName, submitted: false, concept: null }
+      "player_1": { name: cleanCreatorName, submitted: false, concept: null }
     },
     results: null
   };
@@ -1418,6 +1444,10 @@ app.post('/api/rooms/join', async (req, res) => {
   const { roomId, playerName } = req.body;
   if (!roomId || !playerName) {
     return res.status(400).json({ error: "Missing roomId or playerName" });
+  }
+  const cleanPlayerName = playerName.trim().split(/\s+/)[0];
+  if (!cleanPlayerName) {
+    return res.status(400).json({ error: "Invalid player name" });
   }
 
   const room = await getRoom(roomId.toUpperCase());
@@ -1442,13 +1472,13 @@ app.post('/api/rooms/join', async (req, res) => {
   }
 
   // Check if player name already exists in room
-  const nameExists = currentPlayers.some(pid => room.players[pid].name.toLowerCase() === playerName.toLowerCase());
+  const nameExists = currentPlayers.some(pid => room.players[pid].name.toLowerCase() === cleanPlayerName.toLowerCase());
   if (nameExists) {
     return res.status(400).json({ error: "Name is already taken in this room" });
   }
 
   const nextPlayerId = `player_${currentPlayers.length + 1}`;
-  room.players[nextPlayerId] = { name: playerName, submitted: false, concept: null };
+  room.players[nextPlayerId] = { name: cleanPlayerName, submitted: false, concept: null };
 
   await saveRoom(room);
   res.json(room);

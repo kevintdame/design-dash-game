@@ -34,6 +34,8 @@
 - [x] Add /leaderboard route to App.jsx React Router
 - [x] Implement /api/leaderboard endpoint and update /api/portfolio/save with player_name and overall_score in server.js
 - [x] Add sub-topic lists and inject random sub-topics into single and multiplayer challenge prompt generation in server.js
+- [x] Enforce first name only for solo player names, lobby creators, joiners, and portfolio saves
+- [x] Implement pronoun and age keyword heuristics in assignCustomerImage to guarantee correct avatar gender and age
 
 
 
