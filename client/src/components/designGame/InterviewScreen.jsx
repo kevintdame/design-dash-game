@@ -38,29 +38,38 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
       exit={{ opacity: 0, x: -30 }}
       className="max-w-md mx-auto flex flex-col h-full"
     >
-      <div className="text-center mb-3">
-        <motion.div
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 160, damping: 12 }}
-          className="inline-flex items-center gap-1.5 text-yellow-300"
-        >
-          <Sparkles className="h-4 w-4" />
-          <span className="text-xs font-extrabold uppercase tracking-widest">
-            Interview · {questionsLeft} {questionsLeft === 1 ? "question" : "questions"} left
+      <div className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl p-5 mb-4 shadow-xl shadow-orange-500/20 border border-white/10 text-white">
+        {/* Top line with category / questions counter */}
+        <div className="flex items-center justify-between mb-3 border-b border-white/20 pb-2">
+          <span className="text-[10px] font-black uppercase tracking-widest text-orange-100 flex items-center gap-1">
+            <Sparkles className="h-3.5 w-3.5 text-amber-200 animate-pulse" />
+            Design Challenge
           </span>
-        </motion.div>
-      </div>
-      <h2 className="text-4xl sm:text-5xl font-extrabold font-display uppercase leading-none mb-2 text-center">
-        <span className="text-foreground">Ask</span>{" "}
-        <span className="text-accent">{challenge.customer_name.split(" ")[0]}</span>
-      </h2>
-      <div className="bg-orange-950/20 border border-orange-500/30 rounded-2xl p-3 mb-4 text-center shadow-lg shadow-orange-500/5 backdrop-blur-sm">
-        <span className="text-[10px] text-orange-400 font-extrabold uppercase tracking-widest block mb-0.5">Design Challenge</span>
-        <h4 className="text-xs font-black text-orange-200 uppercase tracking-wide mb-1">{challenge.title}</h4>
-        <p className="text-orange-100/90 text-[11px] leading-relaxed max-w-sm mx-auto">
-          {challenge.scenario}
+          <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full text-white">
+            {questionsLeft} {questionsLeft === 1 ? "Q" : "Qs"} left
+          </span>
+        </div>
+        
+        {/* Main Header / Challenge Title */}
+        <h3 className="text-xl sm:text-2xl font-black uppercase tracking-wide mb-1 text-white leading-tight">
+          {challenge.title}
+        </h3>
+        
+        {/* Scenario description */}
+        <p className="text-orange-50 text-sm leading-relaxed mb-4">
+          "{challenge.scenario}"
         </p>
+
+        {/* Action Title integrated at the bottom of the card */}
+        <div className="bg-black/10 rounded-2xl p-3 flex items-center justify-between">
+          <div className="text-left">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-orange-200 block">Interviewing</span>
+            <span className="text-base sm:text-lg font-black uppercase text-white">
+              Ask {challenge.customer_name.split(" ")[0]}
+            </span>
+          </div>
+          <span className="text-2xl">🎤</span>
+        </div>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-1 -mr-1 mb-3 min-h-[200px] sm:min-h-[280px]">
