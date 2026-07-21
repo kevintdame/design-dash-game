@@ -33,6 +33,7 @@
 - [x] Implement Leaderboard.jsx page using rank-based themes and fetch GET /api/leaderboard
 - [x] Add /leaderboard route to App.jsx React Router
 - [x] Implement /api/leaderboard endpoint and update /api/portfolio/save with player_name and overall_score in server.js
+- [x] Add sub-topic lists and inject random sub-topics into single and multiplayer challenge prompt generation in server.js
 
 
 

@@ -115,6 +115,85 @@ function writeLocalDB(data) {
   fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2));
 }
 
+const subTopics = {
+  "Health & Wellness": [
+    "Sleep quality for night workers",
+    "Posture and workplace ergonomics",
+    "Chronic pain management",
+    "Teenage mindfulness and stress relief",
+    "Hydration and water drinking habits",
+    "Digital eye strain prevention",
+    "Gut health tracking",
+    "Seasonal allergy management"
+  ],
+  "Entertainment": [
+    "Interactive collaborative storytelling",
+    "Local indie music discovery",
+    "Board game group matching",
+    "Virtual museum exploration",
+    "Crowd-sourced stand-up comedy",
+    "Creative writing prompts",
+    "Retro gaming communities"
+  ],
+  "Education": [
+    "Language learning through real conversation",
+    "Public speaking anxiety management",
+    "Visual math concepts learning",
+    "History virtual field trips",
+    "Peer-to-peer study groups matching",
+    "Micro-learning study cards",
+    "Coding logic and syntax games"
+  ],
+  "Finance": [
+    "Teen financial literacy and budgeting",
+    "Neighborhood group buying pools",
+    "Impulse spending prevention",
+    "Gig-worker tax prep and savings",
+    "Micro-investing for beginners",
+    "Subscription monitoring and auditing",
+    "Joint savings goals tracking"
+  ],
+  "Food & Cooking": [
+    "Zero-waste pantry recipe creation",
+    "Community spice and herb swaps",
+    "Baking fermentation and sourdough timers",
+    "Picky-eater family meal plans",
+    "Allergy-friendly local restaurant mapping",
+    "Heritage family recipe preservation"
+  ],
+  "Travel & Mobility": [
+    "Multi-modal city commuting planning",
+    "Solo traveler safety navigation",
+    "Weekend micro-road trip planning",
+    "Local transit wheelchair accessibility",
+    "Luggage sharing and pooling networks",
+    "Offline travel audio guides"
+  ],
+  "Sustainability": [
+    "Home appliance repair guides",
+    "Neighborhood tool and utility item sharing libraries",
+    "Backyard composting swaps",
+    "Household energy consumption monitoring",
+    "Plastic packaging reduction in groceries",
+    "Ethical brand scoring and reviews"
+  ],
+  "Work & Productivity": [
+    "Focus and deep work timers",
+    "Asynchronous team standups",
+    "Meeting agenda builders",
+    "Home office ergonomics setup",
+    "Career pivot mentorship connection",
+    "Freelancer invoice and payment tracking"
+  ]
+};
+
+function getRandomSubTopic(domain) {
+  const topics = subTopics[domain];
+  if (!topics || topics.length === 0) return null;
+  const idx = Math.floor(Math.random() * topics.length);
+  return topics[idx];
+}
+
 // ----------------------------------------------------
 // Offline Datasets for Demo Mode Only (When NO key is provided)
 // ----------------------------------------------------
@@ -301,15 +380,17 @@ app.post('/api/challenge', async (req, res) => {
   }
 
   const randomSeed = Math.random().toString(36).substring(7);
+  const subTopic = getRandomSubTopic(domain);
+  const subTopicConstraint = subTopic ? `- Sub-Topic Focus: ${subTopic}\n` : '';
   const prompt = `You are a design thinking game master. Generate ONE compelling, realistic design challenge for a player to solve.
 
 [RANDOM SEED: ${randomSeed}]
 
 PLAYER-CHOSEN PARAMETERS:
 - Domain: ${domain}
-
+${subTopicConstraint}
 Requirements:
-- A real-world design problem in the "${domain}" domain. Keep the challenge title and scenario BROAD, intuitive, and extremely easy for anyone to understand at a glance.
+- A real-world design problem in the "${domain}" domain${subTopic ? `, focusing specifically on the sub-topic focus area "${subTopic}"` : ''}. Keep the challenge title and scenario BROAD, intuitive, and extremely easy for anyone to understand at a glance.
 - PUNCHY & SIMPLE LANGUAGE: Write in plain, everyday English. Do NOT use academic, dry, corporate, or technical jargon (e.g., avoid terms like "closing the loop", "waste management practices", "municipal infrastructure", "decentralized networks", "optimization"). Keep the scenario description under 2 sentences.
 - Open-Ended Challenge: Do NOT force any solution format (like an app, product, or service). The challenge must be open-ended, allowing the player to design any solution that helps the customer.
 - Do NOT reveal the customer's specific frustrations, needs, or pain points in the scenario. Those must be discovered through the interview.
@@ -1255,11 +1336,14 @@ app.post('/api/rooms/create', async (req, res) => {
       };
     }
   } else {
+    const subTopic = getRandomSubTopic(domain);
+    const subTopicConstraint = subTopic ? `- Sub-Topic Focus: ${subTopic}\n` : '';
     const prompt = `You are a design thinking game master. Generate ONE compelling, realistic design challenge for a player to solve.
 PLAYER-CHOSEN PARAMETERS:
 - Domain: ${domain}
+${subTopicConstraint}
 Requirements same as normal challenges:
-- A real-world design problem in the "${domain}" domain. Broad and intuitive.
+- A real-world design problem in the "${domain}" domain${subTopic ? `, focusing specifically on the sub-topic focus area "${subTopic}"` : ''}. Broad and intuitive.
 - Punchy and simple language under 2 sentences.
 - customer_persona is neutral (no struggles/needs).
 - customer_context holds hidden details (frustrations, specific needs).
