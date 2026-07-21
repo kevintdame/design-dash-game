@@ -56,20 +56,9 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
         </h3>
         
         {/* Scenario description */}
-        <p className="text-orange-50 text-sm leading-relaxed mb-4">
+        <p className="text-orange-50 text-sm leading-relaxed">
           "{challenge.scenario}"
         </p>
-
-        {/* Action Title integrated at the bottom of the card */}
-        <div className="bg-black/10 rounded-2xl p-3 flex items-center justify-between">
-          <div className="text-left">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-orange-200 block">Interviewing</span>
-            <span className="text-base sm:text-lg font-black uppercase text-white">
-              Ask {challenge.customer_name.split(" ")[0]}
-            </span>
-          </div>
-          <span className="text-2xl">🎤</span>
-        </div>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-1 -mr-1 mb-3 min-h-[200px] sm:min-h-[280px]">
