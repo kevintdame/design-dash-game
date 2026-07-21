@@ -40,6 +40,8 @@
 - [x] Run sub-topics generation script
 - [x] Update server.js to load sub_topics.json and enforce random selections
 - [x] Update female and male first name lists in server.js to have 80 entries each and configure server-side pre-selected profiles
+- [x] Add Design Challenge reminder card to the top of the interview screen
+
 
 
 

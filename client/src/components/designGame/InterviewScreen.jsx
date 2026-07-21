@@ -55,9 +55,13 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
         <span className="text-foreground">Ask</span>{" "}
         <span className="text-accent">{challenge.customer_name.split(" ")[0]}</span>
       </h2>
-      <p className="text-foreground/70 text-sm mb-4 text-center">
-        Ask anything to understand their needs, frustrations, and daily life.
-      </p>
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-3 mb-4 text-center">
+        <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest block mb-0.5">Design Challenge</span>
+        <h4 className="text-xs font-black text-white uppercase tracking-wide mb-1">{challenge.title}</h4>
+        <p className="text-slate-300 text-[11px] leading-relaxed max-w-sm mx-auto">
+          {challenge.scenario}
+        </p>
+      </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-1 -mr-1 mb-3 min-h-[200px] sm:min-h-[280px]">
         {qa.length === 0 && !loading && (
