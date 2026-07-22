@@ -58,48 +58,7 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
     }
   }
 
-  const audioRef = useRef(null);
-
-  async function speakCustomerAnswer(text) {
-    setStatusMsg("Customer speaking...");
-    try {
-      const res = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text,
-          gender: challenge?.customer_gender
-        })
-      });
-
-      const data = await res.json();
-      if (data.audio) {
-        if (audioRef.current) {
-          audioRef.current.pause();
-        }
-        const audio = new Audio(data.audio);
-        audioRef.current = audio;
-        audio.onplay = () => setIsSpeaking(true);
-        audio.onended = () => {
-          setIsSpeaking(false);
-          setStatusMsg("");
-        };
-        audio.onerror = () => {
-          setIsSpeaking(false);
-          setStatusMsg("");
-          fallbackDeviceSpeech(text);
-        };
-        await audio.play();
-        return;
-      }
-    } catch (e) {
-      console.warn("Google Cloud TTS endpoint fetch failed, falling back to device speech:", e);
-    }
-
-    fallbackDeviceSpeech(text);
-  }
-
-  function fallbackDeviceSpeech(text) {
+  function speakCustomerAnswer(text) {
     if (!("speechSynthesis" in window)) return;
     try {
       window.speechSynthesis.cancel();
@@ -127,7 +86,7 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
 
       window.speechSynthesis.speak(utterance);
     } catch (err) {
-      console.warn("Device speech fallback failed:", err);
+      console.warn("Speech synthesis error:", err);
       setIsSpeaking(false);
     }
   }
