@@ -1626,28 +1626,32 @@ Scenario: "${scenario.title}" - ${scenario.description}
 Goal: "${scenario.goal}"
 Player Question: "${question}"
 
-Provide a concise, funny, and highly informative answer (2-3 sentences) answering the player's question about the environment.
-If your answer reveals a new physical item, animal, or obstacle in the room that wasn't previously known, output it in JSON format at the end:
+Provide a concise, funny, and highly informative answer (2-3 sentences max) answering the player's question about the environment.
+If your answer reveals a new physical item, animal, or obstacle in the room that wasn't previously known, output it in JSON format.
+
+Return JSON ONLY:
 \`\`\`json
 {
-  "answer": "Descriptive answer here...",
+  "answer": "Descriptive 2-3 sentence answer here.",
   "newItem": { "name": "Item Name", "icon": "📦", "desc": "Short description" }
 }
 \`\`\`
-If no new item is discovered, set "newItem": null.
-Return ONLY valid JSON.`;
+If no new item is discovered, set "newItem": null.`;
 
   try {
     const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: promptText,
+      config: {
+        temperature: 0.7,
+        responseMimeType: 'application/json'
+      }
     });
     const text = typeof response?.text === 'function' ? response.text() : response?.candidates?.[0]?.content?.parts?.[0]?.text;
     let cleanText = text ? text.trim() : "";
-    if (cleanText.startsWith("```")) {
-      cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
-    }
-    const parsed = JSON.parse(cleanText);
+    const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No JSON found in response");
+    const parsed = JSON.parse(jsonMatch[0]);
     return res.json(parsed);
   } catch (err) {
     console.error("Conundrum ask error:", err.message);
@@ -1677,25 +1681,28 @@ app.post('/api/conundrum/evaluate', async (req, res) => {
 
   const promptText = `You are the Game Master for the comedic puzzle game CONUNDRUM.
 
-Scenario: "${scenario.title}"
+Scenario: "${scenario.title}" - ${scenario.description}
+Character: "${scenario.character}"
 Goal: "${scenario.goal}"
+Player's Questions Asked: ${JSON.stringify(questions || [])}
 Player's Solution Plan: "${cleanPlan}"
 
 Evaluate this plan realistically:
 - If the plan is lazy, incomplete, or physically impossible, set "success": false, "successRate": 10-35, and write a hilarious failure narrative.
 - If the plan is clever, detailed, and plausible, set "success": true, "successRate": 80-98, and write a victory narrative.
+- Write a vivid, specific 1-sentence "imagePrompt" depicting the final outcome scene. You MUST explicitly name the character (${scenario.character}) and key animals/items in the scene!
 
 Return JSON ONLY:
 \`\`\`json
 {
   "success": true,
-  "successRate": 90,
-  "strategyScore": 92,
-  "creativityScore": 88,
+  "successRate": 92,
+  "strategyScore": 95,
+  "creativityScore": 90,
   "hilarityScore": 94,
-  "points": 420,
-  "narrative": "A 4-step comedic story of how the plan unfolds step-by-step.",
-  "imagePrompt": "Detailed Pixar 3D animation style prompt depicting the final outcome scene, warm studio lighting, 3D render, no text"
+  "points": 450,
+  "narrative": "A vivid 4-step comedic story of how the plan unfolds step-by-step.",
+  "imagePrompt": "A Pixar 3D animation style scene of a Corgi dog happily eating peanut butter on a rug while a black cat sits on a shelf eating salmon treats, 3D render, no text"
 }
 \`\`\``;
 
@@ -1703,13 +1710,22 @@ Return JSON ONLY:
     const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: promptText,
+      config: {
+        temperature: 0.7,
+        responseMimeType: 'application/json'
+      }
     });
     const text = typeof response?.text === 'function' ? response.text() : response?.candidates?.[0]?.content?.parts?.[0]?.text;
     let cleanText = text ? text.trim() : "";
-    if (cleanText.startsWith("```")) {
-      cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+    const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No JSON found in response");
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    // Ensure image prompt explicitly anchors character & Pixar style
+    if (parsed.imagePrompt && !parsed.imagePrompt.toLowerCase().includes(scenario.character.toLowerCase())) {
+      parsed.imagePrompt = `${parsed.imagePrompt}, featuring ${scenario.character}, Pixar 3D animation style, warm studio lighting, 3D render, no text`;
     }
-    const parsed = JSON.parse(cleanText);
+
     return res.json(parsed);
   } catch (err) {
     console.error("Conundrum evaluation error:", err.message);
