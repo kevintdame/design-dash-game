@@ -1614,36 +1614,36 @@ app.post('/api/rooms/:id/submit', async (req, res) => {
   res.json(room);
 });
 
-// --- CONUNDRUM GAME ENDPOINTS ---
-
-// 1. Ask Environment Question
+// --- CONUNDRUM GAME ENDPO// 1. Ask Environment Question
 app.post('/api/conundrum/ask', async (req, res) => {
   const { scenario, question, previousQa, inventory } = req.body;
   if (!question) return res.status(400).json({ error: "Missing question" });
 
-  const promptText = `You are the witty Game Master for a comedic puzzle game called CONUNDRUM.
+  const promptText = `You are the Game Master for the comedic puzzle game CONUNDRUM.
 Scenario: "${scenario.title}" - ${scenario.description}
 Goal: "${scenario.goal}"
 Player Question: "${question}"
 
-Provide a concise, funny, and highly informative answer (2-3 sentences max) answering the player's question about the environment.
-If your answer reveals a new physical item, animal, or obstacle in the room that wasn't previously known, output it in JSON format.
+CRITICAL GAME MASTER RULES:
+1. Answer ONLY the specific question asked by the player.
+2. Do NOT disclose unasked secrets, unasked items, or unasked room traps. Keep un-asked details hidden!
+3. Be concise and direct (1-2 sentences max).
+4. If your answer reveals a NEW specific item or pet that the player explicitly asked about, output it in "newItem". Otherwise "newItem": null.
 
 Return JSON ONLY:
 \`\`\`json
 {
-  "answer": "Descriptive 2-3 sentence answer here.",
+  "answer": "Direct 1-2 sentence answer focused ONLY on what was asked.",
   "newItem": { "name": "Item Name", "icon": "📦", "desc": "Short description" }
 }
-\`\`\`
-If no new item is discovered, set "newItem": null.`;
+\`\`\``;
 
   try {
     const response = await generateContentWithRetry({
       model: 'gemini-3.1-flash-lite',
       contents: promptText,
       config: {
-        temperature: 0.7,
+        temperature: 0.5,
         responseMimeType: 'application/json'
       }
     });
@@ -1684,13 +1684,14 @@ app.post('/api/conundrum/evaluate', async (req, res) => {
 Scenario: "${scenario.title}" - ${scenario.description}
 Character: "${scenario.character}"
 Goal: "${scenario.goal}"
-Player's Questions Asked: ${JSON.stringify(questions || [])}
 Player's Solution Plan: "${cleanPlan}"
 
-Evaluate this plan realistically:
-- If the plan is lazy, incomplete, or physically impossible, set "success": false, "successRate": 10-35, and write a hilarious failure narrative.
-- If the plan is clever, detailed, and plausible, set "success": true, "successRate": 80-98, and write a victory narrative.
-- Write a vivid, specific 1-sentence "imagePrompt" depicting the final outcome scene. You MUST explicitly name the character (${scenario.character}) and key animals/items in the scene!
+EVALUATION RULES:
+1. Be FAIR and LOGICAL.
+2. If the player's plan uses reasonable logic, animal abilities (e.g. asking a cat to jump up to a 4ft shelf or open a latch), or clever teamwork, the plan MUST SUCCEED (success: true, successRate: 85-98)!
+3. Do NOT invent random unmentioned hazards or artificial traps to fail a reasonable plan.
+4. Write a 4-step narrative showing the player's EXACT plan succeeding step-by-step.
+5. In "imagePrompt", write a vivid Pixar 3D scene prompt depicting the EXACT outcome described in the player's plan (e.g. naming the character ${scenario.character}, the cat, and the treats).
 
 Return JSON ONLY:
 \`\`\`json
@@ -1701,8 +1702,8 @@ Return JSON ONLY:
   "creativityScore": 90,
   "hilarityScore": 94,
   "points": 450,
-  "narrative": "A vivid 4-step comedic story of how the plan unfolds step-by-step.",
-  "imagePrompt": "A Pixar 3D animation style scene of a Corgi dog happily eating peanut butter on a rug while a black cat sits on a shelf eating salmon treats, 3D render, no text"
+  "narrative": "A vivid 4-step comedic story showing the player's exact plan succeeding.",
+  "imagePrompt": "A Pixar 3D animation style scene depicting the exact outcome of the player's solution plan, featuring ${scenario.character}, warm lighting, 3D render, no text"
 }
 \`\`\``;
 
@@ -1711,7 +1712,7 @@ Return JSON ONLY:
       model: 'gemini-3.1-flash-lite',
       contents: promptText,
       config: {
-        temperature: 0.7,
+        temperature: 0.5,
         responseMimeType: 'application/json'
       }
     });
