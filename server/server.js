@@ -1621,23 +1621,28 @@ app.post('/api/conundrum/ask', async (req, res) => {
   const { scenario, question, previousQa, inventory } = req.body;
   if (!question) return res.status(400).json({ error: "Missing question" });
 
-  const promptText = `You are the Game Master for a comedic puzzle game called CONUNDRUM.
+  const promptText = `You are the witty Game Master for a comedic puzzle game called CONUNDRUM.
 Scenario: "${scenario.title}" - ${scenario.description}
 Goal: "${scenario.goal}"
 Player Question: "${question}"
 
-Provide a concise, funny, and informative answer (2-3 sentences) answering the player's question about the environment.
-Format your output as JSON ONLY:
+Provide a concise, funny, and highly informative answer (2-3 sentences) answering the player's question about the environment.
+If your answer reveals a new physical item, animal, or obstacle in the room that wasn't previously known, output it in JSON format at the end:
 \`\`\`json
 {
-  "answer": "Your 2-3 sentence descriptive answer here.",
-  "newItem": { "name": "Item Name", "icon": "📦", "desc": "Short description" } // OR null if no new item
+  "answer": "Descriptive answer here...",
+  "newItem": { "name": "Item Name", "icon": "📦", "desc": "Short description" }
 }
-\`\`\``;
+\`\`\`
+If no new item is discovered, set "newItem": null.
+Return ONLY valid JSON.`;
 
   try {
-    const response = await aiModel.generateContent(promptText);
-    const text = response?.response?.text();
+    const response = await generateContentWithRetry({
+      model: 'gemini-3.1-flash-lite',
+      contents: promptText,
+    });
+    const text = typeof response?.text === 'function' ? response.text() : response?.candidates?.[0]?.content?.parts?.[0]?.text;
     let cleanText = text ? text.trim() : "";
     if (cleanText.startsWith("```")) {
       cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
@@ -1645,16 +1650,8 @@ Format your output as JSON ONLY:
     const parsed = JSON.parse(cleanText);
     return res.json(parsed);
   } catch (err) {
-    console.warn("Conundrum ask JSON parse failed, generating text answer:", err.message);
-    
-    // Dynamically generate intelligent text response if JSON parse fails
-    try {
-      const fallbackResponse = await aiModel.generateContent(`Answer this question about the environment in 2 sentences: "${question}" for scenario: ${scenario.title}`);
-      const directAnswer = fallbackResponse?.response?.text()?.trim() || `You inspect the area carefully and discover key details about ${question}.`;
-      return res.json({ answer: directAnswer, newItem: null });
-    } catch (e) {
-      return res.json({ answer: `You carefully inspect the area and notice key details about the surroundings.`, newItem: null });
-    }
+    console.error("Conundrum ask error:", err.message);
+    return res.status(500).json({ error: "Failed to answer question" });
   }
 });
 
@@ -1678,7 +1675,7 @@ app.post('/api/conundrum/evaluate', async (req, res) => {
     });
   }
 
-  const prompt = `You are the Game Master for the comedic puzzle game CONUNDRUM.
+  const promptText = `You are the Game Master for the comedic puzzle game CONUNDRUM.
 
 Scenario: "${scenario.title}"
 Goal: "${scenario.goal}"
@@ -1703,8 +1700,11 @@ Return JSON ONLY:
 \`\`\``;
 
   try {
-    const response = await aiModel.generateContent(prompt);
-    const text = response?.response?.text();
+    const response = await generateContentWithRetry({
+      model: 'gemini-3.1-flash-lite',
+      contents: promptText,
+    });
+    const text = typeof response?.text === 'function' ? response.text() : response?.candidates?.[0]?.content?.parts?.[0]?.text;
     let cleanText = text ? text.trim() : "";
     if (cleanText.startsWith("```")) {
       cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
@@ -1712,17 +1712,8 @@ Return JSON ONLY:
     const parsed = JSON.parse(cleanText);
     return res.json(parsed);
   } catch (err) {
-    console.error("Conundrum evaluation error:", err);
-    return res.json({
-      success: true,
-      successRate: 85,
-      strategyScore: 88,
-      creativityScore: 90,
-      hilarityScore: 92,
-      points: 380,
-      narrative: `Your plan for ${scenario.title} unfolds with surprising twists and hilarious energy!`,
-      imagePrompt: `A vibrant Pixar 3D animation style scene of ${scenario.title} outcome, warm studio lighting, 3D render, no text`
-    });
+    console.error("Conundrum evaluation error:", err.message);
+    return res.status(500).json({ error: "Failed to evaluate plan" });
   }
 });
 
