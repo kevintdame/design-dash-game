@@ -1722,9 +1722,11 @@ Return JSON ONLY:
     if (!jsonMatch) throw new Error("No JSON found in response");
     const parsed = JSON.parse(jsonMatch[0]);
 
-    // Ensure image prompt explicitly anchors character & Pixar style
+    // Ensure image prompt explicitly anchors character & Flat 2D Vector style
     if (parsed.imagePrompt && !parsed.imagePrompt.toLowerCase().includes(scenario.character.toLowerCase())) {
-      parsed.imagePrompt = `${parsed.imagePrompt}, featuring ${scenario.character}, Pixar 3D animation style, warm studio lighting, 3D render, no text`;
+      parsed.imagePrompt = `Flat 2D vector illustration style. ${parsed.imagePrompt}, featuring ${scenario.character}, clean bold outlines, flat color blocks, simplified geometric shapes, vector graphic design, no 3D, no text`;
+    } else if (parsed.imagePrompt) {
+      parsed.imagePrompt = `Flat 2D vector illustration style. ${parsed.imagePrompt}, clean bold outlines, flat color blocks, simplified geometric shapes, vector graphic design, no 3D, no text`;
     }
 
     return res.json(parsed);
