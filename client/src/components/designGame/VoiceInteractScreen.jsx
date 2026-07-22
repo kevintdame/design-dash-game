@@ -63,28 +63,7 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
   async function speakCustomerAnswer(text) {
     setStatusMsg("Customer speaking...");
     
-    // 1. Try Free Amazon Polly Neural Voices (Salli & Joey - 100% Free, No Keys Needed)
-    try {
-      const res = await fetch("/api/tts-free", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text,
-          gender: challenge?.customer_gender
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.audio) {
-          playAudioData(data.audio, text);
-          return;
-        }
-      }
-    } catch (e) {
-      console.warn("Free Neural TTS fetch failed, trying OpenAI TTS:", e);
-    }
-
-    // 2. Try OpenAI Neural Voices (Human voice actors: nova / echo)
+    // 1. Try OpenAI Neural Voices (Human voice actors: nova / echo)
     try {
       const res = await fetch("/api/tts-openai", {
         method: "POST",
@@ -103,6 +82,27 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
       }
     } catch (e) {
       console.warn("OpenAI TTS fetch failed, trying Google Cloud TTS:", e);
+    }
+
+    // 2. Try Google Cloud TTS (Journey Voices)
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          gender: challenge?.customer_gender
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.audio) {
+          playAudioData(data.audio, text);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Google Cloud TTS fetch failed, falling back to device speech:", e);
     }
 
     // 3. Fallback to Device Synthesis

@@ -1158,33 +1158,6 @@ app.post('/api/tts-openai', async (req, res) => {
   }
 });
 
-// 6f. Free Studio Neural Text-to-Speech Endpoint (Amazon Polly: Salli & Joey - 100% Free, No Keys Needed)
-app.post('/api/tts-free', async (req, res) => {
-  const { text, gender } = req.body;
-  if (!text) {
-    return res.status(400).json({ error: "Missing text parameter" });
-  }
-
-  const isFemale = gender?.toLowerCase() === 'female';
-  const voice = isFemale ? 'Salli' : 'Joey'; // Amazon Polly Studio Neural Voices
-
-  try {
-    const url = `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(text)}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Free Neural TTS error: status ${response.status}`);
-    }
-
-    const buffer = await response.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString('base64');
-    return res.json({ audio: `data:audio/mp3;base64,${base64}` });
-  } catch (err) {
-    console.error("Free Neural TTS synthesis failed:", err.message);
-    return res.status(500).json({ error: err.message });
-  }
-});
-
 // 7. Database / Portfolio saving
 app.post('/api/portfolio/save', async (req, res) => {
   const val = Number(req.body.value_score || 0);
