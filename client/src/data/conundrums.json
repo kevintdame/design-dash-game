@@ -9,8 +9,6 @@
     "description": "Barnaby's owner locked a brand new jar of peanut butter inside a wooden pantry cabinet 4 feet off the ground.",
     "goal": "Get the peanut butter jar down onto the floor and open it!",
     "heroPrompt": "A vibrant Pixar 3D animation style scene of a cute short-legged Corgi named Barnaby looking up at a high wooden pantry cabinet in a cozy kitchen, 3D render, warm lighting, no text",
-    "heroFallback": "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80",
-    "outcomeFallback": "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80",
     "initialItems": [
       { "name": "4ft Pantry Cabinet", "icon": "🚪", "desc": "Mounted high above counter with magnetic latch" },
       { "name": "Short Corgi Legs", "icon": "🐾", "desc": "Standing jump 1.5ft, running jump 2.2ft" }
@@ -26,8 +24,6 @@
     "description": "Arthur desperately wants to sneak out of the office at 3:15 PM on a sunny Friday without his micromanaging boss catching him.",
     "goal": "Escape the office building with your backpack without Mr. Henderson spotting you!",
     "heroPrompt": "A vibrant 3D animated character render of a nervous office accountant looking down a cubicle hallway, Pixar animated style, 3D render, no text",
-    "heroFallback": "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80",
-    "outcomeFallback": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
     "initialItems": [
       { "name": "Cubicle 4B", "icon": "🏢", "desc": "40 feet down hallway from the main exit" },
       { "name": "Mr. Henderson's Glass Office", "icon": "👀", "desc": "Door wide open, watching main hallway" }
@@ -43,8 +39,6 @@
     "description": "Gloop discovered an Earth kitchen appliance (a pop-up toaster) on a abandoned space station and thinks it is a sacred energy reactor.",
     "goal": "Toast a slice of bread inside the toaster without getting zapped or triggering zero-gravity floating bread chaos!",
     "heroPrompt": "A funny Pixar 3D animation style scene of a cute green alien staring intently at a chrome kitchen toaster on a spaceship, 3D render, no text",
-    "heroFallback": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
-    "outcomeFallback": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
     "initialItems": [
       { "name": "Chrome Pop-Up Toaster", "icon": "🍞", "desc": "Unplugged on spaceship counter" },
       { "name": "Zero-G Gravity Field", "icon": "🌌", "desc": "Objects float if unanchored" }

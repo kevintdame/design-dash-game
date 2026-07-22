@@ -1726,14 +1726,33 @@ Return JSON ONLY:
   }
 });
 
-// 3. Generate Conundrum Visual Card (Pollinations FLUX Schnell)
+// 3. Generate Conundrum Visual Card (Server-Side Base64 Buffer)
 app.post('/api/conundrum/card', async (req, res) => {
   const { prompt } = req.body;
   const cleanPrompt = encodeURIComponent(prompt || "Vibrant Pixar 3D animation style character render, warm studio lighting, no text");
   const seed = Math.floor(Math.random() * 99999);
-  // High-reliability Pollinations main URL
-  const imageUrl = `https://pollinations.ai/p/${cleanPrompt}?width=800&height=800&seed=${seed}&nologo=true`;
-  return res.json({ imageUrl });
+  const targetUrl = `https://pollinations.ai/p/${cleanPrompt}?width=800&height=800&seed=${seed}&nologo=true`;
+
+  try {
+    const fetchRes = await fetch(targetUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+      }
+    });
+    if (fetchRes.ok) {
+      const arrayBuffer = await fetchRes.arrayBuffer();
+      const base64 = Buffer.from(arrayBuffer).toString('base64');
+      const dataUri = `data:image/jpeg;base64,${base64}`;
+      return res.json({ imageUrl: dataUri });
+    } else {
+      console.warn("Server-side image fetch status:", fetchRes.status);
+    }
+  } catch (err) {
+    console.error("Server-side image generation error:", err.message);
+  }
+
+  // Fallback to secondary direct stream URL if server fetch fails
+  return res.json({ imageUrl: `https://image.pollinations.ai/prompt/${cleanPrompt}?width=800&height=800&seed=${seed}` });
 });
 
 // Serve static client assets in production
