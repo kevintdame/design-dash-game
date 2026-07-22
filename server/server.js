@@ -1069,6 +1069,51 @@ app.post('/api/concept-vibe', async (req, res) => {
   }
 });
 
+// 6d. Google Cloud Text-to-Speech Endpoint (Journey Human Voices)
+app.post('/api/tts', async (req, res) => {
+  const { text, gender } = req.body;
+  if (!text) {
+    return res.status(400).json({ error: "Missing text parameter" });
+  }
+
+  const isFemale = gender?.toLowerCase() === 'female';
+  // Use Google Cloud's human Journey/Neural2 voices
+  const voiceName = isFemale ? 'en-US-Journey-F' : 'en-US-Journey-O';
+
+  try {
+    const url = `https://texttospeech.googleapis.com/v1/texttospeech:synthesize?key=${apiKey}`;
+    const payload = {
+      input: { text },
+      voice: {
+        languageCode: 'en-US',
+        name: voiceName
+      },
+      audioConfig: {
+        audioEncoding: 'MP3',
+        pitch: 0,
+        speakingRate: 1.0
+      }
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    if (data.audioContent) {
+      return res.json({ audio: `data:audio/mp3;base64,${data.audioContent}` });
+    } else {
+      console.warn("Google Cloud TTS fallback warning:", data);
+      return res.status(400).json({ error: "Google Cloud TTS error", details: data });
+    }
+  } catch (err) {
+    console.error("Google Cloud TTS synthesis failed:", err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // 7. Database / Portfolio saving
 app.post('/api/portfolio/save', async (req, res) => {
   const val = Number(req.body.value_score || 0);
