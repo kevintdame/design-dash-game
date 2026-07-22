@@ -18,45 +18,6 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
     };
   }, []);
 
-  const [mouthOpen, setMouthOpen] = useState(0);
-
-  // Dynamic mouth motion animation when customer speaks
-  useEffect(() => {
-    if (!isSpeaking) {
-      setMouthOpen(0);
-      return;
-    }
-    const interval = setInterval(() => {
-      setMouthOpen(Math.random() * 0.7 + 0.3);
-    }, 110);
-    return () => {
-      clearInterval(interval);
-      setMouthOpen(0);
-    };
-  }, [isSpeaking]);
-
-  function getBestDeviceVoice(gender) {
-    if (!("speechSynthesis" in window)) return null;
-    const voices = window.speechSynthesis.getVoices();
-    if (!voices || voices.length === 0) return null;
-
-    const isFemale = gender?.toLowerCase() === "female";
-    const englishVoices = voices.filter(v => v.lang.startsWith("en"));
-
-    // Prioritize natural, neural, enhanced, and Siri voices installed on device
-    const premiumVoices = englishVoices.filter(v => 
-      /enhanced|premium|natural|siri|google/i.test(v.name)
-    );
-
-    const pool = premiumVoices.length > 0 ? premiumVoices : englishVoices;
-
-    if (isFemale) {
-      return pool.find(v => /female|samantha|ava|victoria|karen|zira|siri/i.test(v.name)) || pool[0];
-    } else {
-      return pool.find(v => /male|alex|daniel|fred|george|david|siri/i.test(v.name)) || pool[0];
-    }
-  }
-
   function speakCustomerAnswer(text) {
     if (!("speechSynthesis" in window)) return;
     try {
@@ -64,11 +25,6 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 1.0;
       utterance.pitch = challenge?.customer_gender?.toLowerCase() === "female" ? 1.15 : 0.9;
-
-      const bestVoice = getBestDeviceVoice(challenge?.customer_gender);
-      if (bestVoice) {
-        utterance.voice = bestVoice;
-      }
 
       utterance.onstart = () => {
         setIsSpeaking(true);
@@ -169,35 +125,16 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 bg-black flex flex-col justify-between overflow-hidden"
     >
-      {/* Full-Screen High-Res Customer Photo Takeover with Subtle Jaw Motion */}
+      {/* Full-Screen High-Res Customer Photo Takeover */}
       {challenge?.customer_image ? (
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.img
-            initial={{ scale: 1.05 }}
-            animate={{ 
-              scale: isSpeaking ? [1, 1.015, 1] : 1,
-              y: isSpeaking ? [0, mouthOpen * 3, 0] : 0
-            }}
-            transition={{ duration: 0.12 }}
-            src={challenge.customer_image}
-            alt={challenge.customer_name}
-            className="w-full h-full object-cover opacity-90 filter contrast-105"
-          />
-          {/* Dynamic Talking Lip Movement Overlay */}
-          {isSpeaking && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <motion.div
-                animate={{
-                  scaleY: [1, 1 + mouthOpen * 0.45, 1],
-                  scaleX: [1, 1 + mouthOpen * 0.15, 1],
-                  opacity: [0.35, 0.75, 0.35]
-                }}
-                transition={{ duration: 0.11 }}
-                className="w-20 h-8 rounded-full bg-black/40 border border-white/20 filter blur-sm shadow-inner"
-              />
-            </div>
-          )}
-        </div>
+        <motion.img
+          initial={{ scale: 1.05 }}
+          animate={{ scale: isSpeaking ? [1, 1.02, 1] : 1 }}
+          transition={{ duration: 2.5, repeat: isSpeaking ? Infinity : 0 }}
+          src={challenge.customer_image}
+          alt={challenge.customer_name}
+          className="absolute inset-0 w-full h-full object-cover opacity-90 filter contrast-105"
+        />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-slate-900 to-indigo-950 flex items-center justify-center">
           <span className="text-9xl font-black text-white/20 font-display">
