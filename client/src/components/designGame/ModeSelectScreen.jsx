@@ -22,15 +22,6 @@ const MODES = [
     ring: "ring-amber-300",
     glow: "rgba(251,191,36,0.5)",
   },
-  {
-    key: "voice",
-    label: "Voice Interact",
-    desc: "Full-screen hands-free voice Q&A mode.",
-    emoji: "🎙️",
-    grad: "from-cyan-500 to-blue-600",
-    ring: "ring-cyan-300",
-    glow: "rgba(6,182,212,0.5)",
-  },
 ];
 
 export default function ModeSelectScreen({ onSelect }) {
@@ -74,7 +65,7 @@ export default function ModeSelectScreen({ onSelect }) {
       </motion.h2>
       <p className="text-foreground/70 text-sm sm:text-base mb-8">Solo mission or a squad showdown?</p>
 
-      <div className="grid sm:grid-cols-3 gap-3 mb-8 text-left">
+      <div className="grid sm:grid-cols-2 gap-4 mb-8">
         {MODES.map((m, i) => {
           const active = mode === m.key;
           return (

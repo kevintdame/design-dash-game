@@ -7,7 +7,6 @@ import SplashScreen from "@/components/designGame/SplashScreen";
 import ModeSelectScreen from "@/components/designGame/ModeSelectScreen";
 import ChallengeScreen from "@/components/designGame/ChallengeScreen";
 import InterviewScreen from "@/components/designGame/InterviewScreen";
-import VoiceInteractScreen from "@/components/designGame/VoiceInteractScreen";
 import BrainstormScreen from "@/components/designGame/BrainstormScreen";
 import FinalConceptScreen from "@/components/designGame/FinalConceptScreen";
 import ResultsScreen from "@/components/designGame/ResultsScreen";
@@ -212,7 +211,7 @@ export default function Game() {
                   <StartScreen key="start" onStart={handleStart} loading={loadingChallenge} onPortfolio={() => navigate("/portfolio")} />
                 )}
                 {stage === "challenge" && challenge && (
-                  <ChallengeScreen key="challenge" challenge={challenge} onContinue={() => setStage(mode === "voice" ? "voice_interview" : "interview")} />
+                  <ChallengeScreen key="challenge" challenge={challenge} onContinue={() => setStage("interview")} />
                 )}
                 {stage === "interview" && challenge && (
                   <InterviewScreen
@@ -221,16 +220,6 @@ export default function Game() {
                     qa={qa}
                     setQa={setQa}
                     onContinue={handleInterviewDone}
-                  />
-                )}
-                {stage === "voice_interview" && challenge && (
-                  <VoiceInteractScreen
-                    key="voice_interview"
-                    challenge={challenge}
-                    qa={qa}
-                    setQa={setQa}
-                    onContinue={handleInterviewDone}
-                    onClose={() => setStage("mode")}
                   />
                 )}
                 {stage === "brainstorm" && challenge && (
