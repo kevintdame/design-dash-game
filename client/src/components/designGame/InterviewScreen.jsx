@@ -1,19 +1,81 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Send, ArrowRight, Loader2, Sparkles } from "lucide-react";
+import { Send, ArrowRight, Loader2, Sparkles, Mic, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AnimatedCustomerCard from "./AnimatedCustomerCard";
 
 export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [voiceMode, setVoiceMode] = useState(() => {
+    return localStorage.getItem("designdash_voice_mode") === "true";
+  });
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const scrollRef = useRef(null);
+
   const MAX_Q = 5;
   const questionsLeft = MAX_Q - qa.length;
   const canAsk = input.trim() && !loading && questionsLeft > 0;
 
   useEffect(() => {
+    localStorage.setItem("designdash_voice_mode", voiceMode);
+    if (!voiceMode && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  }, [voiceMode]);
+
+  useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [qa, loading]);
+
+  function speakAnswer(text) {
+    if (!voiceMode || !("speechSynthesis" in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = challenge.customer_gender === "female" ? 1.15 : 0.9;
+      
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn("Speech synthesis failed:", e);
+      setIsSpeaking(false);
+    }
+  }
+
+  function startVoiceListening() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in this browser version.");
+      return;
+    }
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+
+      recognition.onstart = () => setIsListening(true);
+      recognition.onend = () => setIsListening(false);
+      recognition.onerror = () => setIsListening(false);
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          setInput(transcript);
+        }
+      };
+
+      recognition.start();
+    } catch (e) {
+      console.warn("Speech recognition error:", e);
+      setIsListening(false);
+    }
+  }
 
   async function handleAsk() {
     if (!canAsk) return;
@@ -24,8 +86,15 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
       const { answerAsCustomer } = await import("@/lib/designGame");
       const answer = await answerAsCustomer(challenge, question, qa);
       setQa([...qa, { question, answer }]);
+      if (voiceMode) {
+        speakAnswer(answer);
+      }
     } catch (e) {
-      setQa([...qa, { question, answer: "Hmm, I didn't quite catch that — could you rephrase?" }]);
+      const fallbackMsg = "Hmm, I didn't quite catch that — could you rephrase?";
+      setQa([...qa, { question, answer: fallbackMsg }]);
+      if (voiceMode) {
+        speakAnswer(fallbackMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -38,7 +107,26 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
       exit={{ opacity: 0, x: -30 }}
       className="max-w-md mx-auto flex flex-col h-full"
     >
-      <div className="bg-gradient-to-br from-primary/90 to-accent/90 text-primary-foreground rounded-3xl p-5 mb-4 shadow-xl shadow-primary/30">
+      {/* Voice Mode Feature Toggle Header */}
+      <div className="flex items-center justify-between mb-3 bg-card/60 backdrop-blur border border-white/10 rounded-2xl px-4 py-2">
+        <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+          {voiceMode ? <Volume2 className="h-4 w-4 text-accent" /> : <VolumeX className="h-4 w-4 text-muted-foreground" />}
+          2D Voice & Character Mode
+        </span>
+        <button
+          onClick={() => setVoiceMode(!voiceMode)}
+          className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider transition-all shadow-sm ${
+            voiceMode
+              ? "bg-accent text-accent-foreground shadow-accent/20 ring-2 ring-accent"
+              : "bg-white/10 text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {voiceMode ? "ON 🎙️" : "OFF"}
+        </button>
+      </div>
+
+      {/* Challenge Card */}
+      <div className="bg-gradient-to-br from-primary/90 to-accent/90 text-primary-foreground rounded-3xl p-5 mb-3 shadow-xl shadow-primary/30">
         {/* Top line with category / questions counter */}
         <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
           <span className="text-[10px] font-black uppercase tracking-widest text-primary-foreground/75 flex items-center gap-1">
@@ -61,12 +149,22 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
         </p>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-1 -mr-1 mb-3 min-h-[200px] sm:min-h-[280px]">
+      {/* 2D Animated Customer Character (Rendered only when Voice Mode is ON) */}
+      {voiceMode && (
+        <AnimatedCustomerCard
+          customerName={challenge.customer_name}
+          isSpeaking={isSpeaking}
+          gender={challenge.customer_gender}
+        />
+      )}
+
+      {/* Q&A Chat Container */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-1 -mr-1 mb-3 min-h-[200px] sm:min-h-[260px]">
         {qa.length === 0 && !loading && (
-          <div className="h-full flex flex-col items-center justify-center text-center py-10 gap-2">
+          <div className="h-full flex flex-col items-center justify-center text-center py-8 gap-2">
             <span className="text-4xl">🎤</span>
             <p className="text-foreground/60 text-sm max-w-[15rem] font-medium">
-              Start the conversation — ask about their frustrations, daily routine, or what they wish existed.
+              Start the conversation — ask {challenge.customer_name.split(" ")[0]} about their frustrations, daily routine, or what they wish existed.
             </p>
           </div>
         )}
@@ -103,14 +201,29 @@ export default function InterviewScreen({ challenge, qa, setQa, onContinue }) {
         )}
       </div>
 
+      {/* Input Bar & Actions */}
       <div className="space-y-2">
         {questionsLeft > 0 ? (
           <div className="flex gap-2">
+            {voiceMode && (
+              <Button
+                type="button"
+                onClick={startVoiceListening}
+                className={`rounded-2xl h-12 w-12 p-0 transition-all ${
+                  isListening
+                    ? "bg-red-500 text-white animate-pulse ring-2 ring-red-400"
+                    : "bg-card/90 border border-white/10 text-accent hover:bg-accent hover:text-accent-foreground"
+                }`}
+                title="Speak question into phone"
+              >
+                <Mic className="h-5 w-5" />
+              </Button>
+            )}
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAsk()}
-              placeholder="Type your question..."
+              placeholder={isListening ? "Listening to your voice..." : "Type your question..."}
               className="flex-1 bg-card/90 backdrop-blur text-card-foreground rounded-2xl px-4 py-3 text-base sm:text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-accent shadow-sm ring-1 ring-border"
             />
             <Button
