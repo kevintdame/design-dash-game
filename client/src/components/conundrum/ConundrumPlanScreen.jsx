@@ -59,7 +59,7 @@ export default function ConundrumPlanScreen({ scenario, inventory, onSubmitPlan,
           onChange={(e) => setPlan(e.target.value)}
           placeholder={`Describe your step-by-step plan...\n\nExample: "Ask Cleo the cat to jump onto the counter, open the cabinet latch to get her salmon treats, and swat the peanut butter jar down to the floor!"`}
           rows={6}
-          className="w-full bg-card border border-border text-foreground placeholder:text-muted-foreground/60 rounded-3xl p-4 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-accent shadow-md resize-none"
+          className="w-full bg-slate-900 border border-slate-700 text-white placeholder:text-slate-400 rounded-3xl p-4 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-accent shadow-md resize-none"
         />
       </div>
 

@@ -217,7 +217,7 @@ export default function ConundrumDiscoveryScreen({ scenario, onGoToPlan, onBack 
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAsk()}
               placeholder="Ask an environment question..."
-              className="flex-1 bg-card border border-border text-foreground placeholder:text-muted-foreground rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent shadow-sm"
+              className="flex-1 bg-slate-900 border border-slate-700 text-white placeholder:text-slate-400 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent shadow-sm"
             />
             <Button
               onClick={handleAsk}
