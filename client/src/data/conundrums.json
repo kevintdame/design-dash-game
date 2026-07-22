@@ -1,0 +1,47 @@
+[
+  {
+    "id": "peanut-butter-heist",
+    "title": "The Peanut Butter Heist",
+    "character": "Barnaby the Corgi",
+    "characterType": "Pet",
+    "emoji": "🐕",
+    "difficulty": "Easy",
+    "description": "Barnaby's owner locked a brand new jar of peanut butter inside a wooden pantry cabinet 4 feet off the ground.",
+    "goal": "Get the peanut butter jar down onto the floor and open it!",
+    "heroPrompt": "A vibrant Pixar 3D animation style scene. A cute short-legged Corgi named Barnaby stands in a colorful modern kitchen looking up with determination at a high wooden pantry cabinet that is out of reach, warm cozy studio lighting, 3D animated render, no text",
+    "initialItems": [
+      { "name": "4ft Pantry Cabinet", "icon": "🚪", "desc": "Mounted high above counter with magnetic latch" },
+      { "name": "Short Corgi Legs", "icon": "🐾", "desc": "Standing jump 1.5ft, running jump 2.2ft" }
+    ]
+  },
+  {
+    "id": "friday-office-escape",
+    "title": "Operation Early Friday",
+    "character": "Arthur the Accountant",
+    "characterType": "Stealth / Comedy",
+    "emoji": "💼",
+    "difficulty": "Medium",
+    "description": "Arthur desperately wants to sneak out of the office at 3:15 PM on a sunny Friday without his micromanaging boss catching him.",
+    "goal": "Escape the office building with your backpack without Mr. Henderson spotting you!",
+    "heroPrompt": "A vibrant 3D animated character render of a nervous mild-mannered office accountant sitting in a cubicle looking sneakingly down the hallway at a glass boss office, Pixar animated style, warm office lighting, 3D render, no text",
+    "initialItems": [
+      { "name": "Cubicle 4B", "icon": "🏢", "desc": "40 feet down hallway from the main exit" },
+      { "name": "Mr. Henderson's Glass Office", "icon": "👀", "desc": "Door wide open, watching main hallway" }
+    ]
+  },
+  {
+    "id": "alien-zero-g-toaster",
+    "title": "The Zero-G Toaster Dilemma",
+    "character": "Gloop the Alien Explorer",
+    "characterType": "Sci-Fi / Chaos",
+    "emoji": "🛸",
+    "difficulty": "Hard",
+    "description": "Gloop discovered an Earth kitchen appliance (a pop-up toaster) on a abandoned space station and thinks it is a sacred energy reactor.",
+    "goal": "Toast a slice of bread inside the toaster without getting zapped or triggering zero-gravity floating bread chaos!",
+    "heroPrompt": "A funny Pixar 3D animation style scene of a curious green 3-eyed alien named Gloop staring intently at a chrome kitchen toaster on a spaceship counter, floating sci-fi glow, 3D animated movie render, no text",
+    "initialItems": [
+      { "name": "Chrome Pop-Up Toaster", "icon": "🍞", "desc": "Unplugged on spaceship counter" },
+      { "name": "Zero-G Gravity Field", "icon": "🌌", "desc": "Objects float if unanchored" }
+    ]
+  }
+]

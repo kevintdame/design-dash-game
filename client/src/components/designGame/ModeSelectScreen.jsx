@@ -23,6 +23,15 @@ const MODES = [
     glow: "rgba(251,191,36,0.5)",
   },
   {
+    key: "conundrum",
+    label: "Conundrum",
+    desc: "Solve hilarious character dilemmas with AI.",
+    emoji: "🧩",
+    grad: "from-cyan-500 to-emerald-600",
+    ring: "ring-cyan-300",
+    glow: "rgba(6,182,212,0.5)",
+  },
+  {
     key: "voice",
     label: "Voice Interact",
     desc: "Full-screen hands-free voice Q&A with customer avatar.",

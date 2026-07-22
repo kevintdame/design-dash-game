@@ -202,6 +202,8 @@ export default function Game() {
                       navigate("/portfolio");
                     } else if (m === "leaderboard") {
                       navigate("/leaderboard");
+                    } else if (m === "conundrum") {
+                      navigate("/conundrum");
                     } else {
                       setMode(m);
                       setStage("start");
