@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Loader2, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import PhotoTalkingAvatar from "./PhotoTalkingAvatar";
 
 export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, onClose }) {
   const [isListening, setIsListening] = useState(false);
@@ -170,13 +169,35 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 bg-black flex flex-col justify-between overflow-hidden"
     >
-      {/* Full-Screen Photo Takeover with 2D Canvas Talking Face Animation */}
+      {/* Full-Screen High-Res Customer Photo Takeover with Subtle Jaw Motion */}
       {challenge?.customer_image ? (
-        <PhotoTalkingAvatar
-          src={challenge.customer_image}
-          isSpeaking={isSpeaking}
-          altName={challenge.customer_name}
-        />
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.img
+            initial={{ scale: 1.05 }}
+            animate={{ 
+              scale: isSpeaking ? [1, 1.015, 1] : 1,
+              y: isSpeaking ? [0, mouthOpen * 3, 0] : 0
+            }}
+            transition={{ duration: 0.12 }}
+            src={challenge.customer_image}
+            alt={challenge.customer_name}
+            className="w-full h-full object-cover opacity-90 filter contrast-105"
+          />
+          {/* Dynamic Talking Lip Movement Overlay */}
+          {isSpeaking && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <motion.div
+                animate={{
+                  scaleY: [1, 1 + mouthOpen * 0.45, 1],
+                  scaleX: [1, 1 + mouthOpen * 0.15, 1],
+                  opacity: [0.35, 0.75, 0.35]
+                }}
+                transition={{ duration: 0.11 }}
+                className="w-20 h-8 rounded-full bg-black/40 border border-white/20 filter blur-sm shadow-inner"
+              />
+            </div>
+          )}
+        </div>
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-slate-900 to-indigo-950 flex items-center justify-center">
           <span className="text-9xl font-black text-white/20 font-display">
