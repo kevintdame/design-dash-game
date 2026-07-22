@@ -7,8 +7,8 @@ export default function ConundrumDiscoveryScreen({ scenario, onGoToPlan, onBack 
   const [qa, setQa] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [heroImage, setHeroImage] = useState(null);
-  const [loadingHero, setLoadingHero] = useState(true);
+  const [heroImage, setHeroImage] = useState(scenario.heroFallback);
+  const [loadingHero, setLoadingHero] = useState(false);
   const [inventory, setInventory] = useState(scenario.initialItems || []);
   const scrollRef = useRef(null);
 
@@ -30,8 +30,6 @@ export default function ConundrumDiscoveryScreen({ scenario, onGoToPlan, onBack 
         }
       } catch (err) {
         console.warn("Failed to load hero card:", err);
-      } finally {
-        setLoadingHero(false);
       }
     }
     loadHero();
@@ -87,15 +85,15 @@ export default function ConundrumDiscoveryScreen({ scenario, onGoToPlan, onBack 
       <div className="bg-gradient-to-br from-card to-card/90 border border-border/80 rounded-3xl overflow-hidden shadow-xl mb-4">
         {/* Pixar 3D Scenario Card */}
         <div className="relative h-48 sm:h-64 bg-slate-950 flex items-center justify-center overflow-hidden">
-          {loadingHero ? (
-            <div className="flex flex-col items-center justify-center text-center p-6">
-              <Loader2 className="h-8 w-8 text-accent animate-spin mb-2" />
-              <p className="text-xs font-bold text-slate-300">Rendering Scenario Hero Visual...</p>
-            </div>
-          ) : heroImage ? (
+          {heroImage ? (
             <img
               src={heroImage}
               alt={scenario.title}
+              onError={(e) => {
+                if (e.target.src !== scenario.heroFallback) {
+                  e.target.src = scenario.heroFallback;
+                }
+              }}
               className="w-full h-full object-cover filter contrast-105"
             />
           ) : (

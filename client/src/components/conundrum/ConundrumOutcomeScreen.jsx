@@ -4,15 +4,12 @@ import { Trophy, Sparkles, Loader2, RefreshCw, ArrowRight, CheckCircle, XCircle 
 import { Button } from "@/components/ui/button";
 
 export default function ConundrumOutcomeScreen({ evaluation, scenario, onReplay, onNextScenario }) {
-  const [outcomeImage, setOutcomeImage] = useState(null);
-  const [loadingCard, setLoadingCard] = useState(true);
+  const [outcomeImage, setOutcomeImage] = useState(scenario?.outcomeFallback);
+  const [loadingCard, setLoadingCard] = useState(false);
 
   useEffect(() => {
     async function loadOutcomeCard() {
-      if (!evaluation?.imagePrompt) {
-        setLoadingCard(false);
-        return;
-      }
+      if (!evaluation?.imagePrompt) return;
       try {
         const res = await fetch("/api/conundrum/card", {
           method: "POST",
@@ -25,8 +22,6 @@ export default function ConundrumOutcomeScreen({ evaluation, scenario, onReplay,
         }
       } catch (err) {
         console.warn("Failed to load outcome card:", err);
-      } finally {
-        setLoadingCard(false);
       }
     }
     loadOutcomeCard();
@@ -62,15 +57,15 @@ export default function ConundrumOutcomeScreen({ evaluation, scenario, onReplay,
 
       {/* Pixar 3D Outcome Visual Card */}
       <div className="bg-slate-950 border border-border/80 rounded-3xl overflow-hidden shadow-xl min-h-[220px] flex items-center justify-center relative">
-        {loadingCard ? (
-          <div className="p-8 text-center flex flex-col items-center justify-center">
-            <Loader2 className="h-8 w-8 text-accent animate-spin mb-2" />
-            <p className="text-xs font-bold text-slate-300">Rendering Pixar 3D Outcome Visual Card...</p>
-          </div>
-        ) : outcomeImage ? (
+        {outcomeImage ? (
           <img
             src={outcomeImage}
             alt="Outcome Visual"
+            onError={(e) => {
+              if (scenario?.outcomeFallback && e.target.src !== scenario.outcomeFallback) {
+                e.target.src = scenario.outcomeFallback;
+              }
+            }}
             className="w-full h-72 sm:h-80 object-cover filter contrast-105"
           />
         ) : (
