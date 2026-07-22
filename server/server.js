@@ -1726,12 +1726,14 @@ Return JSON ONLY:
   }
 });
 
-// 3. Generate Conundrum Visual Card (Server-Side Base64 Buffer)
+// 3. Generate Conundrum Visual Card (Server-Side Verified Base64 Buffer)
 app.post('/api/conundrum/card', async (req, res) => {
   const { prompt } = req.body;
   const cleanPrompt = encodeURIComponent(prompt || "Vibrant Pixar 3D animation style character render, warm studio lighting, no text");
   const seed = Math.floor(Math.random() * 99999);
-  const targetUrl = `https://pollinations.ai/p/${cleanPrompt}?width=800&height=800&seed=${seed}&nologo=true`;
+  
+  // Use image.pollinations.ai API endpoint (returns real image/jpeg bytes)
+  const targetUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=800&height=800&nologo=true&seed=${seed}`;
 
   try {
     const fetchRes = await fetch(targetUrl, {
@@ -1739,20 +1741,38 @@ app.post('/api/conundrum/card', async (req, res) => {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
       }
     });
-    if (fetchRes.ok) {
+
+    const contentType = fetchRes.headers.get("content-type") || "";
+    
+    // VERIFY that response is a real image (image/jpeg, image/png) and NOT HTML
+    if (fetchRes.ok && contentType.includes("image")) {
       const arrayBuffer = await fetchRes.arrayBuffer();
       const base64 = Buffer.from(arrayBuffer).toString('base64');
-      const dataUri = `data:image/jpeg;base64,${base64}`;
+      const dataUri = `data:${contentType.split(';')[0]};base64,${base64}`;
       return res.json({ imageUrl: dataUri });
     } else {
-      console.warn("Server-side image fetch status:", fetchRes.status);
+      console.warn("Server-side image fetch non-image Content-Type:", contentType, "Status:", fetchRes.status);
     }
   } catch (err) {
     console.error("Server-side image generation error:", err.message);
   }
 
-  // Fallback to secondary direct stream URL if server fetch fails
-  return res.json({ imageUrl: `https://image.pollinations.ai/prompt/${cleanPrompt}?width=800&height=800&seed=${seed}` });
+  // Fallback: Generate a high-res SVG Visual Scenario Card URI if remote fetch fails
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#3B1466"/>
+        <stop offset="50%" stop-color="#1E1B4B"/>
+        <stop offset="100%" stop-color="#0F172A"/>
+      </linearGradient>
+    </defs>
+    <rect width="800" height="800" fill="url(#bg)"/>
+    <circle cx="400" cy="360" r="180" fill="#7D40E7" opacity="0.15"/>
+    <text x="400" y="380" font-size="120" text-anchor="middle" dominant-baseline="middle">🧩</text>
+    <text x="400" y="560" font-size="32" font-weight="900" fill="#F8FAFC" font-family="sans-serif" text-anchor="middle">CONUNDRUM SCENARIO CARD</text>
+  </svg>`;
+  const svgBase64 = Buffer.from(svg).toString('base64');
+  return res.json({ imageUrl: `data:image/svg+xml;base64,${svgBase64}` });
 });
 
 // Serve static client assets in production
