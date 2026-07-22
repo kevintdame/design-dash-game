@@ -1114,50 +1114,6 @@ app.post('/api/tts', async (req, res) => {
   }
 });
 
-// 6e. OpenAI Text-to-Speech Endpoint (Human Voice Actors: nova, shimmer, echo, onyx)
-app.post('/api/tts-openai', async (req, res) => {
-  const { text, gender } = req.body;
-  if (!text) {
-    return res.status(400).json({ error: "Missing text parameter" });
-  }
-
-  const openaiApiKey = process.env.OPENAI_API_KEY;
-  if (!openaiApiKey) {
-    return res.status(400).json({ error: "No OPENAI_API_KEY environment variable found." });
-  }
-
-  const isFemale = gender?.toLowerCase() === 'female';
-  const voice = isFemale ? 'nova' : 'echo';
-
-  try {
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'tts-1',
-        input: text,
-        voice: voice,
-        response_format: 'mp3'
-      })
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`OpenAI API error: ${errText}`);
-    }
-
-    const buffer = await response.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString('base64');
-    return res.json({ audio: `data:audio/mp3;base64,${base64}` });
-  } catch (err) {
-    console.error("OpenAI TTS failed:", err.message);
-    return res.status(500).json({ error: err.message });
-  }
-});
-
 // 7. Database / Portfolio saving
 app.post('/api/portfolio/save', async (req, res) => {
   const val = Number(req.body.value_score || 0);

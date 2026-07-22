@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Loader2, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DuolingoVectorAvatar from "./DuolingoVectorAvatar";
+import PhotoTalkingAvatar from "./PhotoTalkingAvatar";
 
 export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, onClose }) {
   const [isListening, setIsListening] = useState(false);
@@ -62,29 +62,6 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
 
   async function speakCustomerAnswer(text) {
     setStatusMsg("Customer speaking...");
-    
-    // 1. Try OpenAI Neural Voices (Human voice actors: nova / echo)
-    try {
-      const res = await fetch("/api/tts-openai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text,
-          gender: challenge?.customer_gender
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.audio) {
-          playAudioData(data.audio, text);
-          return;
-        }
-      }
-    } catch (e) {
-      console.warn("OpenAI TTS fetch failed, trying Google Cloud TTS:", e);
-    }
-
-    // 2. Try Google Cloud TTS (Journey Voices)
     try {
       const res = await fetch("/api/tts", {
         method: "POST",
@@ -94,38 +71,32 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
           gender: challenge?.customer_gender
         })
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.audio) {
-          playAudioData(data.audio, text);
-          return;
+
+      const data = await res.json();
+      if (data.audio) {
+        if (audioRef.current) {
+          audioRef.current.pause();
         }
+        const audio = new Audio(data.audio);
+        audioRef.current = audio;
+        audio.onplay = () => setIsSpeaking(true);
+        audio.onended = () => {
+          setIsSpeaking(false);
+          setStatusMsg("");
+        };
+        audio.onerror = () => {
+          setIsSpeaking(false);
+          setStatusMsg("");
+          fallbackDeviceSpeech(text);
+        };
+        await audio.play();
+        return;
       }
     } catch (e) {
-      console.warn("Google Cloud TTS fetch failed, falling back to device speech:", e);
+      console.warn("Google Cloud TTS endpoint fetch failed, falling back to device speech:", e);
     }
 
-    // 3. Fallback to Device Synthesis
     fallbackDeviceSpeech(text);
-  }
-
-  function playAudioData(audioSrc, rawText) {
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    const audio = new Audio(audioSrc);
-    audioRef.current = audio;
-    audio.onplay = () => setIsSpeaking(true);
-    audio.onended = () => {
-      setIsSpeaking(false);
-      setStatusMsg("");
-    };
-    audio.onerror = () => {
-      setIsSpeaking(false);
-      setStatusMsg("");
-      fallbackDeviceSpeech(rawText);
-    };
-    audio.play().catch(() => fallbackDeviceSpeech(rawText));
   }
 
   function fallbackDeviceSpeech(text) {
@@ -240,12 +211,20 @@ export default function VoiceInteractScreen({ challenge, qa, setQa, onContinue, 
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 bg-black flex flex-col justify-between overflow-hidden"
     >
-      {/* Full-Screen Duolingo-Style 2D Vector Character Rig */}
-      <DuolingoVectorAvatar
-        customerName={challenge?.customer_name}
-        gender={challenge?.customer_gender}
-        isSpeaking={isSpeaking}
-      />
+      {/* Full-Screen Photo Takeover with 2D Canvas Talking Face Animation */}
+      {challenge?.customer_image ? (
+        <PhotoTalkingAvatar
+          src={challenge.customer_image}
+          isSpeaking={isSpeaking}
+          altName={challenge.customer_name}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-slate-900 to-indigo-950 flex items-center justify-center">
+          <span className="text-9xl font-black text-white/20 font-display">
+            {challenge?.customer_name?.charAt(0) || "C"}
+          </span>
+        </div>
+      )}
 
       {/* Subtle Vignette Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/60 pointer-events-none" />
