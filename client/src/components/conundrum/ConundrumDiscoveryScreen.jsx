@@ -84,10 +84,10 @@ export default function ConundrumDiscoveryScreen({ scenario, onGoToPlan, onBack 
       exit={{ opacity: 0, scale: 0.98 }}
       className="max-w-2xl mx-auto py-2 px-2 flex flex-col min-h-[85vh]"
     >
-      {/* Scenario Header Card with Pixar 3D Hero Visual */}
-      <div className="bg-gradient-to-br from-card to-card/90 border border-border/80 rounded-3xl overflow-hidden shadow-xl mb-4">
-        {/* Pixar 3D Scenario Card */}
-        <div className="relative h-48 sm:h-64 bg-slate-950 flex items-center justify-center overflow-hidden">
+      {/* Scenario Header Card with Style A Sticker Visual */}
+      <div className="bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-950 border border-indigo-500/30 rounded-3xl overflow-hidden shadow-2xl mb-4 relative">
+        {/* Style A Sticker Card Frame */}
+        <div className="relative h-64 sm:h-72 p-4 flex items-center justify-center overflow-hidden">
           {loadingHero ? (
             <div className="flex flex-col items-center justify-center text-center p-6">
               <Loader2 className="h-8 w-8 text-accent animate-spin mb-2" />
@@ -97,7 +97,7 @@ export default function ConundrumDiscoveryScreen({ scenario, onGoToPlan, onBack 
             <img
               src={heroImage}
               alt={scenario.title}
-              className="w-full h-full object-cover filter contrast-105"
+              className="h-full w-auto object-contain rounded-2xl drop-shadow-2xl filter contrast-105"
             />
           ) : (
             <div className="text-6xl">{scenario.emoji}</div>

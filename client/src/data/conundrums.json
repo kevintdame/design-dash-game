@@ -8,7 +8,7 @@
     "difficulty": "Easy",
     "description": "Barnaby's owner locked a brand new jar of peanut butter inside a wooden pantry cabinet 4 feet off the ground.",
     "goal": "Get the peanut butter jar down onto the floor and open it!",
-    "heroPrompt": "Flat 2D vector illustration style. A cute minimalist geometric Corgi dog looking up at a tall wooden pantry cabinet in a modern kitchen. Simplified shapes, clean bold outlines, flat pastel color palette, modern graphic design, vector art, no 3D, no text",
+    "heroPrompt": "Modern 2D graphic badge sticker illustration style. A curious expressive Corgi dog looking up at a wooden pantry cabinet in a charming modern kitchen, rich purple circular background with subtle sparkle accents, bold white vector rim highlight outline, vivid solid color shading layers, polished app icon badge aesthetic, zero 3D render, no text",
     "initialItems": [
       { "name": "4ft Pantry Cabinet", "icon": "🚪", "desc": "Mounted high above counter with magnetic latch" },
       { "name": "Short Corgi Legs", "icon": "🐾", "desc": "Standing jump 1.5ft, running jump 2.2ft" }
@@ -23,7 +23,7 @@
     "difficulty": "Medium",
     "description": "Arthur desperately wants to sneak out of the office at 3:15 PM on a sunny Friday without his micromanaging boss catching him.",
     "goal": "Escape the office building with your backpack without Mr. Henderson spotting you!",
-    "heroPrompt": "Flat 2D vector illustration style. A nervous minimalist office accountant sitting in a cubicle looking down the hallway, clean bold outlines, flat color blocks, modern graphic design, vector art, no 3D, no text",
+    "heroPrompt": "Modern flat 2D graphic illustration style. A nervous expressive office accountant sitting in a cubicle looking down the hallway, clean geometric vector shapes, vibrant color blocks, detailed office background, storybook graphic aesthetic, zero 3D render, no text",
     "initialItems": [
       { "name": "Cubicle 4B", "icon": "🏢", "desc": "40 feet down hallway from the main exit" },
       { "name": "Mr. Henderson's Glass Office", "icon": "👀", "desc": "Door wide open, watching main hallway" }
@@ -38,7 +38,7 @@
     "difficulty": "Hard",
     "description": "Gloop discovered an Earth kitchen appliance (a pop-up toaster) on a abandoned space station and thinks it is a sacred energy reactor.",
     "goal": "Toast a slice of bread inside the toaster without getting zapped or triggering zero-gravity floating bread chaos!",
-    "heroPrompt": "Flat 2D vector illustration style. A cute minimalist green alien staring at a chrome toaster on a spaceship counter, clean bold outlines, flat vibrant color palette, vector art, no 3D, no text",
+    "heroPrompt": "Modern flat 2D graphic illustration style. A cute expressive green alien staring at a chrome toaster on a spaceship counter, clean geometric vector shapes, vibrant neon color blocks, detailed spaceship background, storybook graphic aesthetic, zero 3D render, no text",
     "initialItems": [
       { "name": "Chrome Pop-Up Toaster", "icon": "🍞", "desc": "Unplugged on spaceship counter" },
       { "name": "Zero-G Gravity Field", "icon": "🌌", "desc": "Objects float if unanchored" }

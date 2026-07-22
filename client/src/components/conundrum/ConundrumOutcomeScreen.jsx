@@ -61,8 +61,8 @@ export default function ConundrumOutcomeScreen({ evaluation, scenario, onReplay,
         </p>
       </div>
 
-      {/* Pixar 3D Outcome Visual Card */}
-      <div className="bg-slate-950 border border-border/80 rounded-3xl overflow-hidden shadow-xl min-h-[220px] flex items-center justify-center relative">
+      {/* Style A Sticker Outcome Visual Card */}
+      <div className="bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-950 border border-indigo-500/30 rounded-3xl p-4 overflow-hidden shadow-2xl min-h-[260px] flex items-center justify-center relative">
         {loadingCard ? (
           <div className="p-8 text-center flex flex-col items-center justify-center">
             <Loader2 className="h-8 w-8 text-accent animate-spin mb-2" />
@@ -72,7 +72,7 @@ export default function ConundrumOutcomeScreen({ evaluation, scenario, onReplay,
           <img
             src={outcomeImage}
             alt="Outcome Visual"
-            className="w-full h-72 sm:h-80 object-cover filter contrast-105"
+            className="h-64 sm:h-72 w-auto object-contain rounded-2xl drop-shadow-2xl filter contrast-105"
           />
         ) : (
           <div className="p-8 text-center text-4xl">{isSuccess ? "🎉" : "💥"}</div>

@@ -1703,7 +1703,7 @@ Return JSON ONLY:
   "hilarityScore": 94,
   "points": 450,
   "narrative": "A vivid 4-step comedic story showing the player's exact plan succeeding.",
-  "imagePrompt": "A Pixar 3D animation style scene depicting the exact outcome of the player's solution plan, featuring ${scenario.character}, warm lighting, 3D render, no text"
+  "imagePrompt": "Modern 2D graphic badge sticker illustration style. ${scenario.character} resolving the conundrum in a kitchen, rich purple circular background with subtle sparkle accents, bold white vector rim highlight outline, vivid solid color shading layers, polished app icon badge aesthetic, zero 3D render, no text"
 }
 \`\`\``;
 
@@ -1722,11 +1722,10 @@ Return JSON ONLY:
     if (!jsonMatch) throw new Error("No JSON found in response");
     const parsed = JSON.parse(jsonMatch[0]);
 
-    // Ensure image prompt explicitly anchors character & Flat 2D Vector style
-    if (parsed.imagePrompt && !parsed.imagePrompt.toLowerCase().includes(scenario.character.toLowerCase())) {
-      parsed.imagePrompt = `Flat 2D vector illustration style. ${parsed.imagePrompt}, featuring ${scenario.character}, clean bold outlines, flat color blocks, simplified geometric shapes, vector graphic design, no 3D, no text`;
-    } else if (parsed.imagePrompt) {
-      parsed.imagePrompt = `Flat 2D vector illustration style. ${parsed.imagePrompt}, clean bold outlines, flat color blocks, simplified geometric shapes, vector graphic design, no 3D, no text`;
+    // Ensure image prompt explicitly anchors character & Style A Sticker Badge formula
+    if (parsed.imagePrompt) {
+      const baseAction = parsed.imagePrompt;
+      parsed.imagePrompt = `Modern 2D graphic badge sticker illustration style. ${baseAction}, featuring ${scenario.character}, rich purple circular background with subtle sparkle accents, bold white vector rim highlight outline, vivid solid color shading layers, polished app icon badge aesthetic, zero 3D render, no text`;
     }
 
     return res.json(parsed);
@@ -1739,7 +1738,7 @@ Return JSON ONLY:
 // 3. Generate Conundrum Visual Card (Direct Verified Server-Side Base64 Image)
 app.post('/api/conundrum/card', async (req, res) => {
   const { prompt } = req.body;
-  const cleanPrompt = encodeURIComponent(prompt || "Vibrant Pixar 3D animation style character render, warm studio lighting, no text");
+  const cleanPrompt = encodeURIComponent(prompt || "Modern 2D graphic badge sticker illustration style. Corgi dog in kitchen, rich purple circular background with subtle sparkle accents, bold white vector rim highlight outline, vivid solid color shading layers, polished app icon badge aesthetic, zero 3D render, no text");
   const seed = Math.floor(Math.random() * 99999);
   
   // Direct official API endpoint (returns real image/jpeg bytes)
